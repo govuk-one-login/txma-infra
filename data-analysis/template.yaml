@@ -1,0 +1,220 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static infrastructure for TICF Zendesk integration
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Resources:
+  BatchJobManifestBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-batch-job-manifest-bucket
+      LifecycleConfiguration:
+        Rules:
+          - Id: BatchJobManifestCleanupRule
+            Status: Enabled
+            ExpirationInDays: 5
+      LoggingConfiguration:
+        DestinationBucketName: !Ref BatchJobBucketLogsBucket
+        LogFilePrefix: String
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  BatchJobBucketLogsBucket:
+    #checkov:skip=CKV_AWS_18:This is the logs bucket
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${Environment}-batch-job-bucket-logs
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  AuditAnalysisDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Description: TxMA - Event Message Analysis Database
+        Name:  !Join [ '', [ !Join [ '', !Split [ '-', !Ref AWS::StackName ] ], !Sub '_${Environment}_analysis_database' ] ]
+
+  AuditAnalysisTable:
+    Type: AWS::Glue::Table
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseName: !Ref AuditAnalysisDatabase
+      TableInput:
+        Description: Table contains event message data to be analysed
+        Name: !Join [ '', [ !Join [ '', !Split [ '-', !Ref AWS::StackName ] ], !Sub '_${Environment}_analysis_table' ] ]
+        Parameters:
+          has_encrypted_data: false
+          projection.enabled: true
+          projection.datetime.type: date
+          projection.datetime.range: '2022/01/01/00,NOW'
+          projection.datetime.format: 'yyyy/MM/dd/HH'
+          projection.datetime.interval: 1
+          projection.datetime.interval.unit: HOURS
+          storage.location.template: !Join [ '', [ 's3://', !Ref AWS::StackName, '-', !Ref Environment, '-analysis-bucket/firehose/${datetime}/' ] ]
+        PartitionKeys:
+          - { Name: "datetime", Type: string }
+        StorageDescriptor:
+          Columns:
+            - { Name: "event_id", Type: string }
+            - { Name: "client_id", Type: string }
+            - { Name: "timestamp", Type: bigint }
+            - { Name: "timestamp_formatted", Type: string }
+            - { Name: "event_name", Type: string }
+            - { Name: "component_id", Type: string }
+            - { Name: "user", Type: string }
+            - { Name: "platform", Type: string }
+            - { Name: "restricted", Type: string }
+            - { Name: "extensions", Type: string }
+          Compressed: true
+          InputFormat: org.apache.hadoop.mapred.TextInputFormat
+          Location: !Sub s3://${AWS::StackName}-${Environment}-analysis-bucket/firehose/
+          OutputFormat: org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+          SerdeInfo:
+            Parameters: { "ignore.malformed.json": true, "serialiazation.format": 1, "field.delim": "" }
+            SerializationLibrary: org.openx.data.jsonserde.JsonSerDe
+          StoredAsSubDirectories: false
+        TableType: EXTERNAL_TABLE
+
+  AthenaAnalysisWorkgroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Description: The workgroup for TxMA queries
+      Name: !Sub ${AWS::StackName}-${Environment}-analysis-queries-workgroup
+      RecursiveDeleteOption: true
+      WorkGroupConfiguration:
+        EnforceWorkGroupConfiguration: true
+        PublishCloudWatchMetricsEnabled: false
+        ResultConfiguration:
+          EncryptionConfiguration:
+            EncryptionOption: SSE_S3
+          OutputLocation: !Join [ '', [ 's3://', !Ref QueryResultsBucket, '/' ] ]
+
+  QueryRequestTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: zendeskId
+          AttributeType: S
+        - AttributeName: athenaQueryId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: zendeskId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: athenaQueryIdIndex
+          KeySchema:
+            - AttributeName: athenaQueryId
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
+  BatchJobManifestBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: BatchJobManifestBucketArn
+      Type: String
+      Value: !GetAtt BatchJobManifestBucket.Arn
+
+  BatchJobManifestBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: BatchJobManifestBucketName
+      Type: String
+      Value: !Ref BatchJobManifestBucket
+
+  AuditAnalysisDatabaseArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditAnalysisDatabaseArn
+      Type: String
+      Value: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/${AuditAnalysisDatabase}
+
+  AuditAnalysisDatabaseNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditAnalysisDatabaseName
+      Type: String
+      Value: !Ref AuditAnalysisDatabase
+
+  AuditAnalysisTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditAnalysisTableArn
+      Type: String
+      Value: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:table/${AuditAnalysisDatabase}/${AuditAnalysisTable}
+
+  AuditAnalysisTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditAnalysisTableName
+      Type: String
+      Value: !Ref AuditAnalysisTable
+
+  AthenaAnalysisWorkgroupArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaAnalysisWorkgroupArn
+      Type: String
+      Value: !Sub arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${AthenaAnalysisWorkgroup}
+
+  AthenaAnalysisWorkgroupNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaAnalysisWorkgroupName
+      Type: String
+      Value: !Ref AthenaAnalysisWorkgroup
+
+  QueryRequestTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QueryRequestTableName
+      Type: String
+      Value: !Ref QueryRequestTable
+
+  QueryRequestTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QueryRequestTableArn
+      Type: String
+      Value: !GetAtt QueryRequestTable.Arn
