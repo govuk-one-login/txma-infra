@@ -116,7 +116,7 @@ Resources:
         ResultConfiguration:
           EncryptionConfiguration:
             EncryptionOption: SSE_S3
-          OutputLocation: !Join [ '', [ 's3://', !Ref QueryResultsBucket, '/' ] ]
+          OutputLocation: !Join [ '', [ 's3://', !ImportValue QueryResultsBucketName, '/' ] ]
 
   QueryRequestTable:
     Type: AWS::DynamoDB::Table
@@ -205,16 +205,16 @@ Resources:
       Type: String
       Value: !Ref AthenaAnalysisWorkgroup
 
-  QueryRequestTableNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: QueryRequestTableName
-      Type: String
-      Value: !Ref QueryRequestTable
-
   QueryRequestTableArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: QueryRequestTableArn
       Type: String
       Value: !GetAtt QueryRequestTable.Arn
+
+  QueryRequestTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QueryRequestTableName
+      Type: String
+      Value: !Ref QueryRequestTable

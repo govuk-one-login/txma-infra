@@ -54,3 +54,23 @@ Resources:
         RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
+
+  QueryResultsBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QueryResultsBucketArn
+      Type: String
+      Value: !GetAtt QueryResultsBucket.Arn
+
+  QueryResultsBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QueryResultsBucketName
+      Type: String
+      Value: !Ref QueryResultsBucket
+
+Outputs:
+  QueryResultsBucketName:
+    Value: !Ref QueryResultsBucket
+    Export:
+      Name: QueryResultsBucketName
