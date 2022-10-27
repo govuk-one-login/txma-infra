@@ -74,6 +74,6 @@ jobs:
       - name: Package SAM app
         uses: alphagov/di-devplatform-upload-action@v2
         with:
-          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAM_DEV_TOOLS }}
+          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME_DEV_TOOLS }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
           working-directory: '.'
