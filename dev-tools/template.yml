@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Developer tool infrastructure
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Resources:
+  EmptyS3BucketsFunction:
+    #checkov:skip=CKV_AWS_116:DLQ not required as failures will be reported to CloudFormation
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Condition: DeployS3Cleanup
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: emptyS3Buckets.handler
+      FunctionName: !Sub ${AWS::StackName}-empty-s3-buckets
+      KmsKeyArn: !GetAtt LambdaKmsKey.Arn
+      Policies:
+        - Statement:
+          - Sid: CloudFormationListResources
+            Effect: Allow
+            Action:
+              - cloudformation:ListStackResources
+            Resource: '*'
+          - Sid: Logs
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !GetAtt EmptyS3BucketsLogs.Arn
+          - Sid: S3Permissions
+            Effect: Allow
+            Action:
+              - s3:DeleteObject*
+              - s3:GetBucketVersioning
+              - s3:ListBucket
+              - s3:ListBucketVersions
+              - s3:PutBucketVersioning
+            Resource: '*'
+  
+  SendQueryResultsNotificationLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-empty-s3-buckets'
+      RetentionInDays: 30
+
+  EmptyS3BucketsFunctionArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EmptyS3BucketsFunctionArn
+      Type: String
+      Value: !GetAtt EmptyS3BucketsFunction.Arn
