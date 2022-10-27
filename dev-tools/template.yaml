@@ -44,7 +44,7 @@ Resources:
     Properties:
       Handler: emptyS3Buckets.handler
       FunctionName: !Sub ${AWS::StackName}-empty-s3-buckets
-      KmsKeyArn: '{{ssm:resolve:LambdaKmsKeyArn}}'
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
       Policies:
         - Statement:
           - Sid: CloudFormationListResources
