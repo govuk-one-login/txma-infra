@@ -5,6 +5,8 @@
 !./dev-tools/.yarn/sdks
 !./dev-tools/.yarn/versions
 
+node_modules/
+
 # Swap the comments on the following lines if you don't wish to use zero-installs
 # Documentation here: https://yarnpkg.com/features/zero-installs
 !./dev-tools/.yarn/cache
