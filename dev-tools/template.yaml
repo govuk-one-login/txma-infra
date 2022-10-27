@@ -76,6 +76,23 @@ Resources:
       LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-empty-s3-buckets'
       RetentionInDays: 30
 
+  IntegrationTestDataBucket:
+  #checkov:skip=CKV_AWS_18: Logging not required for test resource
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-test-data-bucket
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
   EmptyS3BucketsFunctionArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
