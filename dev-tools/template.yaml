@@ -44,7 +44,7 @@ Resources:
     Properties:
       Handler: emptyS3Buckets.handler
       FunctionName: !Sub ${AWS::StackName}-empty-s3-buckets
-      KmsKeyArn: !GetAtt LambdaKmsKey.Arn
+      KmsKeyArn: '{{ssm:resolve:LambdaKmsKeyArn}}'
       Policies:
         - Statement:
           - Sid: CloudFormationListResources
@@ -69,7 +69,7 @@ Resources:
               - s3:PutBucketVersioning
             Resource: '*'
   
-  SendQueryResultsNotificationLogs:
+  EmptyS3BucketsLogs:
     Type: AWS::Logs::LogGroup
     Properties:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
