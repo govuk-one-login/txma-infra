@@ -50,18 +50,7 @@ const sendResponse = async (
         ? event.PhysicalResourceId
         : formatStackId(event.StackId)
   }
-
-  // const options = {
-  //   hostname: parsedUrl.hostname,
-  //   port: 443,
-  //   path: parsedUrl.path,
-  //   method: 'PUT',
-  //   headers: {
-  //     'content-type': '',
-  //     'content-length': JSON.stringify(data).length
-  //   }
-  // }
-  // await makeHttpsRequest(options, data)
+  
   await axios.put(event.ResponseURL, data)
 }
 

@@ -1,97 +1,92 @@
+import { CloudFormationCustomResourceUpdateEvent } from 'aws-lambda'
 import { emptyS3Bucket } from './emptyS3Bucket'
-import { mockClient } from 'aws-sdk-client-mock'
-import 'aws-sdk-client-mock-jest'
-import {
-  DeleteObjectCommand,
-  GetBucketVersioningCommand,
-  PutBucketVersioningCommand,
-  S3Client,
-  _Object
-} from '@aws-sdk/client-s3'
-import { listS3Files } from './listS3Files'
-import { listS3ObjectVersions } from './listS3ObjectVersions'
+import { listS3Buckets } from './listS3Buckets'
+import { defaultCustomResourceDeleteEvent } from '../../utils/tests/events/defaultCustomResourceDeleteEvent'
+import { handler } from './handler'
+import axios from 'axios'
 
-const s3Mock = mockClient(S3Client)
-
-jest.mock('./listS3Files', () => ({
-  listS3Files: jest.fn()
+jest.mock('./listS3Buckets', () => ({
+  listS3Buckets: jest.fn()
 }))
-const mocklistS3Files = listS3Files as jest.Mock<Promise<_Object[]>>
 
-jest.mock('./listS3ObjectVersions', () => ({
-  listS3ObjectVersions: jest.fn()
+jest.mock('./emptyS3Bucket', () => ({
+  emptyS3Bucket: jest.fn()
 }))
-const mocklistS3ObjectVersions = listS3ObjectVersions as jest.Mock<
-  Promise<{ deleteMarkers: string[]; versions: string[] }>
->
 
-const bucketName = 'example-bucket'
+const mockListS3Buckets = listS3Buckets as jest.Mock<Promise<string[]>>
+const mockEmptyS3Bucket = emptyS3Bucket as jest.Mock<Promise<void>>
+let httpsRequestSpy: jest.SpyInstance
 
-describe('empty s3 bucket', () => {
+const successPayload = {
+  PhysicalResourceId: defaultCustomResourceDeleteEvent.PhysicalResourceId,
+  StackId: defaultCustomResourceDeleteEvent.StackId,
+  RequestId: defaultCustomResourceDeleteEvent.RequestId,
+  LogicalResourceId: defaultCustomResourceDeleteEvent.LogicalResourceId,
+  Status: 'SUCCESS'
+}
+
+describe('empty s3 buckets handler', () => {
+  const givenNoS3Buckets = () => {
+    mockListS3Buckets.mockResolvedValue([])
+  }
+
+  const givenS3Buckets = () => {
+    mockListS3Buckets.mockResolvedValue(['example-bucket'])
+  }
+
   beforeEach(() => {
-    s3Mock.reset()
-    mocklistS3ObjectVersions.mockReset()
-    mocklistS3Files.mockReset()
+    httpsRequestSpy = jest
+      .spyOn(axios, 'put')
+      .mockResolvedValue({})
   })
 
-  test('s3 bucket does not have versioning enabled', async () => {
-    s3Mock.on(GetBucketVersioningCommand).resolves({})
-    mocklistS3Files.mockResolvedValue([{ Key: 'object-1' }])
-    s3Mock.on(DeleteObjectCommand).resolves({})
-
-    await emptyS3Bucket(bucketName)
-    expect(s3Mock).toHaveReceivedCommandWith(DeleteObjectCommand, {
-      Key: 'object-1'
-    })
+  afterEach(() => {
+    httpsRequestSpy.mockClear()
   })
 
-  test('s3 bucket has versioning enabled', async () => {
-    s3Mock.on(GetBucketVersioningCommand).resolves({
-      Status: 'Enabled'
-    })
-    s3Mock.on(PutBucketVersioningCommand).resolves({})
-    s3Mock.on(DeleteObjectCommand).resolves({})
-    mocklistS3Files.mockResolvedValue([{ Key: 'object-1' }])
-    mocklistS3ObjectVersions.mockResolvedValue({
-      deleteMarkers: ['version-1'],
-      versions: ['version-1']
-    })
+  test('does nothing if event type is not delete', async () => {
+    const updateEvent = {
+      ...defaultCustomResourceDeleteEvent,
+      RequestType: 'Update'
+    } as CloudFormationCustomResourceUpdateEvent
 
-    await emptyS3Bucket(bucketName)
+    await handler(updateEvent)
 
-    expect(s3Mock).toHaveReceivedCommandWith(PutBucketVersioningCommand, {
-      Bucket: bucketName,
-      VersioningConfiguration: { Status: 'Suspended' }
-    })
-    expect(s3Mock).toHaveReceivedCommandTimes(DeleteObjectCommand, 3)
+    expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
   })
 
-  test('No objects in unversioned s3 bucket', async () => {
-    s3Mock.on(GetBucketVersioningCommand).resolves({})
-    mocklistS3Files.mockResolvedValue([])
+  test('does nothing if stack contains no s3 buckets', async () => {
+    givenNoS3Buckets()
 
-    await emptyS3Bucket(bucketName)
+    await handler(defaultCustomResourceDeleteEvent)
 
-    expect(s3Mock).toHaveReceivedCommandTimes(DeleteObjectCommand, 0)
+    expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
   })
 
-  test('No objects in versioned s3 bucket', async () => {
-    s3Mock.on(GetBucketVersioningCommand).resolves({
-      Status: 'Enabled'
-    })
-    s3Mock.on(PutBucketVersioningCommand).resolves({})
-    mocklistS3Files.mockResolvedValue([])
-    mocklistS3ObjectVersions.mockResolvedValue({
-      deleteMarkers: [],
-      versions: []
+  test('calls empty bucket if stack contains s3 buckets', async () => {
+    givenS3Buckets()
+    mockEmptyS3Bucket.mockImplementationOnce(() => Promise.resolve())
+
+    await handler(defaultCustomResourceDeleteEvent)
+
+    expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
+    expect(emptyS3Bucket).toHaveBeenCalledWith('example-bucket')
+  })
+
+  test('sends error payload when error emptying buckets', async () => {
+    givenS3Buckets()
+    mockEmptyS3Bucket.mockImplementationOnce(() => {
+      throw new Error('error message')
     })
 
-    await emptyS3Bucket(bucketName)
+    await handler(defaultCustomResourceDeleteEvent)
 
-    expect(s3Mock).toHaveReceivedCommandWith(PutBucketVersioningCommand, {
-      Bucket: bucketName,
-      VersioningConfiguration: { Status: 'Suspended' }
-    })
-    expect(s3Mock).toHaveReceivedCommandTimes(DeleteObjectCommand, 0)
+    const errorPayload = {
+      ...successPayload,
+      Status: 'FAILED',
+      Reason: 'error message'
+    }
+
+    expect(httpsRequestSpy).toBeCalledWith(expect.anything(), errorPayload)
   })
 })
