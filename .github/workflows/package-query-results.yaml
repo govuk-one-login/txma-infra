@@ -1,0 +1,79 @@
+name: Package query results infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "query-results/**"
+  workflow_dispatch: {}
+
+env:
+  AWS_REGION: eu-west-2
+
+jobs:
+  validate:
+    name: Validate template
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS Validate role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_QUERY_RESULTS }}
+      - name: Validate SAM template
+        if: always()
+        run: sam validate -t query-results/template.yaml --parameter-overrides Environment=build
+      - name: Run Checkov on SAM template
+        if: always()
+        uses: bridgecrewio/checkov-action@master
+        with:
+          file: query-results/template.yaml
+          quiet: true
+          framework: cloudformation
+      - name: Upload template artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: query-results-sam-template
+          path: |
+            query-results/template.yaml
+
+  package:
+    name: Package template
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download template artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: query-results-sam-template
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_QUERY_RESULTS }}
+      - name: Package SAM app
+        uses: alphagov/di-devplatform-upload-action@v2
+        with:
+          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME_QUERY_RESULTS }}
+          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          working-directory: '.'

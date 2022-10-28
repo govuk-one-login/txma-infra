@@ -38,6 +38,7 @@ Globals:
 
 Resources:
   EmptyS3BucketsFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
     #checkov:skip=CKV_AWS_116:DLQ not required as failures will be reported to CloudFormation
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
