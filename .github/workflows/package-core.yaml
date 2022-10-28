@@ -34,7 +34,7 @@ jobs:
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_CORE }}
       - name: Validate SAM template
         if: always()
-        run: sam validate -t core/template.yaml --parameter-overrides Environment=build
+        run: sam validate -t core/template.yaml
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
