@@ -30,7 +30,7 @@ jobs:
       - name: Assume AWS Validate role
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ env.REGION }}
+          aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DATA_ANALYSIS_CONFIG }}
       - name: Validate SAM template
         if: always()
@@ -69,7 +69,7 @@ jobs:
       - name: Assume AWS role
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ env.REGION }}
+          aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DATA_ANALYSIS_CONFIG }}
       - name: Package SAM app
         uses: alphagov/di-devplatform-upload-action@v2
