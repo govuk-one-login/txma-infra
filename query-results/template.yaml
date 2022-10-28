@@ -55,6 +55,18 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  SecureFraudSiteDataTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: !Sub ${AWS::StackName}-secure-fraud-site-data
+      PrimaryKey:
+        Name: downloadHash
+        Type: String
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
   QueryResultsBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -68,6 +80,20 @@ Resources:
       Name: QueryResultsBucketName
       Type: String
       Value: !Ref QueryResultsBucket
+
+  SecureFraudSiteDataTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SecureFraudSiteDataTableArn
+      Type: String
+      Value: !GetAtt SecureFraudSiteDataTable.Arn
+
+  SecureFraudSiteDataTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SecureFraudSiteDataTableName
+      Type: String
+      Value: !Ref SecureFraudSiteDataTable
 
 Outputs:
   QueryResultsBucketName:
