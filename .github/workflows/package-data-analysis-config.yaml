@@ -51,6 +51,7 @@ jobs:
 
   package:
     name: Package template
+    needs: [validate]
     permissions:
       id-token: write
       contents: read
