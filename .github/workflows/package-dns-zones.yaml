@@ -50,6 +50,7 @@ jobs:
             dns-zones/template.yaml
   package:
     name: Package template
+    needs: [validate]
     permissions:
       id-token: write
       contents: read
