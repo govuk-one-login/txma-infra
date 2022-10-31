@@ -55,7 +55,7 @@ jobs:
         with:
           name: query-results-sam-template
           path: |
-            template.yaml
+            query-results/template.yaml
 
   package:
     name: Package template

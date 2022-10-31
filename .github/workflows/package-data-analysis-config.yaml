@@ -55,7 +55,7 @@ jobs:
         with:
           name: data-analysis-config-sam-template
           path: |
-            template.yaml
+            data-analysis-config/template.yaml
 
   package:
     name: Package template
