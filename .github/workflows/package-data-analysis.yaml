@@ -59,6 +59,7 @@ jobs:
 
   package:
     name: Package template
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
@@ -79,7 +80,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DATA_ANLYSIS }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DATA_ANALYSIS }}
       - name: Package SAM app
         uses: alphagov/di-devplatform-upload-action@v2
         with:
