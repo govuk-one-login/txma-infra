@@ -1,0 +1,31 @@
+{
+  "name": "di-txma-infra",
+  "author": "GDS",
+  "license": "MIT",
+  "private": true,
+  "packageManager": "yarn@3.2.4",
+  "workspaces": [
+    "dev-tools"
+  ],
+  "scripts": {
+    "lint": "prettier . --check || exit 1 ; eslint . --max-warnings=0",
+    "lint:fix": "prettier . --write ; eslint . --fix",
+    "postinstall": "husky install",
+    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "5.40.1",
+    "@typescript-eslint/parser": "5.40.1",
+    "eslint": "8.26.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-jest": "27.1.3",
+    "husky": "8.0.1",
+    "lint-staged": "13.0.3",
+    "prettier": "2.7.1",
+    "typescript": "4.8.4"
+  },
+  "lint-staged": {
+    "*": "prettier --write",
+    "*.{js,ts}": "eslint --fix"
+  }
+}

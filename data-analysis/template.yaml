@@ -97,7 +97,14 @@ Resources:
       CatalogId: !Ref AWS::AccountId
       DatabaseInput:
         Description: TxMA - Event Message Analysis Database
-        Name:  !Join [ '', [ !Join [ '', !Split [ '-', !Ref AWS::StackName ] ], !Sub '_${Environment}_analysis_database' ] ]
+        Name:
+          !Join [
+            '',
+            [
+              !Join ['', !Split ['-', !Ref AWS::StackName]],
+              !Sub '_${Environment}_analysis_database'
+            ]
+          ]
 
   AthenaAnalysisWorkgroup:
     Type: AWS::Athena::WorkGroup
@@ -111,7 +118,8 @@ Resources:
         ResultConfiguration:
           EncryptionConfiguration:
             EncryptionOption: SSE_S3
-          OutputLocation: !Join [ '', [ 's3://', !ImportValue QueryResultsBucketName, '/' ] ]
+          OutputLocation:
+            !Join ['', ['s3://', !ImportValue QueryResultsBucketName, '/']]
 
   QueryRequestTable:
     Type: AWS::DynamoDB::Table

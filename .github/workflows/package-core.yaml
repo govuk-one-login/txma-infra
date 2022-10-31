@@ -1,11 +1,16 @@
 name: Package core infrastructure
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - core/**
   push:
     branches:
       - main
     paths:
-      - "core/**"
+      - core/**
   workflow_dispatch: {}
 
 env:
@@ -18,6 +23,9 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: core
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -34,12 +42,12 @@ jobs:
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_CORE }}
       - name: Validate SAM template
         if: always()
-        run: sam validate -t core/template.yaml
+        run: sam validate
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: core/template.yaml
+          file: template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload build artifact
@@ -47,7 +55,7 @@ jobs:
         with:
           name: core-sam-template
           path: |
-            core/template.yaml
+            template.yaml
 
   package:
     name: Package template

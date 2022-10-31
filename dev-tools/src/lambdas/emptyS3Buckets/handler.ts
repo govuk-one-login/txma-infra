@@ -50,7 +50,7 @@ const sendResponse = async (
         ? event.PhysicalResourceId
         : formatStackId(event.StackId)
   }
-  
+
   await axios.put(event.ResponseURL, data)
 }
 

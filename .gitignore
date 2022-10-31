@@ -1,10 +1,10 @@
-./dev-tools/.yarn/*
-!./dev-tools/.yarn/cache
-!./dev-tools/.yarn/patches
-!./dev-tools/.yarn/plugins
-!./dev-tools/.yarn/releases
-!./dev-tools/.yarn/sdks
-!./dev-tools/.yarn/versions
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
+dist/
 node_modules/
-dist

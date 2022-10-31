@@ -35,9 +35,7 @@ describe('empty s3 buckets handler', () => {
   }
 
   beforeEach(() => {
-    httpsRequestSpy = jest
-      .spyOn(axios, 'put')
-      .mockResolvedValue({})
+    httpsRequestSpy = jest.spyOn(axios, 'put').mockResolvedValue({})
   })
 
   afterEach(() => {
