@@ -59,6 +59,7 @@ jobs:
 
   package:
     name: Package template
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
