@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates the necessary components to manage DNS in TxMA
+Parameters:
+  Environment:
+    Description: The name of the environment to deploy to
+    Type: String
+    AllowedValues:
+      - build
+      - staging
+      - integration
+      - production
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, production]
+
+Resources:
+  PublicHostedZone:
+    Type: AWS::Route53::HostedZone
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: !If
+        - IsProduction
+        - transaction.account.gov.uk
+        - !Sub transaction.${Environment}.account.gov.uk
+
+Outputs:
+  PublicHostedZoneNameServers:
+    Value: !Join
+      - ','
+      - !GetAtt PublicHostedZone.NameServers
+  PublicHostedZoneId:
+    Value: !GetAtt PublicHostedZone.Id
+    Export:
+      Name: PublicHostedZoneId
