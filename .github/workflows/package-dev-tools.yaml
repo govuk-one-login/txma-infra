@@ -52,7 +52,7 @@ jobs:
         run: yarn build
       - name: Validate SAM template
         if: always()
-        run: sam validate template.yaml
+        run: sam validate
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
@@ -65,12 +65,13 @@ jobs:
         with:
           name: dev-tools-sam-template
           path: |
-            dist/
-            template.yaml
+            dev-tools/dist/
+            dev-tools/template.yaml
 
   package:
     name: Package template
-    needs: [build-test-and-validate, check-yarn-cache]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build-test-and-validate]
     permissions:
       id-token: write
       contents: read

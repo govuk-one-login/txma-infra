@@ -55,10 +55,11 @@ jobs:
         with:
           name: data-analysis-sam-template
           path: |
-            template.yaml
+            data-analysis/template.yaml
 
   package:
     name: Package template
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
@@ -68,7 +69,7 @@ jobs:
       - name: Download template artifact
         uses: actions/download-artifact@v3
         with:
-          name: data-anlysis-sam-template
+          name: data-analysis-sam-template
       - name: Setup Python
         uses: actions/setup-python@v3
         with:
@@ -79,7 +80,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DATA_ANLYSIS }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DATA_ANALYSIS }}
       - name: Package SAM app
         uses: alphagov/di-devplatform-upload-action@v2
         with:

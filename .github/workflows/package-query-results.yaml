@@ -55,10 +55,11 @@ jobs:
         with:
           name: query-results-sam-template
           path: |
-            template.yaml
+            query-results/template.yaml
 
   package:
     name: Package template
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
