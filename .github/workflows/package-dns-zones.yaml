@@ -1,15 +1,17 @@
 name: Package dns zones
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - dns-zones/**
   push:
     branches:
       - main
     paths:
-      - "dns-zones/**"
+      - dns-zones/**
   workflow_dispatch: {}
-
-env:
-  AWS_REGION: eu-west-2
 
 jobs:
   validate:
@@ -18,6 +20,9 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dns-zones
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -34,20 +39,20 @@ jobs:
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DNS_ZONES }}
       - name: Validate SAM template
         if: always()
-        run: sam validate -t dns-zones/template.yaml
+        run: sam validate
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: dns-zones/template.yaml
+          file: template.yaml
           quiet: true
           framework: cloudformation
-      - name: Upload build artifact
+      - name: Upload template artifact
         uses: actions/upload-artifact@v3
         with:
           name: dns-zones-sam-template
           path: |
-            dns-zones/template.yaml
+            template.yaml
   package:
     name: Package template
     needs: [validate]

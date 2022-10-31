@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates the necessary components to manage DNS in TxMA
 Parameters:
   Environment:
@@ -11,7 +11,7 @@ Parameters:
       - production
 
 Conditions:
-  IsProduction: !Equals [ !Ref Environment, production]
+  IsProduction: !Equals [!Ref Environment, production]
 
 Resources:
   PublicHostedZone:
@@ -27,8 +27,8 @@ Resources:
 Outputs:
   PublicHostedZoneNameServers:
     Value: !Join
-          - ","
-          - !GetAtt PublicHostedZone.NameServers
+      - ','
+      - !GetAtt PublicHostedZone.NameServers
   PublicHostedZoneId:
     Value: !GetAtt PublicHostedZone.Id
     Export:
