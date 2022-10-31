@@ -87,7 +87,7 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdDataPaths
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdDataPaths ]
+      Value: !FindInMap [Environment, !Ref Environment, ZendeskFieldIdDataPaths]
 
   ZendeskFieldIdDateFromParameter:
     Type: AWS::SSM::Parameter
@@ -95,7 +95,7 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdDateFrom
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdDateFrom ]
+      Value: !FindInMap [Environment, !Ref Environment, ZendeskFieldIdDateFrom]
 
   ZendeskFieldIdDateToParameter:
     Type: AWS::SSM::Parameter
@@ -103,7 +103,7 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdDateTo
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdDateTo ]
+      Value: !FindInMap [Environment, !Ref Environment, ZendeskFieldIdDateTo]
 
   ZendeskFieldIdEventIdsParameter:
     Type: AWS::SSM::Parameter
@@ -111,7 +111,7 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdEventIds
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdEventIds ]
+      Value: !FindInMap [Environment, !Ref Environment, ZendeskFieldIdEventIds]
 
   ZendeskFieldIdIdentifierTypeParameter:
     Type: AWS::SSM::Parameter
@@ -119,7 +119,8 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdIdentifierType
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdIdentifierType ]
+      Value:
+        !FindInMap [Environment, !Ref Environment, ZendeskFieldIdIdentifierType]
 
   ZendeskFieldIdJourneyIdsParameter:
     Type: AWS::SSM::Parameter
@@ -127,7 +128,8 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdJourneyIds
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdJourneyIds ]
+      Value:
+        !FindInMap [Environment, !Ref Environment, ZendeskFieldIdJourneyIds]
 
   ZendeskFieldIdPiiTypesParameter:
     Type: AWS::SSM::Parameter
@@ -135,7 +137,7 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdPiiTypes
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdPiiTypes ]
+      Value: !FindInMap [Environment, !Ref Environment, ZendeskFieldIdPiiTypes]
 
   ZendeskFieldIdRecipientEmailParameter:
     Type: AWS::SSM::Parameter
@@ -143,7 +145,8 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdRecipientEmail
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdRecipientEmail ]
+      Value:
+        !FindInMap [Environment, !Ref Environment, ZendeskFieldIdRecipientEmail]
 
   ZendeskFieldIdRecipientNameParameter:
     Type: AWS::SSM::Parameter
@@ -151,7 +154,8 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdRecipientName
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdRecipientName ]
+      Value:
+        !FindInMap [Environment, !Ref Environment, ZendeskFieldIdRecipientName]
 
   ZendeskFieldIdSessionIdsParameter:
     Type: AWS::SSM::Parameter
@@ -159,7 +163,8 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdSessionIds
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdSessionIds ]
+      Value:
+        !FindInMap [Environment, !Ref Environment, ZendeskFieldIdSessionIds]
 
   ZendeskFieldIdUserIdsParameter:
     Type: AWS::SSM::Parameter
@@ -167,7 +172,7 @@ Resources:
       AllowedPattern: '^\d+$'
       Name: ZendeskFieldIdUserIds
       Type: String
-      Value: !FindInMap [ Environment, !Ref Environment, ZendeskFieldIdUserIds ]
+      Value: !FindInMap [Environment, !Ref Environment, ZendeskFieldIdUserIds]
 
   ZendeskSecretSet:
     Type: AWS::SecretsManager::Secret

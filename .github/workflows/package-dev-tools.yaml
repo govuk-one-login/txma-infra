@@ -1,0 +1,99 @@
+name: Package dev tools infrastructure
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'dev-tools/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'dev-tools/**'
+  workflow_dispatch: {}
+
+env:
+  AWS_REGION: eu-west-2
+
+jobs:
+  build-test-and-validate:
+    name: Run tests and validation
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dev-tools
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS Validate role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DEV_TOOLS }}
+      - name: Node - Enable Corepack
+        run: corepack enable
+      - name: Install ESBuild binaries
+        run: yarn unplug
+      - name: Run tests
+        if: always()
+        run: yarn test
+      - name: Build Lambda functions
+        if: always()
+        run: yarn build
+      - name: Validate SAM template
+        if: always()
+        run: sam validate template.yaml
+      - name: Run Checkov on SAM template
+        if: always()
+        uses: bridgecrewio/checkov-action@master
+        with:
+          file: template.yaml
+          quiet: true
+          framework: cloudformation
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dev-tools-sam-template
+          path: |
+            dist/
+            template.yaml
+
+  package:
+    name: Package template
+    needs: [build-test-and-validate, check-yarn-cache]
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dev-tools-sam-template
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DEV_TOOLS }}
+      - name: Package SAM app
+        uses: alphagov/di-devplatform-upload-action@v2
+        with:
+          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME_DEV_TOOLS }}
+          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          working-directory: '.'
