@@ -55,6 +55,42 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  ValidEmailRecipientsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-email-recipients
+      LoggingConfiguration:
+        DestinationBucketName: !Ref ValidEmailRecipientsLogsBucket
+        LogFilePrefix: String
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  ValidEmailRecipientsLogsBucket:
+    #checkov:skip=CKV_AWS_18:This is the logs bucket
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${Environment}-email-recipients-logs
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
   AuditAnalysisDatabase:
     Type: AWS::Glue::Database
     Properties:
@@ -129,6 +165,20 @@ Resources:
       Name: BatchJobManifestBucketName
       Type: String
       Value: !Ref BatchJobManifestBucket
+
+  ValidEmailRecipientsBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ValidEmailRecipientsBucketName
+      Type: String
+      Value: !Ref ValidEmailRecipientsBucket
+
+  ValidEmailRecipientsBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ValidEmailRecipientsBucketArn
+      Type: String
+      Value: !GetAtt ValidEmailRecipientsBucket.Arn
 
   AuditAnalysisDatabaseArnParameter:
     Type: AWS::SSM::Parameter
