@@ -68,7 +68,7 @@ jobs:
       - name: Download template artifact
         uses: actions/download-artifact@v3
         with:
-          name: data-anlysis-sam-template
+          name: data-analysis-sam-template
       - name: Setup Python
         uses: actions/setup-python@v3
         with:
