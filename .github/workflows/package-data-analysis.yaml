@@ -1,11 +1,16 @@
 name: Package data analysis infra
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - data-analysis/**
   push:
     branches:
       - main
     paths:
-      - "data-analysis/**"
+      - data-analysis/**
   workflow_dispatch: {}
 
 env:
@@ -18,6 +23,9 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: data-analysis
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -34,12 +42,12 @@ jobs:
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DATA_ANALYSIS }}
       - name: Validate SAM template
         if: always()
-        run: sam validate -t data-analysis/template.yaml
+        run: sam validate
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: data-analysis/template.yaml
+          file: template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -47,7 +55,7 @@ jobs:
         with:
           name: data-analysis-sam-template
           path: |
-            data-analysis/template.yaml
+            template.yaml
 
   package:
     name: Package template

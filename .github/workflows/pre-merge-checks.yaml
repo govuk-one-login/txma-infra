@@ -1,0 +1,24 @@
+name: Run linting and check Yarn cache
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  AWS_REGION: eu-west-2
+
+jobs:
+  validate:
+    name: Run linting and check Yarn cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Node - Enable Corepack
+        run: corepack enable
+      - name: Run linting
+        if: always()
+        run: yarn lint
+      - name: Check Yarn cache
+        run: yarn install --immutable --immutable-cache --check-cache

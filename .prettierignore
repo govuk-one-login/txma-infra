@@ -1,0 +1,13 @@
+*.sh
+*.toml
+.editorconfig
+.eslintignore
+.gitignore
+.husky
+.prettierignore
+.pnp.*
+.yarn
+CODEOWNERS
+coverage/
+dist/
+yarn.lock
