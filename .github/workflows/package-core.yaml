@@ -55,7 +55,7 @@ jobs:
         with:
           name: core-sam-template
           path: |
-            template.yaml
+            core/template.yaml
 
   package:
     name: Package template
