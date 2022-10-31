@@ -1,23 +1,31 @@
 name: Package dev tools infrastructure
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'dev-tools/**'
   push:
     branches:
       - main
     paths:
-      - "dev-tools/**"
+      - 'dev-tools/**'
   workflow_dispatch: {}
 
 env:
   AWS_REGION: eu-west-2
 
 jobs:
-  validate:
-    name: Validate template
+  build-test-and-validate:
+    name: Run tests and validation
     permissions:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dev-tools
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -32,14 +40,24 @@ jobs:
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DEV_TOOLS }}
+      - name: Node - Enable Corepack
+        run: corepack enable
+      - name: Install ESBuild binaries
+        run: yarn unplug
+      - name: Run tests
+        if: always()
+        run: yarn test
+      - name: Build Lambda functions
+        if: always()
+        run: yarn build
       - name: Validate SAM template
         if: always()
-        run: sam validate -t dev-tools/template.yaml
+        run: sam validate template.yaml
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: dev-tools/template.yaml
+          file: template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload build artifact
@@ -47,11 +65,12 @@ jobs:
         with:
           name: dev-tools-sam-template
           path: |
-            dev-tools/template.yaml
+            dist/
+            template.yaml
 
   package:
     name: Package template
-    needs: [validate]
+    needs: [build-test-and-validate, check-yarn-cache]
     permissions:
       id-token: write
       contents: read
