@@ -52,7 +52,7 @@ jobs:
         run: yarn build
       - name: Validate SAM template
         if: always()
-        run: sam validate template.yaml
+        run: sam validate
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
