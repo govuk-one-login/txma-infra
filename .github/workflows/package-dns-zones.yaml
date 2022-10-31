@@ -52,9 +52,10 @@ jobs:
         with:
           name: dns-zones-sam-template
           path: |
-            template.yaml
+            dns-zones/template.yaml
   package:
     name: Package template
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
