@@ -20,5 +20,7 @@ jobs:
       - name: Run linting
         if: always()
         run: yarn lint
+      - name: Install ESBuild binaries
+        run: yarn unplug
       - name: Check Yarn cache
         run: yarn install --immutable --immutable-cache --check-cache
