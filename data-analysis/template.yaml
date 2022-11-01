@@ -152,7 +152,7 @@ Resources:
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
-  ZendeskWebhookWafAcl:
+  ZendeskWebhookApiWafAcl:
     Type: AWS::WAFv2::WebACL
     Properties:
       DefaultAction:
@@ -160,7 +160,7 @@ Resources:
       Scope: REGIONAL
       VisibilityConfig:
         CloudWatchMetricsEnabled: true
-        MetricName: TxmaWafMetric
+        MetricName: ZendeskWebhookApiWafMetric
         SampledRequestsEnabled: true
       Rules:
         - Name: AwsManagedRulesCommonRuleSet
@@ -175,7 +175,7 @@ Resources:
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
-            MetricName: AWSManagedRulesCommonRuleSetMetric
+            MetricName: ZendeskWebhookApiWafCommonRuleSetMetric
         - Name: AWSManagedRulesKnownBadInputsRuleSet
           Priority: 1
           Statement:
@@ -186,7 +186,7 @@ Resources:
             None: {}
           VisibilityConfig:
             CloudWatchMetricsEnabled: true
-            MetricName: AWSManagedRulesKnownBadInputsRuleSetMetric
+            MetricName: ZendeskWebhookApiWafKnownBadInputsRuleSetMetric
             SampledRequestsEnabled: true
         - Name: AWSManagedRulesAmazonIpReputationList
           Priority: 2
@@ -198,7 +198,7 @@ Resources:
             None: {}
           VisibilityConfig:
             CloudWatchMetricsEnabled: true
-            MetricName: AWSManagedRulesAmazonIpReputationListMetric
+            MetricName: ZendeskWebhookApiWafIpReputationListMetric
             SampledRequestsEnabled: true
 
   BatchJobManifestBucketArnParameter:
@@ -271,9 +271,9 @@ Resources:
       Type: String
       Value: !Ref QueryRequestTable
 
-  ZendeskWebhookWafAclArnParameter:
+  ZendeskWebhookApiWafAclArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: ZendeskWebhookWafAclArn
+      Name: ZendeskWebhookApiWafAclArn
       Type: String
-      Value: !GetAtt ZendeskWebhookWafAcl.Arn
+      Value: !GetAtt ZendeskWebhookApiWafAcl.Arn

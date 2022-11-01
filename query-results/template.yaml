@@ -95,7 +95,7 @@ Resources:
       Scope: REGIONAL
       VisibilityConfig:
         CloudWatchMetricsEnabled: true
-        MetricName: TxmaWafMetric
+        MetricName: SecureFraudApiWafMetric
         SampledRequestsEnabled: true
       Rules:
         - Name: AwsManagedRulesCommonRuleSet
@@ -110,7 +110,7 @@ Resources:
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
-            MetricName: AWSManagedRulesCommonRuleSetMetric
+            MetricName: SecureFraudApiCommonRuleSetMetric
         - Name: AWSManagedRulesKnownBadInputsRuleSet
           Priority: 1
           Statement:
@@ -121,7 +121,7 @@ Resources:
             None: {}
           VisibilityConfig:
             CloudWatchMetricsEnabled: true
-            MetricName: AWSManagedRulesKnownBadInputsRuleSetMetric
+            MetricName: SecureFraudApiKnownBadInputsRuleSetMetric
             SampledRequestsEnabled: true
         - Name: AWSManagedRulesAmazonIpReputationList
           Priority: 2
@@ -133,7 +133,7 @@ Resources:
             None: {}
           VisibilityConfig:
             CloudWatchMetricsEnabled: true
-            MetricName: AWSManagedRulesAmazonIpReputationListMetric
+            MetricName: SecureFraudApiIpReputationListMetric
             SampledRequestsEnabled: true
 
   QueryResultsBucketArnParameter:
