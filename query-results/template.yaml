@@ -55,11 +55,11 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-  SecureFraudSiteDataTable: 
+  SecureFraudSiteDataTable:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: !Sub ${AWS::StackName}-secure-fraud-site-data
-      AttributeDefinitions: 
+      AttributeDefinitions:
         - AttributeName: downloadHash
           AttributeType: S
         - AttributeName: zendeskId
@@ -73,7 +73,7 @@ Resources:
             - AttributeName: zendeskId
               KeyType: HASH
           Projection:
-            ProjectionType: "KEYS_ONLY"
+            ProjectionType: 'KEYS_ONLY'
           ProvisionedThroughput:
             ReadCapacityUnits: 5
             WriteCapacityUnits: 5
