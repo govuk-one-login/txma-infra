@@ -152,6 +152,55 @@ Resources:
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
+  ZendeskWebhookWafAcl:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      DefaultAction:
+        Allow: {}
+      Scope: REGIONAL
+      VisibilityConfig:
+        CloudWatchMetricsEnabled: true
+        MetricName: TxmaWafMetric
+        SampledRequestsEnabled: true
+      Rules:
+        - Name: AwsManagedRulesCommonRuleSet
+          Priority: 0
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+              ExcludedRules: []
+          OverrideAction:
+            Count: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesCommonRuleSetMetric
+        - Name: AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesKnownBadInputsRuleSetMetric
+            SampledRequestsEnabled: true
+        - Name: AWSManagedRulesAmazonIpReputationList
+          Priority: 2
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAmazonIpReputationList
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesAmazonIpReputationListMetric
+            SampledRequestsEnabled: true
+
   BatchJobManifestBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -221,3 +270,10 @@ Resources:
       Name: QueryRequestTableName
       Type: String
       Value: !Ref QueryRequestTable
+
+  ZendeskWebhookWafAclArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ZendeskWebhookWafAclArn
+      Type: String
+      Value: !GetAtt ZendeskWebhookWafAcl.Arn
