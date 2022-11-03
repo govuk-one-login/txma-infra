@@ -13,6 +13,9 @@ on:
       - dns-zones/**
   workflow_dispatch: {}
 
+env:
+  AWS_REGION: eu-west-2
+
 jobs:
   validate:
     name: Validate template
