@@ -69,6 +69,16 @@ jobs:
             dev-tools/template.yaml
 
   package:
+    strategy:
+      matrix:
+        target: [AUDIT_DEV, QUERY_RESULTS_DEV]
+        include:
+          - target: AUDIT_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DEV_TOOLS_AUDIT_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DEV_TOOLS_AUDIT_DEV
+          - target: QUERY_RESULTS_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DEV_TOOLS_QUERY_RESULTS_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DEV_TOOLS_QUERY_RESULTS_DEV
     name: Package template
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: [build-test-and-validate]
@@ -91,10 +101,10 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DEV_TOOLS }}
+          role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
       - name: Package SAM app
         uses: alphagov/di-devplatform-upload-action@v2
         with:
-          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME_DEV_TOOLS }}
+          artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
           working-directory: '.'
