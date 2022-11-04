@@ -65,9 +65,11 @@ jobs:
           - target: AUDIT_BUILD
             ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_ZONES_AUDIT
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_ZONES_AUDIT
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_AUDIT_BUILD
           - target: QUERY_RESULTS_BUILD
             ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_ZONES_QUERY_RESULTS
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_ZONES_QUERY_RESULTS
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
     name: Package template
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: [validate]
@@ -95,5 +97,5 @@ jobs:
         uses: alphagov/di-devplatform-upload-action@v2
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET] }}
-          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
           working-directory: '.'
