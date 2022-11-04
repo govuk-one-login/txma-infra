@@ -58,6 +58,16 @@ jobs:
             data-analysis-config/template.yaml
 
   package:
+    strategy:
+      matrix:
+        target: [AUDIT_DEV, AUDIT_BUILD]
+        include:
+          - target: AUDIT_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DATA_ANALYSIS_CONFIG_AUDIT_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DATA_ANALYSIS_CONFIG_AUDIT_DEV
+          - target: AUDIT_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DATA_ANALYSIS_CONFIG_AUDIT_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DATA_ANALYSIS_CONFIG_AUDIT_BUILD
     name: Package template
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: [validate]
