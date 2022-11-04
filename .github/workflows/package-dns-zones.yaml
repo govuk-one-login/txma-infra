@@ -57,7 +57,17 @@ jobs:
           path: |
             dns-zones/template.yaml
 
-  package-audit:
+  package:
+    strategy:
+      matrix:
+        target: [AUDIT_BUILD, QUERY_RESULTS_BUILD]
+        include:
+          - target: AUDIT_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_ZONES_AUDIT
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_ZONES_AUDIT
+          - target: QUERY_RESULTS_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_ZONES_QUERY_RESULTS
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_ZONES_QUERY_RESULTS
     name: Package template
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: [validate]
@@ -80,41 +90,10 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DNS_ZONES_AUDIT }}
+          role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
       - name: Package SAM app
         uses: alphagov/di-devplatform-upload-action@v2
         with:
-          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME_DNS_ZONES_AUDIT }}
-          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
-          working-directory: '.'
-
-  package-query-results:
-    name: Package template
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-    needs: [validate]
-    permissions:
-      id-token: write
-      contents: read
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: dns-zones-sam-template
-      - name: Setup Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.8'
-      - name: Setup SAM CLI
-        uses: aws-actions/setup-sam@v2
-      - name: Assume AWS role
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_DNS_ZONES_QUERY_RESULTS }}
-      - name: Package SAM app
-        uses: alphagov/di-devplatform-upload-action@v2
-        with:
-          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME_DNS_ZONES_QUERY_RESULTS }}
+          artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET] }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
           working-directory: '.'
