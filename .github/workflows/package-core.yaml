@@ -58,6 +58,22 @@ jobs:
             core/template.yaml
 
   package:
+    strategy:
+      matrix:
+        target: [AUDIT_DEV, QUERY_RESULTS_DEV, AUDIT_BUILD, QUERY_RESULTS_BUILD]
+        include:
+          - target: AUDIT_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_CORE_AUDIT_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_CORE_AUDIT_DEV
+          - target: QUERY_RESULTS_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_CORE_QUERY_RESULTS_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_CORE_QUERY_RESULTS_DEV
+          - target: AUDIT_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_CORE_AUDIT_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_CORE_AUDIT_BUILD
+          - target: QUERY_RESULTS_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_CORE_QUERY_RESULTS_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_CORE_QUERY_RESULTS_BUILD
     name: Package template
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: [validate]
@@ -80,10 +96,10 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_CORE }}
+          role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
       - name: Package SAM app
         uses: alphagov/di-devplatform-upload-action@v2
         with:
-          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME_CORE }}
+          artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
           working-directory: '.'
