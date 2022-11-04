@@ -58,6 +58,16 @@ jobs:
             query-results/template.yaml
 
   package:
+    strategy:
+      matrix:
+        target: [QUERY_RESULTS_DEV, QUERY_RESULTS_BUILD]
+        include:
+          - target: QUERY_RESULTS_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_QUERY_RESULTS_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_QUERY_RESULTS_DEV
+          - target: QUERY_RESULTS_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_QUERY_RESULTS_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_QUERY_RESULTS_BUILD
     name: Package template
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: [validate]
