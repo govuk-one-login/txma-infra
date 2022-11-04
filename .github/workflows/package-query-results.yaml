@@ -90,10 +90,10 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_QUERY_RESULTS }}
+          role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
       - name: Package SAM app
         uses: alphagov/di-devplatform-upload-action@v2
         with:
-          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME_QUERY_RESULTS }}
+          artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET] }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
           working-directory: '.'
