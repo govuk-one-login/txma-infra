@@ -136,6 +136,21 @@ Resources:
             MetricName: SecureFraudApiIpReputationListMetric
             SampledRequestsEnabled: true
 
+  AuditDataRequestQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-queue
+      KmsMasterKeyId: '{{resolve:ssm:SqsKmsKeyArn}}'
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt AuditDataRequestDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  AuditDataRequestDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-dead-letter-queue
+      KmsMasterKeyId: '{{resolve:ssm:SqsKmsKeyArn}}'
+
   QueryResultsBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -170,6 +185,20 @@ Resources:
       Name: SecureFraudApiWafAclArn
       Type: String
       Value: !GetAtt SecureFraudApiWafAcl.Arn
+
+  AuditDataRequestQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataRequestQueueArn
+      Type: String
+      Value: !GetAtt AuditDataRequestQueue.Arn
+
+  AuditDataRequestQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataRequestQueueUrl
+      Type: String
+      Value: !Ref AuditDataRequestQueue
 
 Outputs:
   QueryResultsBucketName:
