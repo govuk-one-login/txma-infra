@@ -136,19 +136,19 @@ Resources:
             MetricName: SecureFraudApiIpReputationListMetric
             SampledRequestsEnabled: true
 
-  AuditDataRequestQueue:
+  AuditDataRequestEventsQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-queue
       KmsMasterKeyId: '{{resolve:ssm:SqsKmsKeyArn}}'
       RedrivePolicy:
-        deadLetterTargetArn: !GetAtt AuditDataRequestDeadLetterQueue.Arn
+        deadLetterTargetArn: !GetAtt AuditDataRequestEventsDeadLetterQueue.Arn
         maxReceiveCount: 5
 
-  AuditDataRequestDeadLetterQueue:
+  AuditDataRequestEventsDeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-dead-letter-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-dead-letter-queue
       KmsMasterKeyId: '{{resolve:ssm:SqsKmsKeyArn}}'
 
   QueryResultsBucketArnParameter:
@@ -186,19 +186,19 @@ Resources:
       Type: String
       Value: !GetAtt SecureFraudApiWafAcl.Arn
 
-  AuditDataRequestQueueArnParameter:
+  AuditDataRequestEventsQueueArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: AuditDataRequestQueueArn
+      Name: AuditDataRequestEventsQueueArn
       Type: String
-      Value: !GetAtt AuditDataRequestQueue.Arn
+      Value: !GetAtt AuditDataRequestEventsQueue.Arn
 
-  AuditDataRequestQueueUrlParameter:
+  AuditDataRequestEventsQueueUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: AuditDataRequestQueueUrl
+      Name: AuditDataRequestEventsQueueUrl
       Type: String
-      Value: !Ref AuditDataRequestQueue
+      Value: !Ref AuditDataRequestEventsQueue
 
 Outputs:
   QueryResultsBucketName:
