@@ -163,6 +163,19 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/database-kms-key
       TargetKeyId: !Ref DatabaseKmsKey
 
+  AuditDataRequestQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: !Ref SqsKmsKey
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt AuditDataRequestDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  AuditDataRequestDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: !Ref SqsKmsKey
+
   LambdaKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -197,3 +210,17 @@ Resources:
       Name: DatabaseKmsKeyArn
       Type: String
       Value: !GetAtt DatabaseKmsKey.Arn
+
+  AuditDataRequestQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataRequestQueueArn
+      Type: String
+      Value: !GetAtt AuditDataRequestQueue.Arn
+
+  AuditDataRequestQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataRequestQueueUrl
+      Type: String
+      Value: !Ref AuditDataRequestQueue
