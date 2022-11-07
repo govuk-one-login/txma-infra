@@ -1,14 +1,7 @@
-name: Package data-analysis-config infrastructure
+name: Package data analysis config infrastructure
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - data-analysis-config/**
   push:
-    branches:
-      - main
     paths:
       - data-analysis-config/**
   workflow_dispatch: {}
@@ -29,7 +22,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Setup Python
+      - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
@@ -71,7 +64,7 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DATA_ANALYSIS_CONFIG_AUDIT_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_AUDIT_BUILD
     name: Package template
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
@@ -82,7 +75,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: data-analysis-config-sam-template
-      - name: Setup Python
+      - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'

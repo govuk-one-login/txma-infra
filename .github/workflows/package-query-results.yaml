@@ -1,14 +1,7 @@
 name: Package query results infrastructure
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - query-results/**
   push:
-    branches:
-      - main
     paths:
       - query-results/**
   workflow_dispatch: {}
@@ -29,7 +22,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Setup Python
+      - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
@@ -71,7 +64,7 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_QUERY_RESULTS_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
     name: Package template
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
@@ -82,7 +75,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: query-results-sam-template
-      - name: Setup Python
+      - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'

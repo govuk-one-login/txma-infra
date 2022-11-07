@@ -1,23 +1,16 @@
 name: Package dev tools infrastructure
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'dev-tools/**'
   push:
-    branches:
-      - main
     paths:
-      - 'dev-tools/**'
+      - dev-tools/**
   workflow_dispatch: {}
 
 env:
   AWS_REGION: eu-west-2
 
 jobs:
-  build-test-and-validate:
+  validate-build:
     name: Run tests and validation
     permissions:
       id-token: write
@@ -29,7 +22,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Setup Python
+      - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
@@ -82,8 +75,8 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DEV_TOOLS_QUERY_RESULTS_DEV
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_DEV
     name: Package template
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-    needs: [build-test-and-validate]
+    if: github.ref == 'refs/heads/main'
+    needs: [validate-build]
     permissions:
       id-token: write
       contents: read
@@ -93,7 +86,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: dev-tools-sam-template
-      - name: Setup Python
+      - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'

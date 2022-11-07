@@ -1,14 +1,7 @@
-name: Package data analysis infra
+name: Package data analysis infrastructure
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - data-analysis/**
   push:
-    branches:
-      - main
     paths:
       - data-analysis/**
   workflow_dispatch: {}
@@ -29,7 +22,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Setup Python
+      - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
@@ -59,7 +52,7 @@ jobs:
 
   package:
     name: Package template
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
@@ -70,7 +63,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: data-analysis-sam-template
-      - name: Setup Python
+      - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
