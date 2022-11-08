@@ -65,8 +65,6 @@ Resources:
               StringLike:
                 aws:PrincipalArn: 'arn:aws:iam::*:role/txma-ticf-integration-InitiateAthenaQueryFunctionR-*'
 
-        
-
   QueryResultsLogsBucket:
     #checkov:skip=CKV_AWS_18:This is the query results logs bucket
     Type: AWS::S3::Bucket
