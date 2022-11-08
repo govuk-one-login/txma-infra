@@ -118,8 +118,7 @@ Resources:
         ResultConfiguration:
           EncryptionConfiguration:
             EncryptionOption: SSE_S3
-          OutputLocation:
-            !Join ['', ['s3://', !ImportValue QueryResultsBucketName, '/']]
+          OutputLocation: !Sub s3://txma-qr-infra-${Environment}-query-results-bucket
 
   QueryRequestTable:
     Type: AWS::DynamoDB::Table
