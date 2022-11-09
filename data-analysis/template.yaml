@@ -118,7 +118,48 @@ Resources:
         ResultConfiguration:
           EncryptionConfiguration:
             EncryptionOption: SSE_S3
-          OutputLocation: !Sub s3://txma-qr-infra-${Environment}-query-results-bucket
+          OutputLocation: !Join [ '', [ 's3://', !Ref AthenaQueryOutputBucket, '/' ] ]
+          
+  AthenaQueryOutputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-athena-query-output-bucket
+      LifecycleConfiguration:
+        Rules:
+          - Id: AnalysisCleanupRule
+            Status: Enabled
+            ExpirationInDays: 30
+      LoggingConfiguration:
+        DestinationBucketName: !Ref AthenaQueryOutputLogsBucket
+        LogFilePrefix: String
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  AthenaQueryOutputLogsBucket:
+    #checkov:skip=CKV_AWS_18:This is the query results logs bucket
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${Environment}-athena-query-output-logs
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
 
   QueryRequestTable:
     Type: AWS::DynamoDB::Table
