@@ -290,7 +290,7 @@ Resources:
           - Sid: Enable Decrypt access for Event Processing
             Effect: Allow
             Principal:
-              AWS: !Sub '{{ssm:resolve:EventProcessingAccountRootArn}}'
+              AWS: '{{resolve:ssm:EventProcessingAccountRootArn}}'
             Action:
               - kms:Decrypt
             Resource: '*'
