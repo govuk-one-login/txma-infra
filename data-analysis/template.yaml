@@ -292,7 +292,7 @@ Resources:
           - Sid: Enable Decrypt access for Query Results account
             Effect: Allow
             Principal:
-              AWS: !Sub '{{ssm:resolve:QueryResultsAccountRootArn}}'
+              AWS: '{{ssm:resolve:QueryResultsAccountRootArn}}'
             Action:
               - kms:Decrypt
             Resource: '*'
