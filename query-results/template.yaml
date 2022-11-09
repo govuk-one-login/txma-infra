@@ -163,11 +163,44 @@ Resources:
             MetricName: SecureFraudApiIpReputationListMetric
             SampledRequestsEnabled: true
 
+  # Need a separate KMS key here for the audit queue because we need to grant access to the event processing account
+  # and our main KMS key definitions are in 'core', which is a shared set of definitions across all stacks.
+  AuditDataRequestEventsQueueKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Enable Decrypt access for Event Processing
+            Effect: Allow
+            Principal:
+              AWS: !Sub '{{ssm:resolve:EventProcessingAccountRootArn}}'
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
+
   AuditDataRequestEventsQueue:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-queue
-      KmsMasterKeyId: '{{resolve:ssm:SqsKmsKeyArn}}'
+      KmsMasterKeyId: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt AuditDataRequestEventsDeadLetterQueue.Arn
         maxReceiveCount: 5
@@ -176,7 +209,26 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-dead-letter-queue
-      KmsMasterKeyId: '{{resolve:ssm:SqsKmsKeyArn}}'
+      KmsMasterKeyId: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
+
+  AuditDataRequestQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref AuditDataRequestEventsQueue
+      PolicyDocument:
+        Statement:
+          - Sid: AllowEventProcessingAccountQueueRead
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
+              - 'sqs:ReceiveMessage'
+            Effect: 'Allow'
+            Resource: !GetAtt AuditDataRequestEventsQueue.Arn
+            Principal:
+              AWS:
+                - '{{resolve:ssm:EventProcessingAccountNumber}}'
 
   QueryResultsBucketArnParameter:
     Type: AWS::SSM::Parameter
@@ -226,6 +278,13 @@ Resources:
       Name: AuditDataRequestEventsQueueUrl
       Type: String
       Value: !Ref AuditDataRequestEventsQueue
+
+  AuditDataRequestEventsQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataRequestEventsQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
 
 Outputs:
   QueryResultsBucketName:
