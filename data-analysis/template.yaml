@@ -365,6 +365,20 @@ Resources:
       Type: String
       Value: !Ref AthenaAnalysisWorkgroup
 
+  AthenaQueryOutputBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaQueryOutputBucketName
+      Type: String
+      Value: !Ref AthenaQueryOutputBucket
+  
+  AthenaQueryOutputBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaQueryOutputBucketArn
+      Type: String
+      Value: !GetAtt AthenaQueryOutputBucket.Arn
+
   QueryRequestTableArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
