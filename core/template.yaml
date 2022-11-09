@@ -163,34 +163,6 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/database-kms-key
       TargetKeyId: !Ref DatabaseKmsKey
 
-  AthenaQueryOutputBucketKmsKey:
-    Type: AWS::KMS::Key
-    Properties:
-      EnableKeyRotation: true
-      KeyPolicy:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: Enable Root access
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action:
-              - kms:*
-            Resource: '*'
-          - Sid: Allow AWS Lambda access
-            Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action:
-              - kms:Decrypt
-            Resource: '*'
-
-  AthenaQueryOutputBucketKmsKeyAlias:
-    Type: AWS::KMS::Alias
-    Properties:
-      AliasName: !Sub alias/${AWS::StackName}/${Environment}/athena-query-output-bucket-kms-key
-      TargetKeyId: !Ref AthenaQueryOutputBucketKmsKey
-
   LambdaKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -225,10 +197,3 @@ Resources:
       Name: DatabaseKmsKeyArn
       Type: String
       Value: !GetAtt DatabaseKmsKey.Arn
-
-  AthenaQueryOutputBucketKmsKeyArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AthenaQueryOutputBucketKmsKeyArn
-      Type: String
-      Value: !GetAtt AthenaQueryOutputBucketKmsKey.Arn

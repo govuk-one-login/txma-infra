@@ -128,7 +128,7 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
-              KMSMasterKeyID: '{{resolve:ssm:AthenaQueryOutputBucketKmsKeyArn}}'
+              KMSMasterKeyID: !GetAtt AthenaQueryOutputBucketKmsKey.Arn
       BucketName: !Sub ${AWS::StackName}-${Environment}-athena-query-output-bucket
       LifecycleConfiguration:
         Rules:
@@ -162,6 +162,34 @@ Resources:
         RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
+
+  AthenaQueryOutputBucketKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+
+  AthenaQueryOutputBucketKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/athena-query-output-bucket-kms-key
+      TargetKeyId: !Ref AthenaQueryOutputBucketKmsKey
 
   QueryRequestTable:
     Type: AWS::DynamoDB::Table
@@ -421,3 +449,10 @@ Resources:
       Name: AuditDataRequestEventsQueueKmsKeyArn
       Type: String
       Value: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
+
+  AthenaQueryOutputBucketKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaQueryOutputBucketKmsKeyArn
+      Type: String
+      Value: !GetAtt AthenaQueryOutputBucketKmsKey.Arn
