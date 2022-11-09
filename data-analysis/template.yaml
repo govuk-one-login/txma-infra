@@ -127,7 +127,8 @@ Resources:
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: '{{resolve:ssm:AthenaQueryOutputBucketKmsKeyArn}}'
       BucketName: !Sub ${AWS::StackName}-${Environment}-athena-query-output-bucket
       LifecycleConfiguration:
         Rules:
