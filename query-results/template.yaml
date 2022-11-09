@@ -38,42 +38,6 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-  QueryResultsBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref QueryResultsBucket
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: AllowSSLRequestsOnly
-            Action: s3:*
-            Effect: Deny
-            Resource:
-              - !Sub ${QueryResultsBucket.Arn}/*
-            Principal: '*'
-            Condition:
-              Bool:
-                aws:SecureTransport: false
-          - Sid: AthenaLambdaAccess
-            Action:
-              - s3:GetBucketLocation
-              - s3:GetObject
-              - s3:ListBucket
-              - s3:ListBucketMultipartUploads
-              - s3:ListMultipartUploadParts
-              - s3:AbortMultipartUpload
-              - s3:PutObject
-            Effect: Allow
-            Resource:
-              - '{{resolve:ssm:QueryResultsBucketArn}}'
-              - '{{resolve:ssm:QueryResultsBucketArn}}/*'
-            Principal:
-              AWS:
-                - '{{resolve:ssm:AuditAccountRootArn}}'
-            Condition:
-              StringLike:
-                aws:PrincipalArn: 'arn:aws:iam::*:role/txma-ticf-integration-InitiateAthenaQueryFunctionR-*'
-
   QueryResultsLogsBucket:
     #checkov:skip=CKV_AWS_18:This is the query results logs bucket
     Type: AWS::S3::Bucket
