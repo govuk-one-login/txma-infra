@@ -233,6 +233,12 @@ Resources:
               - kms:Decrypt
             Resource: '*'
 
+  AuditDataRequestEventsQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/data-request-events-queue-kms-key
+      TargetKeyId: !Ref AuditDataRequestEventsQueueKmsKey
+
   AuditDataRequestEventsQueue:
     Type: AWS::SQS::Queue
     Properties:
@@ -299,6 +305,12 @@ Resources:
               - kms:Encrypt
               - kms:Decrypt
             Resource: '*'
+
+  QueryCompletedQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/query-completed-queue-kms-key
+      TargetKeyId: !Ref QueryCompletedQueueKmsKey
 
   QueryCompletedQueue:
     Type: AWS::SQS::Queue
