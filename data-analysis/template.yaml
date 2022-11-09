@@ -289,7 +289,7 @@ Resources:
             Action:
               - kms:*
             Resource: '*'
-          - Sid: Enable Decrypt access for Event Processing
+          - Sid: Enable Decrypt access for Query Results account
             Effect: Allow
             Principal:
               AWS: !Sub '{{ssm:resolve:QueryResultsAccountRootArn}}'
