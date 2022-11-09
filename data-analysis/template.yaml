@@ -371,7 +371,7 @@ Resources:
       Name: AthenaQueryOutputBucketName
       Type: String
       Value: !Ref AthenaQueryOutputBucket
-  
+
   AthenaQueryOutputBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
