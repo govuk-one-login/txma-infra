@@ -153,6 +153,15 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
+          - Sid: 'AllowSSLRequestsOnly'
+            Effect: 'Deny'
+            'Action': 's3:*'
+            Resource:
+              - !Sub '${AthenaQueryOutputBucket.Arn}/*'
+            Principal: '*'
+            Condition:
+              Bool:
+                'aws:SecureTransport': 'false'
           - Sid: AllowQueryResultsAccountAccess
             Action:
               - s3:GetObject
