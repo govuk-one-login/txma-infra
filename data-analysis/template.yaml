@@ -146,6 +146,24 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  AthenaQueryOutputBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AthenaQueryOutputBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowQueryResultsAccountAccess
+            Action:
+              - s3:GetObject
+              - s3:GetObjectAcl
+              - s3:GetObjectTagging
+            Effect: Allow
+            Resource:
+              !Join ['', ['arn:aws:s3:::', !Ref AthenaQueryOutputBucket, '/*']]
+            Principal:
+              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
+
   AthenaQueryOutputLogsBucket:
     #checkov:skip=CKV_AWS_18:This is the query results logs bucket
     Type: AWS::S3::Bucket
@@ -176,6 +194,13 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action:
               - kms:*
+            Resource: '*'
+          - Sid: Allow Results account access
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
+            Action:
+              - kms:Decrypt
             Resource: '*'
           - Sid: Allow AWS Lambda access
             Effect: Allow
