@@ -201,7 +201,7 @@ Resources:
             Resource: !GetAtt AuditDataRequestEventsQueue.Arn
             Principal:
               AWS:
-                - '{{resolve:ssm:EventProcessingAccountNumber}}'
+                - '{{resolve:ssm:EventProcessingAccountRootArn}}'
 
   QueryResultsBucketArnParameter:
     Type: AWS::SSM::Parameter
