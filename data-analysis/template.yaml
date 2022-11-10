@@ -304,6 +304,12 @@ Resources:
               - kms:Decrypt
             Resource: '*'
 
+  AuditDataRequestEventsQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/data-request-events-queue-kms-key
+      TargetKeyId: !Ref AuditDataRequestEventsQueueKmsKey
+
   AuditDataRequestEventsQueue:
     Type: AWS::SQS::Queue
     Properties:
@@ -337,6 +343,79 @@ Resources:
     Properties:
       QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-dead-letter-queue
       KmsMasterKeyId: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
+
+  # Need a separate KMS key here for the query completed queue because we need to grant access to the query-results account
+  # and our main KMS key definitions are in 'core', which is a shared set of definitions across all stacks.
+  QueryCompletedQueueKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Enable Decrypt access for Query Results account
+            Effect: Allow
+            Principal:
+              AWS: '{{ssm:resolve:QueryResultsAccountRootArn}}'
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
+
+  QueryCompletedQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/query-completed-queue-kms-key
+      TargetKeyId: !Ref QueryCompletedQueueKmsKey
+
+  QueryCompletedQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-query-completed-queue
+      KmsMasterKeyId: !GetAtt QueryCompletedQueueKmsKey.Arn
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt AuditDataRequestEventsDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  QueryCompletedQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref QueryCompletedQueue
+      PolicyDocument:
+        Statement:
+          - Sid: AllowResultsDeliveryQueueRead
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
+              - 'sqs:ReceiveMessage'
+            Effect: 'Allow'
+            Resource: !GetAtt QueryCompletedQueue.Arn
+            Principal:
+              AWS:
+                - '{{resolve:ssm:QueryResultsAccountRootArn}}'
+
+  QueryCompletedDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-query-completed-dead-letter-queue
+      KmsMasterKeyId: !GetAtt QueryCompletedQueueKmsKey.Arn
 
   BatchJobManifestBucketArnParameter:
     Type: AWS::SSM::Parameter
@@ -449,6 +528,27 @@ Resources:
       Name: AuditDataRequestEventsQueueKmsKeyArn
       Type: String
       Value: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
+
+  QueryCompletedQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QueryCompletedQueueArn
+      Type: String
+      Value: !GetAtt QueryCompletedQueue.Arn
+
+  QueryCompletedQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QueryCompletedQueueUrl
+      Type: String
+      Value: !Ref QueryCompletedQueue
+
+  QueryCompletedQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QueryCompletedQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt QueryCompletedQueueKmsKey.Arn
 
   AthenaQueryOutputBucketKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
