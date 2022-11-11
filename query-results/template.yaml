@@ -203,6 +203,79 @@ Resources:
               AWS:
                 - '{{resolve:ssm:EventProcessingAccountRootArn}}'
 
+  # Need a separate KMS key here for the close zendesk queue because we need to grant access to the audit account
+  # and our main KMS key definitions are in 'core', which is a shared set of definitions across all stacks.
+  CloseZendeskTicketQueueKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Enable Decrypt access for Audit account
+            Effect: Allow
+            Principal:
+              AWS: !Sub '{{resolve:ssm:AuditAccountRootArn}}'
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
+
+  CloseZendeskTicketQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/close-zendesk-ticket-queue-kms-key
+      TargetKeyId: !Ref CloseZendeskTicketQueueKmsKey
+
+  CloseZendeskTicketQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-close-zendesk-ticket-queue
+      KmsMasterKeyId: !GetAtt CloseZendeskTicketQueueKmsKey.Arn
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt CloseZendeskTicketDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  CloseZendeskTicketQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref CloseZendeskTicketQueue
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloseZendeskTicketQueueRead
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
+              - 'sqs:ReceiveMessage'
+            Effect: 'Allow'
+            Resource: !GetAtt CloseZendeskTicketQueue.Arn
+            Principal:
+              AWS:
+                - '{{resolve:ssm:AuditAccountRootArn}}'
+
+  CloseZendeskTicketDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-close-zendesk-ticket-dead-letter-queue
+      KmsMasterKeyId: !GetAtt CloseZendeskTicketQueueKmsKey.Arn
+
   QueryResultsBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -258,6 +331,27 @@ Resources:
       Name: AuditDataRequestEventsQueueKmsKeyArn
       Type: String
       Value: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
+
+  CloseZendeskTicketQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CloseZendeskTicketQueueArn
+      Type: String
+      Value: !GetAtt CloseZendeskTicketQueue.Arn
+
+  CloseZendeskTicketQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CloseZendeskTicketQueueUrl
+      Type: String
+      Value: !Ref CloseZendeskTicketQueue
+
+  CloseZendeskTicketQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CloseZendeskTicketQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt CloseZendeskTicketQueueKmsKey.Arn
 
 Outputs:
   QueryResultsBucketName:
