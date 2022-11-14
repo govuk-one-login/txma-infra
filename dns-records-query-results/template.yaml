@@ -22,7 +22,7 @@ Mappings:
       ResultsApiDomainName: results.transaction.account.gov.uk
 
 Resources:
-  ResultsPublicHostedZone:
+  ResultsApiPublicHostedZone:
     Type: AWS::Route53::HostedZone
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
