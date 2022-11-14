@@ -59,5 +59,5 @@ Resources:
       Value: !Ref ResultsApiDomainName
 
 Outputs:
-  ResultsPublicHostedZoneNameServers:
-    Value: !Join [',', !GetAtt ResultsPublicHostedZone.NameServers]
+  ResultsApiPublicHostedZoneNameServers:
+    Value: !Join [',', !GetAtt ResultsApiPublicHostedZone.NameServers]
