@@ -14,13 +14,13 @@ Parameters:
       - dev
       - build
       - staging
-      - integration
   PermissionsBoundary:
     Description: The ARN of the permissions boundary to apply to any role created by the template
     Type: String
     Default: none
 
 Conditions:
+  FeatureBranches: !Equals [!Ref Environment, dev]
   UseCodeSigning: !Not [!Equals [!Ref CodeSigningConfigArn, none]]
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
 
@@ -43,6 +43,7 @@ Resources:
     #checkov:skip=CKV_AWS_115:Defined in Globals
     #checkov:skip=CKV_AWS_116:DLQ not required as failures will be reported to CloudFormation
     #checkov:skip=CKV_AWS_117:VPC not required
+    Condition: FeatureBranches
     Type: AWS::Serverless::Function
     Properties:
       Handler: emptyS3Buckets.handler
@@ -73,6 +74,7 @@ Resources:
               Resource: '*'
 
   EmptyS3BucketsLogs:
+    Condition: FeatureBranches
     Type: AWS::Logs::LogGroup
     Properties:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
@@ -97,6 +99,7 @@ Resources:
         Status: Enabled
 
   EmptyS3BucketsFunctionArnParameter:
+    Condition: FeatureBranches
     Type: AWS::SSM::Parameter
     Properties:
       Name: EmptyS3BucketsFunctionArn
