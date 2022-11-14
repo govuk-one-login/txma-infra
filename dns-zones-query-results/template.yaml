@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates the necessary DNS zones in the query results account
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - build
+      - staging
+      - integration
+      - production
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, production]
+
+Resources:
+  ResultsApiPublicHostedZone:
+    Type: AWS::Route53::HostedZone
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name:
+        !If [
+          IsProduction,
+          results.transaction.account.gov.uk,
+          !Sub 'results.transaction.${Environment}.account.gov.uk'
+        ]
+
+Outputs:
+  ResultsApiPublicHostedZoneNameServers:
+    Value: !Join [',', !GetAtt ResultsApiPublicHostedZone.NameServers]
+
+  ResultsApiPublicHostedZoneId:
+    Value: !GetAtt ResultsApiPublicHostedZone.Id
+    Export:
+      Name: ResultsApiPublicHostedZoneId

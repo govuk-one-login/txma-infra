@@ -3,7 +3,7 @@ name: Package dns zones
 on:
   push:
     paths:
-      - dns-zones/**
+      - dns-zones-audit/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dns-zones
+        working-directory: dns-zones-audit
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -46,23 +46,19 @@ jobs:
       - name: Upload template artifact
         uses: actions/upload-artifact@v3
         with:
-          name: dns-zones-sam-template
+          name: dns-zones-audit-sam-template
           path: |
-            dns-zones/template.yaml
+            dns-zones-audit/template.yaml
 
   package:
     strategy:
       matrix:
-        target: [AUDIT_BUILD, QUERY_RESULTS_BUILD]
+        target: [AUDIT_BUILD]
         include:
           - target: AUDIT_BUILD
-            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_ZONES_AUDIT
-            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_ZONES_AUDIT
-            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_AUDIT_BUILD
-          - target: QUERY_RESULTS_BUILD
-            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_ZONES_QUERY_RESULTS
-            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_ZONES_QUERY_RESULTS
-            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_ZONES_AUDIT_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_ZONES_AUDIT_BUILD
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_AUDIT_BUILD
     name: Package template
     if: github.ref == 'refs/heads/main'
     needs: [validate]
@@ -74,7 +70,7 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v3
         with:
-          name: dns-zones-sam-template
+          name: dns-zones-audit-sam-template
       - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:

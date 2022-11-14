@@ -1,9 +1,9 @@
-name: Package DNS records for Query Results account
+name: Package dns zones
 
 on:
   push:
     paths:
-      - dns-records-query-results/**
+      - dns-zones-query-results/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dns-records-query-results
+        working-directory: dns-zones-query-results
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -32,7 +32,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DNS_RECORDS_QUERY_RESULTS }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DNS_ZONES }}
       - name: Validate SAM template
         if: always()
         run: sam validate
@@ -46,9 +46,9 @@ jobs:
       - name: Upload template artifact
         uses: actions/upload-artifact@v3
         with:
-          name: dns-records-query-results-sam-template
+          name: dns-zones-query-results-sam-template
           path: |
-            dns-records-query-results/template.yaml
+            dns-zones-query-results/template.yaml
 
   package:
     strategy:
@@ -56,8 +56,8 @@ jobs:
         target: [QUERY_RESULTS_BUILD]
         include:
           - target: QUERY_RESULTS_BUILD
-            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_RECORDS_QUERY_RESULTS
-            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_RECORDS_QUERY_RESULTS
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_ZONES_QUERY_RESULTS_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_ZONES_QUERY_RESULTS_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
     name: Package template
     if: github.ref == 'refs/heads/main'
@@ -70,7 +70,7 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v3
         with:
-          name: dns-records-query-results-sam-template
+          name: dns-zones-query-results-sam-template
       - name: Setup Python 3.8
         uses: actions/setup-python@v3
         with:

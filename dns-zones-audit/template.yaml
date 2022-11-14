@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates the necessary DNS zones in the audit account
+Parameters:
+  Environment:
+    Description: The name of the environment to deploy to
+    Type: String
+    AllowedValues:
+      - build
+      - staging
+      - integration
+      - production
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, production]
+
+Resources:
+  RootPublicHostedZone:
+    Type: AWS::Route53::HostedZone
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name:
+        !If [
+          IsProduction,
+          transaction.account.gov.uk,
+          !Sub 'transaction.${Environment}.account.gov.uk'
+        ]
+
+  ZendeskWebhookApiPublicHostedZone:
+    Type: AWS::Route53::HostedZone
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name:
+        !If [
+          IsProduction,
+          zendesk.transaction.account.gov.uk,
+          !Sub 'zendesk.transaction.${Environment}.account.gov.uk'
+        ]
+
+Outputs:
+  RootPublicHostedZoneNameServers:
+    Value: !Join [',', !GetAtt RootPublicHostedZone.NameServers]
+
+  RootPublicHostedZoneId:
+    Value: !GetAtt RootPublicHostedZone.Id
+    Export:
+      Name: RootPublicHostedZoneId
+
+  ZendeskWebhookApiPublicHostedZoneNameServers:
+    Value: !Join [',', !GetAtt ZendeskWebhookApiPublicHostedZone.NameServers]
+    Export:
+      Name: ZendeskWebhookApiPublicHostedZoneNameServers
+
+  ZendeskWebhookApiPublicHostedZoneId:
+    Value: !GetAtt ZendeskWebhookApiPublicHostedZone.Id
+    Export:
+      Name: ZendeskWebhookApiPublicHostedZoneId
