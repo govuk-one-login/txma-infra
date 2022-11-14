@@ -1,4 +1,4 @@
-name: Package dns zones
+name: Package DNS zones for audit account
 
 on:
   push:
