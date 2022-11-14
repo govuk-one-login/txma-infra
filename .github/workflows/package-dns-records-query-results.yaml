@@ -26,6 +26,7 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
+          cache: pip
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Assume AWS Validate role
@@ -50,7 +51,7 @@ jobs:
           path: |
             dns-records-query-results/template.yaml
 
-  package:
+  create-changeset:
     strategy:
       matrix:
         target: [QUERY_RESULTS_BUILD]
@@ -59,8 +60,7 @@ jobs:
             ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_RECORDS_QUERY_RESULTS
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_RECORDS_QUERY_RESULTS
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
-    name: Package template
-    if: github.ref == 'refs/heads/main'
+    name: Create changeset
     needs: [validate]
     permissions:
       id-token: write
@@ -75,6 +75,58 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
+          cache: pip
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
+      - name: Create changeset
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+          S3_BUCKET: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET] }}
+        run: |
+          stack_name=$(
+            echo ${BRANCH_NAME##*/} | \
+            tr -cd '[a-zA-Z0-9-]' | \
+            tr '[:upper:]' '[:lower:]' | \
+            cut -c -32
+          )
+
+          sam deploy \
+            --stack-name ${stack_name} \
+            --no-execute-changeset \
+            --no-fail-on-empty-changeset \
+            --s3-bucket ${S3_BUCKET}
+
+  package:
+    strategy:
+      matrix:
+        target: [QUERY_RESULTS_BUILD]
+        include:
+          - target: QUERY_RESULTS_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_RECORDS_QUERY_RESULTS
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_RECORDS_QUERY_RESULTS
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
+    name: Package template
+    if: github.ref == 'refs/heads/main'
+    needs: [validate, create-changeset]
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dns-records-query-results-sam-template
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+          cache: pip
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Assume AWS role
