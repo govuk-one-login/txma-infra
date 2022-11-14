@@ -59,7 +59,6 @@ jobs:
           - target: QUERY_RESULTS_BUILD
             ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DNS_RECORDS_QUERY_RESULTS
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_RECORDS_QUERY_RESULTS
-            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
     name: Create changeset
     if: github.ref != 'refs/heads/main'
     needs: [validate]
