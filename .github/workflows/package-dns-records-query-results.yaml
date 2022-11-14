@@ -51,7 +51,7 @@ jobs:
           path: |
             dns-records-query-results/template.yaml
 
-  create-changeset:
+  deploy-dry-run:
     strategy:
       matrix:
         target: [QUERY_RESULTS_BUILD]
@@ -61,6 +61,7 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_RECORDS_QUERY_RESULTS
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
     name: Create changeset
+    if: github.ref != 'refs/heads/main'
     needs: [validate]
     permissions:
       id-token: write
@@ -112,7 +113,7 @@ jobs:
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
     name: Package template
     if: github.ref == 'refs/heads/main'
-    needs: [validate, create-changeset]
+    needs: [validate]
     permissions:
       id-token: write
       contents: read
