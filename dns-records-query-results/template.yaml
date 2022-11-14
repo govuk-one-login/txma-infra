@@ -13,11 +13,11 @@ Parameters:
 Mappings:
   Environment:
     build:
-      ResultsApiDomainName: !Sub results.transaction.build.account.gov.uk
+      ResultsApiDomainName: results.transaction.build.account.gov.uk
     staging:
-      ResultsApiDomainName: !Sub results.transaction.staging.account.gov.uk
+      ResultsApiDomainName: results.transaction.staging.account.gov.uk
     integration:
-      ResultsApiDomainName: !Sub results.transaction.integration.account.gov.uk
+      ResultsApiDomainName: results.transaction.integration.account.gov.uk
     production:
       ResultsApiDomainName: results.transaction.account.gov.uk
 
