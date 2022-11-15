@@ -9,7 +9,7 @@ Parameters:
       - staging
       - integration
       - production
-  ResultsPublicHostedZoneNameServers:
+  ResultsApiPublicHostedZoneNameServers:
     Type: AWS::SSM::Parameter::Value<List<String>>
     Default: ResultsApiPublicHostedZoneNameServers
 
