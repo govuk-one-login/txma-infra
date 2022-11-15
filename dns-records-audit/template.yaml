@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates the necessary DNS records, certificates and domain names for the query results account
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - build
+      - staging
+      - integration
+      - production
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, production]
+
+Resources:
+  ZendeskWebhookApiCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:
+        !If [
+          IsProduction,
+          zendesk.transaction.account.gov.uk,
+          !Sub 'zendesk.transaction.${Environment}.account.gov.uk'
+        ]
+      DomainValidationOptions:
+        - DomainName:
+            !If [
+              IsProduction,
+              zendesk.transaction.account.gov.uk,
+              !Sub 'zendesk.transaction.${Environment}.account.gov.uk'
+            ]
+          HostedZoneId: !ImportValue ZendeskWebhookApiPublicHostedZoneId
+      ValidationMethod: DNS
+
+  ZendeskWebhookApiDomainName:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName:
+        !If [
+          IsProduction,
+          zendesk.transaction.account.gov.uk,
+          !Sub 'zendesk.transaction.${Environment}.account.gov.uk'
+        ]
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      RegionalCertificateArn: !Ref ZendeskWebhookApiCertificate
+      SecurityPolicy: TLS_1_2
+
+  ZendeskWebhookApiDomainNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ZendeskWebhookApiDomainName
+      Type: String
+      Value: !Ref ZendeskWebhookApiDomainName
