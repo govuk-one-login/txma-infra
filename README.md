@@ -1,6 +1,6 @@
 # di-txma-infra
 
-Infrastructure for querying data in Transaction Monitoring & Audit.  There is an additional README for each stack.
+Infrastructure for querying data in Transaction Monitoring & Audit. There is an additional README for each stack.
 
 ## Pre-requisites
 
