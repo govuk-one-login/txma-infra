@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates the necessary DNS records for to delegate DNS to sub-domains in the audit and query results accounts
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - build
+      - staging
+      - integration
+      - production
+  ResultsPublicHostedZoneNameServers:
+    Type: AWS::SSM::Parameter::Value<List<String>>
+    Default: ResultsApiPublicHostedZoneNameServers
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, production]
+
+Resources:
+  ZendeskWebhookApiDnsDelegation:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !ImportValue RootPublicHostedZoneId
+      Name:
+        !If [
+          IsProduction,
+          zendesk.transaction.account.gov.uk,
+          !Sub 'zendesk.transaction.${Environment}.account.gov.uk'
+        ]
+      ResourceRecords: !ImportValue ZendeskWebhookApiPublicHostedZoneNameServers
+      TTL: '300'
+      Type: NS
+
+  ResultsApiDnsDelegation:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !ImportValue RootPublicHostedZoneId
+      Name:
+        !If [
+          IsProduction,
+          results.transaction.account.gov.uk,
+          !Sub 'results.transaction.${Environment}.account.gov.uk'
+        ]
+      ResourceRecords: !Ref ResultsApiPublicHostedZoneNameServers
+      TTL: '300'
+      Type: NS
