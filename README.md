@@ -17,11 +17,6 @@ To run this project you will need the following:
 - **Node version 16** is required since the runtimes for Lambda functions are fixed.
 - Remove any old versions of Yarn that you may have installed globally if installing via `corepack enable`, or else the global version will override the version coming from Node.
 
-### Important
-
-- **Node version 16** is required since the runtimes for Lambda functions are fixed.
-- Remove any old versions of Yarn that you may have installed globally if installing via `corepack enable`, or else the global version will override the version coming from Node.
-
 ## Getting started
 
 The project is using [Yarn Zero Installs](https://yarnpkg.com/features/zero-installs). So as long as Yarn itself is installed, everything should be ready to go out of the box. As long as you are running Node v16.10+, the easiest way to install Yarn is to enable corepack.
