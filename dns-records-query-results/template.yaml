@@ -48,6 +48,15 @@ Resources:
       RegionalCertificateArn: !Ref ResultsApiCertificate
       SecurityPolicy: TLS_1_2
 
+  ResultsApiAliasRecord:
+    AliasTarget:
+      DNSName: !GetAtt ResultsApiDomainName.RegionalDomainName
+      EvaluateTargetHealth: false
+      HostedZoneId: !ImportValue ResultsApiPublicHostedZoneId
+    HostedZoneId: !ImportValue ResultsApiPublicHostedZoneId
+    Name: !Ref ResultsApiDomainName
+    Type: A
+
   ResultsApiDomainNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
