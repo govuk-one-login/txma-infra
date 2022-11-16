@@ -48,6 +48,14 @@ Resources:
       RegionalCertificateArn: !Ref ZendeskWebhookApiCertificate
       SecurityPolicy: TLS_1_2
 
+  ZendeskWebhookApiAliasRecord:
+    AliasTarget:
+      DNSName: !GetAtt ZendeskWebhookApiDomainName.RegionalDomainName
+      EvaluateTargetHealth: false
+      HostedZoneId: !ImportValue ZendeskWebhookApiPublicHostedZoneId
+    HostedZoneId: !ImportValue ZendeskWebhookApiPublicHostedZoneId
+    Name: !Ref ZendeskWebhookApiDomainName
+
   ZendeskWebhookApiDomainNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
