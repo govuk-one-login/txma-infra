@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates the necessary DNS records, certificates and domain names for the query results account
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - build
+      - staging
+      - integration
+      - production
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, production]
+
+Resources:
+  ResultsApiCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:
+        !If [
+          IsProduction,
+          results.transaction.account.gov.uk,
+          !Sub 'results.transaction.${Environment}.account.gov.uk'
+        ]
+      DomainValidationOptions:
+        - DomainName:
+            !If [
+              IsProduction,
+              results.transaction.account.gov.uk,
+              !Sub 'results.transaction.${Environment}.account.gov.uk'
+            ]
+          HostedZoneId: !ImportValue ResultsApiPublicHostedZoneId
+      ValidationMethod: DNS
+
+  ResultsApiDomainName:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName:
+        !If [
+          IsProduction,
+          results.transaction.account.gov.uk,
+          !Sub 'results.transaction.${Environment}.account.gov.uk'
+        ]
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      RegionalCertificateArn: !Ref ResultsApiCertificate
+      SecurityPolicy: TLS_1_2
+
+  ResultsApiDomainNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ResultsApiDomainName
+      Type: String
+      Value: !Ref ResultsApiDomainName

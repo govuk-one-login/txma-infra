@@ -27,7 +27,8 @@ Resources:
           zendesk.transaction.account.gov.uk,
           !Sub 'zendesk.transaction.${Environment}.account.gov.uk'
         ]
-      ResourceRecords: !ImportValue ZendeskWebhookApiPublicHostedZoneNameServers
+      ResourceRecords:
+        !Split [',', !ImportValue ZendeskWebhookApiPublicHostedZoneNameServers]
       TTL: '300'
       Type: NS
 
