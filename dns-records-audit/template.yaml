@@ -55,6 +55,7 @@ Resources:
       HostedZoneId: !ImportValue ZendeskWebhookApiPublicHostedZoneId
     HostedZoneId: !ImportValue ZendeskWebhookApiPublicHostedZoneId
     Name: !Ref ZendeskWebhookApiDomainName
+    Type: A
 
   ZendeskWebhookApiDomainNameParameter:
     Type: AWS::SSM::Parameter

@@ -55,6 +55,7 @@ Resources:
       HostedZoneId: !ImportValue ResultsApiPublicHostedZoneId
     HostedZoneId: !ImportValue ResultsApiPublicHostedZoneId
     Name: !Ref ResultsApiDomainName
+    Type: A
 
   ResultsApiDomainNameParameter:
     Type: AWS::SSM::Parameter
