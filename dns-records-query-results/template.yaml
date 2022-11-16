@@ -54,7 +54,7 @@ Resources:
       AliasTarget:
         DNSName: !GetAtt ResultsApiDomainName.RegionalDomainName
         EvaluateTargetHealth: false
-        HostedZoneId: !ImportValue ResultsApiPublicHostedZoneId
+        HostedZoneId: !GetAtt ResultsApiDomainName.RegionalHostedZoneId
       HostedZoneId: !ImportValue ResultsApiPublicHostedZoneId
       Name: !Ref ResultsApiDomainName
       Type: A

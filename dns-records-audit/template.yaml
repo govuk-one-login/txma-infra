@@ -54,7 +54,7 @@ Resources:
       AliasTarget:
         DNSName: !GetAtt ZendeskWebhookApiDomainName.RegionalDomainName
         EvaluateTargetHealth: false
-        HostedZoneId: !ImportValue ZendeskWebhookApiPublicHostedZoneId
+        HostedZoneId: !GetAtt ZendeskWebhookApiDomainName.RegionalHostedZoneId
       HostedZoneId: !ImportValue ZendeskWebhookApiPublicHostedZoneId
       Name: !Ref ZendeskWebhookApiDomainName
       Type: A
