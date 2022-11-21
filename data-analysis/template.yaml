@@ -13,6 +13,10 @@ Parameters:
       - integration
       - production
 
+Conditions:
+  LockCrossAccountPermissionsToLambdaRoles:
+    !Not [!Equals [!Ref Environment, dev]]
+
 Resources:
   BatchJobManifestBucket:
     Type: AWS::S3::Bucket
@@ -397,10 +401,18 @@ Resources:
           - Sid: Enable Decrypt access for Query Results account generate download Lambda
             Effect: Allow
             Principal:
-              AWS: !Sub 'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-build-generate-download-role'
+              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
             Action:
               - kms:Decrypt
             Resource: '*'
+            Condition:
+              StringEquals:
+                'aws:principalArn':
+                  !If [
+                    LockCrossAccountPermissionsToLambdaRoles,
+                    'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-${Environment}-generate-download-role',
+                    '*'
+                  ]
           - Sid: Allow AWS Lambda access
             Effect: Allow
             Principal:
@@ -442,8 +454,15 @@ Resources:
             Effect: 'Allow'
             Resource: !GetAtt QueryCompletedQueue.Arn
             Principal:
-              AWS:
-                - !Sub 'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-build-generate-download-role'
+              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
+            Condition:
+              StringEquals:
+                'aws:principalArn':
+                  !If [
+                    LockCrossAccountPermissionsToLambdaRoles,
+                    'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-${Environment}-generate-download-role',
+                    '*'
+                  ]
 
   QueryCompletedDeadLetterQueue:
     Type: AWS::SQS::Queue
