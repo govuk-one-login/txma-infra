@@ -394,10 +394,10 @@ Resources:
             Action:
               - kms:*
             Resource: '*'
-          - Sid: Enable Decrypt access for Query Results account
+          - Sid: Enable Decrypt access for Query Results account generate download Lambda
             Effect: Allow
             Principal:
-              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
+              AWS: !Sub 'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-build-generate-download-role'
             Action:
               - kms:Decrypt
             Resource: '*'
@@ -443,7 +443,7 @@ Resources:
             Resource: !GetAtt QueryCompletedQueue.Arn
             Principal:
               AWS:
-                - '{{resolve:ssm:QueryResultsAccountRootArn}}'
+                - !Sub 'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-build-generate-download-role'
 
   QueryCompletedDeadLetterQueue:
     Type: AWS::SQS::Queue
