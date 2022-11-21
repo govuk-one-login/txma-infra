@@ -423,7 +423,7 @@ Resources:
       QueueName: !Sub ${AWS::StackName}-${Environment}-query-completed-queue
       KmsMasterKeyId: !GetAtt QueryCompletedQueueKmsKey.Arn
       RedrivePolicy:
-        deadLetterTargetArn: !GetAtt AuditDataRequestEventsDeadLetterQueue.Arn
+        deadLetterTargetArn: !GetAtt QueryCompletedDeadLetterQueue.Arn
         maxReceiveCount: 5
 
   QueryCompletedQueuePolicy:
