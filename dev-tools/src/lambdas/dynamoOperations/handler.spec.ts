@@ -44,5 +44,5 @@ describe('handler', () => {
     })
   })
 
-  it('throws an error when no dynamo')
+  // it('throws an error when no dynamo')
 })
