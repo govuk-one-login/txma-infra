@@ -399,26 +399,26 @@ Resources:
               - kms:*
             Resource: '*'
           - !If
-          - LockCrossAccountPermissionsToLambdaRoles
-          # If we are in a non-dev environment so know the lambda role name
-          - Sid: Enable Decrypt access for Query Results account generate download Lambda
-            Effect: Allow
-            Principal:
-              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
-            Action:
-              - kms:Decrypt
-            Resource: '*'
-            Condition:
-              StringEquals:
-                'aws:principalArn': 'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-${Environment}-generate-download-role'
-          # Otherwise allow anything in the dev query results account root account
-          - Sid: Enable Decrypt access for Query Results dev account
-            Effect: Allow
-            Principal:
-              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
-            Action:
-              - kms:Decrypt
-            Resource: '*'
+            - LockCrossAccountPermissionsToLambdaRoles
+            # If we are in a non-dev environment so know the lambda role name
+            - Sid: Enable Decrypt access for Query Results account generate download Lambda
+              Effect: Allow
+              Principal:
+                AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
+              Condition:
+                StringEquals:
+                  'aws:principalArn': 'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-${Environment}-generate-download-role'
+            # Otherwise allow anything in the dev query results account root account
+            - Sid: Enable Decrypt access for Query Results dev account
+              Effect: Allow
+              Principal:
+                AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
           - Sid: Allow AWS Lambda access
             Effect: Allow
             Principal:
@@ -450,33 +450,34 @@ Resources:
       Queues:
         - !Ref QueryCompletedQueue
       PolicyDocument:
-        Statement: !If
-          - LockCrossAccountPermissionsToLambdaRoles
-          # If we are in a non-dev environment so know the lambda role name
-          - Sid: AllowResultsDeliveryQueueReadForLambdaRole
-            Action:
-              - 'sqs:ChangeMessageVisibility'
-              - 'sqs:DeleteMessage'
-              - 'sqs:GetQueueAttributes'
-              - 'sqs:ReceiveMessage'
-            Effect: 'Allow'
-            Resource: !GetAtt QueryCompletedQueue.Arn
-            Principal:
-              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
-            Condition:
-              StringEquals:
-                'aws:principalArn': 'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-${Environment}-generate-download-role'
-          # Otherwise allow anything in the dev query results account root account
-          - Sid: AllowResultsDeliveryQueueReadForResultsAccount
-            Action:
-              - 'sqs:ChangeMessageVisibility'
-              - 'sqs:DeleteMessage'
-              - 'sqs:GetQueueAttributes'
-              - 'sqs:ReceiveMessage'
-            Effect: 'Allow'
-            Resource: !GetAtt QueryCompletedQueue.Arn
-            Principal:
-              AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
+        Statement:
+          - !If
+            - LockCrossAccountPermissionsToLambdaRoles
+            # If we are in a non-dev environment so know the lambda role name
+            - Sid: AllowResultsDeliveryQueueReadForLambdaRole
+              Action:
+                - 'sqs:ChangeMessageVisibility'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+                - 'sqs:ReceiveMessage'
+              Effect: 'Allow'
+              Resource: !GetAtt QueryCompletedQueue.Arn
+              Principal:
+                AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
+              Condition:
+                StringEquals:
+                  'aws:principalArn': 'arn:aws:iam::{{resolve:ssm:QueryResultsAccountNumber}}:role/txma-query-results-${Environment}-generate-download-role'
+            # Otherwise allow anything in the dev query results account root account
+            - Sid: AllowResultsDeliveryQueueReadForResultsAccount
+              Action:
+                - 'sqs:ChangeMessageVisibility'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+                - 'sqs:ReceiveMessage'
+              Effect: 'Allow'
+              Resource: !GetAtt QueryCompletedQueue.Arn
+              Principal:
+                AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
 
   QueryCompletedDeadLetterQueue:
     Type: AWS::SQS::Queue
