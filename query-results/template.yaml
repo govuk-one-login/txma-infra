@@ -12,6 +12,9 @@ Parameters:
       - staging
       - integration
       - production
+Conditions:
+  LockCrossAccountPermissionsToLambdaRoles:
+    !Not [!Equals [!Ref Environment, dev]]
 
 Resources:
   QueryResultsBucket:
@@ -219,13 +222,27 @@ Resources:
             Action:
               - kms:*
             Resource: '*'
-          - Sid: Enable Decrypt access for Audit account
-            Effect: Allow
-            Principal:
-              AWS: !Sub '{{resolve:ssm:AuditAccountRootArn}}'
-            Action:
-              - kms:Decrypt
-            Resource: '*'
+          - !If
+            - LockCrossAccountPermissionsToLambdaRoles
+            # If we are in a non-dev environment so know the lambda role name
+            - Sid: Enable Decrypt access for Audit account close ticket lambda
+              Effect: Allow
+              Principal:
+                AWS: '{{resolve:ssm:AuditAccountRootArn}}'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
+              Condition:
+                StringEquals:
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-close-zendesk-ticket-role'
+            # Otherwise allow anything in the dev audit root account
+            - Sid: Enable Decrypt access for Audit dev account
+              Effect: Allow
+              Principal:
+                AWS: '{{resolve:ssm:AuditAccountRootArn}}'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
           - Sid: Allow AWS Lambda access
             Effect: Allow
             Principal:
@@ -258,17 +275,33 @@ Resources:
         - !Ref CloseZendeskTicketQueue
       PolicyDocument:
         Statement:
-          - Sid: AllowCloseZendeskTicketQueueRead
-            Action:
-              - 'sqs:ChangeMessageVisibility'
-              - 'sqs:DeleteMessage'
-              - 'sqs:GetQueueAttributes'
-              - 'sqs:ReceiveMessage'
-            Effect: 'Allow'
-            Resource: !GetAtt CloseZendeskTicketQueue.Arn
-            Principal:
-              AWS:
-                - '{{resolve:ssm:AuditAccountRootArn}}'
+          - !If
+            - LockCrossAccountPermissionsToLambdaRoles
+            # If we are in a non-dev environment so know the lambda role name
+            - Sid: AllowAuditAccountCloseTicketQueueReadForLambdaRole
+              Action:
+                - 'sqs:ChangeMessageVisibility'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+                - 'sqs:ReceiveMessage'
+              Effect: 'Allow'
+              Resource: !GetAtt CloseZendeskTicketQueue.Arn
+              Principal:
+                AWS: '{{resolve:ssm:AuditAccountRootArn}}'
+              Condition:
+                StringEquals:
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-close-zendesk-ticket-role'
+            # Otherwise allow anything in the dev audit root account
+            - Sid: AllowResultsDeliveryQueueReadForAuditAccount
+              Action:
+                - 'sqs:ChangeMessageVisibility'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+                - 'sqs:ReceiveMessage'
+              Effect: 'Allow'
+              Resource: !GetAtt CloseZendeskTicketQueue.Arn
+              Principal:
+                AWS: '{{resolve:ssm:AuditAccountRootArn}}'
 
   CloseZendeskTicketDeadLetterQueue:
     Type: AWS::SQS::Queue
