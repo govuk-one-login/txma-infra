@@ -80,9 +80,16 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: dynamoOperations.handler
-      FunctionName: dynamo-operations
-      FunctionUrlConfig:
-        AuthType: AWS_IAM
+      FunctionName: !Sub ${AWS::StackName}-dynamo-operations
+      Policies:
+        - Statement:
+            - Sid: QueryRequestTableReadWrite
+              Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+                - dynamodb:DeleteItem
+              Resource: '{{resolve:ssm:QueryRequestTableArn}}'
 
   EmptyS3BucketsLogs:
     Condition: FeatureBranches
@@ -116,8 +123,3 @@ Resources:
       Name: EmptyS3BucketsFunctionArn
       Type: String
       Value: !GetAtt EmptyS3BucketsFunction.Arn
-
-Outputs:
-  DynamoOperationsUrlEndpoint:
-    Value:
-      Fn::GetAtt: DynamoOperationsUrl.FunctionUrl
