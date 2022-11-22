@@ -1,5 +1,4 @@
 import {
-  AttributeValue,
   DynamoDBClient,
   GetItemCommand,
   GetItemOutput
@@ -7,7 +6,7 @@ import {
 import { mockClient } from 'aws-sdk-client-mock'
 import {
   AUDIT_REQUEST_DYNAMODB,
-  TEST_ATHENA_QUERY_ID,
+  MOCK_ITEM,
   ZENDESK_TICKET_ID
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbGet } from './dynamoDbGet'
@@ -15,27 +14,9 @@ import 'aws-sdk-client-mock-jest'
 
 const dynamoMock = mockClient(DynamoDBClient)
 
-const mockItem: Record<string, AttributeValue> = {
-  requestInfo: {
-    M: {
-      recipientEmail: { S: 'test@test.gov.uk' },
-      recipientName: { S: 'test' },
-      requesterEmail: { S: 'test@test.gov.uk' },
-      requesterName: { S: 'test' },
-      dateTo: { S: '2022-09-06' },
-      identifierType: { S: 'eventId' },
-      dateFrom: { S: '2022-09-06' },
-      zendeskId: { S: '12' },
-      eventIds: { L: [{ S: '234gh24' }, { S: '98h98bc' }] },
-      piiTypes: { L: [{ S: 'passport_number' }] }
-    }
-  },
-  zendeskId: { S: '12' },
-  athenaQueryId: { S: TEST_ATHENA_QUERY_ID }
-}
 const givenDatabaseReturnsData = () => {
   const mockDbGetContents = {
-    Item: mockItem
+    Item: MOCK_ITEM
   }
   dynamoMock.on(GetItemCommand).resolves(mockDbGetContents as GetItemOutput)
 }
@@ -70,7 +51,7 @@ describe('dynamoDbGet', () => {
       GetItemCommand,
       getDynamoEntryCommandWithoutAttName
     )
-    expect(dynamoItem).toEqual(mockItem)
+    expect(dynamoItem).toEqual(MOCK_ITEM)
   })
 
   it('dynamo client is called with the correct params (with attributeName)', async () => {
@@ -90,11 +71,11 @@ describe('dynamoDbGet', () => {
       GetItemCommand,
       getDynamoEntryCommandWithAttName
     )
-    expect(dynamoItem).toEqual(mockItem)
+    expect(dynamoItem).toEqual(MOCK_ITEM)
   })
 
   it('throws an error if function is called without a zendeskId', async () => {
-    await expect(dynamoDbGet({ zendeskId: '' })).rejects.toThrow(
+    expect(dynamoDbGet({})).rejects.toThrow(
       'No Zendesk ID found in dynamoDbGet parameters'
     )
   })

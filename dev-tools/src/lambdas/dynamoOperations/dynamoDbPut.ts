@@ -1,9 +1,22 @@
+import { PutItemCommand } from '@aws-sdk/client-dynamodb'
 import { OperationParams } from '../../types/dynamoDbOperation'
+import { getEnv } from '../../utils/getEnv'
+import { dynamoDbClient } from './dynamoDbClient'
 
 export const dynamoDbPut = async (operationParams: OperationParams) => {
+  if (!operationParams.itemToPut)
+    throw Error('No item found to put to db in dynamoDbPut parameters')
+
+  const putDynamoEntryCommand = {
+    TableName: getEnv('AUDIT_REQUEST_DYNAMODB_TABLE'),
+    ReturnValues: 'ALL_OLD',
+    Item: operationParams.itemToPut
+  }
+
   console.log(
-    'DynamoDbGet function.',
-    operationParams.zendeskId,
-    operationParams.attributeName
+    'Sending PutItemCommand to Dynamo with params: ',
+    putDynamoEntryCommand
   )
+
+  await dynamoDbClient.send(new PutItemCommand(putDynamoEntryCommand))
 }

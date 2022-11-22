@@ -1,0 +1,3 @@
+import { AUDIT_REQUEST_DYNAMODB } from './testConstants'
+
+process.env.AUDIT_REQUEST_DYNAMODB_TABLE = AUDIT_REQUEST_DYNAMODB
