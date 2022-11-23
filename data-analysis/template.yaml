@@ -231,7 +231,10 @@ Resources:
 
   QueryRequestTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
+      TableName: !Sub ${AWS::StackName}-query-requests-table
       AttributeDefinitions:
         - AttributeName: zendeskId
           AttributeType: S
