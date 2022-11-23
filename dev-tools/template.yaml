@@ -73,7 +73,7 @@ Resources:
                 - s3:PutBucketVersioning
               Resource: '*'
 
-  DynamoOperations:
+  DynamoOperationsFunction:
     #checkov:skip=CKV_AWS_115:Defined in Globals
     #checkov:skip=CKV_AWS_116:DLQ not required as failures will be reported to CloudFormation
     #checkov:skip=CKV_AWS_117:VPC not required
@@ -81,8 +81,15 @@ Resources:
     Properties:
       Handler: dynamoOperations.handler
       FunctionName: !Sub ${AWS::StackName}-dynamo-operations
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
       Policies:
         - Statement:
+            - Sid: DecryptKmsKeys
+              Effect: Allow
+              Action:
+                - kms:Decrypt
+              Resource:
+                - '{{resolve:ssm:DatabaseKmsKeyArn}}'
             - Sid: QueryRequestTableReadWrite
               Effect: Allow
               Action:
@@ -116,10 +123,10 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-  EmptyS3BucketsFunctionArnParameter:
-    Condition: FeatureBranches
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: EmptyS3BucketsFunctionArn
-      Type: String
-      Value: !GetAtt EmptyS3BucketsFunction.Arn
+  # EmptyS3BucketsFunctionArnParameter:
+  #   Condition: FeatureBranches
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: EmptyS3BucketsFunctionArn
+  #     Type: String
+  #     Value: !GetAtt EmptyS3BucketsFunction.Arn

@@ -74,7 +74,7 @@ describe('dynamoDbGet', () => {
     expect(dynamoItem).toEqual(MOCK_ITEM)
   })
 
-  it('throws an error if function is called without a zendeskId', async () => {
+  it('throws an error when function is called without a zendeskId', async () => {
     expect(dynamoDbGet({})).rejects.toThrow(
       'No Zendesk ID found in dynamoDbGet parameters'
     )
