@@ -18,5 +18,5 @@ export const dynamoDbPut = async (operationParams: OperationParams) => {
     putDynamoEntryCommand
   )
 
-  dynamoDbClient.send(new PutItemCommand(putDynamoEntryCommand))
+  return dynamoDbClient.send(new PutItemCommand(putDynamoEntryCommand))
 }
