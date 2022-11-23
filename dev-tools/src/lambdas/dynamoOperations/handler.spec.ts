@@ -1,7 +1,6 @@
 import { when } from 'jest-when'
-import { DynamoDbOperation } from '../../types/dynamoDbOperation'
+import { DynamoDbOperation, Operation } from '../../types/dynamoDbOperation'
 import { ZENDESK_TICKET_ID } from '../../utils/tests/constants/testConstants'
-import { testFunctionUrlCallEvent } from '../../utils/tests/events/testFunctionUrlCallEvent'
 import { dynamoDbDelete } from './dynamoDbDelete'
 import { dynamoDbGet } from './dynamoDbGet'
 import { dynamoDbPut } from './dynamoDbPut'
@@ -18,39 +17,22 @@ jest.mock('./dynamoDbDelete', () => ({
 }))
 
 describe('handler', () => {
-  const generateEventBody = (operationDetails?: DynamoDbOperation) => {
-    const eventWithCustomBody = testFunctionUrlCallEvent
-    eventWithCustomBody.body = JSON.stringify(operationDetails)
-    return eventWithCustomBody
-  }
-  const generateGetDynamoParams = (attributeName?: string) => {
-    return generateEventBody({
-      operation: 'GET',
+  const generateDynamoOperationParams = (operation: Operation) => {
+    return {
+      operation,
       params: {
-        zendeskId: ZENDESK_TICKET_ID,
-        ...(attributeName && { attributeName })
+        ...(operation === 'GET' && {
+          zendeskId: ZENDESK_TICKET_ID,
+          attributeName: 'athenaQueryId'
+        }),
+        ...(operation === 'PUT' && {
+          itemToPut: { zendeskId: { S: ZENDESK_TICKET_ID } }
+        }),
+        ...(operation === 'DELETE' && {
+          zendeskId: ZENDESK_TICKET_ID
+        })
       }
-    })
-  }
-  const generatePutDynamoParams = () => {
-    return generateEventBody({
-      operation: 'PUT',
-      params: {
-        itemToPut: {
-          zendeskId: {
-            S: ZENDESK_TICKET_ID
-          }
-        }
-      }
-    })
-  }
-  const generateDeleteDynamoParams = () => {
-    return generateEventBody({
-      operation: 'DELETE',
-      params: {
-        zendeskId: ZENDESK_TICKET_ID
-      }
-    })
+    }
   }
 
   const dynamoDbGetReturnsEntry = () => {
@@ -63,9 +45,12 @@ describe('handler', () => {
   it('returns a dynamoDbEntry when handler is called with correct GET params', async () => {
     dynamoDbGetReturnsEntry()
 
-    const dynamoDbEntry = await handler(generateGetDynamoParams())
+    const dynamoDbEntry = await handler(generateDynamoOperationParams('GET'))
 
-    expect(dynamoDbGet).toHaveBeenCalledWith({ zendeskId: ZENDESK_TICKET_ID })
+    expect(dynamoDbGet).toHaveBeenCalledWith({
+      zendeskId: ZENDESK_TICKET_ID,
+      attributeName: 'athenaQueryId'
+    })
     expect(dynamoDbEntry).toEqual({
       zendeskId: { S: ZENDESK_TICKET_ID },
       athenaQueryId: { S: '123' }
@@ -73,7 +58,7 @@ describe('handler', () => {
   })
 
   it('calls the dynamoDbPut function when handler is called with PUT operation', async () => {
-    await handler(generatePutDynamoParams())
+    await handler(generateDynamoOperationParams('PUT'))
 
     expect(dynamoDbPut).toHaveBeenCalledWith({
       itemToPut: { zendeskId: { S: ZENDESK_TICKET_ID } }
@@ -81,7 +66,7 @@ describe('handler', () => {
   })
 
   it('calls the dynamoDbDelete function when handler is called with DELETE operation', async () => {
-    await handler(generateDeleteDynamoParams())
+    await handler(generateDynamoOperationParams('DELETE'))
 
     expect(dynamoDbDelete).toHaveBeenCalledWith({
       zendeskId: ZENDESK_TICKET_ID
@@ -89,8 +74,14 @@ describe('handler', () => {
   })
 
   it('throws an error when dynamo operation is not recognised', () => {
-    expect(handler(generateEventBody())).rejects.toThrow(
-      'Dynamo operation not recognised'
+    expect(
+      handler(generateDynamoOperationParams('something else' as Operation))
+    ).rejects.toThrow('Dynamo operation not recognised')
+  })
+
+  it('throws an error when parameter is undefined', () => {
+    expect(handler(undefined as unknown as DynamoDbOperation)).rejects.toThrow(
+      'Function called with undefined params'
     )
   })
 })
