@@ -60,6 +60,8 @@ Resources:
 
   SecureFraudSiteDataTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${AWS::StackName}-secure-fraud-site-data
       AttributeDefinitions:
