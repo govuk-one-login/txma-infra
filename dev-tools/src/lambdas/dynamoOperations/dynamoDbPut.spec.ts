@@ -1,7 +1,7 @@
 import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb'
 import { mockClient } from 'aws-sdk-client-mock'
 import {
-  AUDIT_REQUEST_DYNAMODB,
+  QUERY_REQUEST_DYNAMODB_TABLE_NAME,
   ZENDESK_TICKET_ID
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbPut } from './dynamoDbPut'
@@ -13,7 +13,7 @@ describe('dynamoDbPut', () => {
   it('dynamo client is called with the correct params', async () => {
     const item = { zendeskId: { S: ZENDESK_TICKET_ID } }
     const putItemCommand = {
-      TableName: AUDIT_REQUEST_DYNAMODB,
+      TableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       ReturnValues: 'ALL_OLD',
       Item: item
     }

@@ -8,7 +8,7 @@ export const dynamoDbDelete = async (operationParams: OperationParams) => {
     throw Error('No Zendesk ID found in dynamoDbDelete parameters')
 
   const deleteDynamoEntryCommand = {
-    TableName: getEnv('AUDIT_REQUEST_DYNAMODB_TABLE'),
+    TableName: getEnv('QUERY_REQUEST_DYNAMODB_TABLE_NAME'),
     Key: {
       zendeskId: { S: operationParams.zendeskId }
     }

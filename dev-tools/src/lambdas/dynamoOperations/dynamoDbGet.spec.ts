@@ -5,7 +5,7 @@ import {
 } from '@aws-sdk/client-dynamodb'
 import { mockClient } from 'aws-sdk-client-mock'
 import {
-  AUDIT_REQUEST_DYNAMODB,
+  QUERY_REQUEST_DYNAMODB_TABLE_NAME,
   MOCK_ITEM,
   ZENDESK_TICKET_ID
 } from '../../utils/tests/constants/testConstants'
@@ -14,31 +14,27 @@ import 'aws-sdk-client-mock-jest'
 
 const dynamoMock = mockClient(DynamoDBClient)
 
-const givenDatabaseReturnsData = () => {
-  const mockDbGetContents = {
-    Item: MOCK_ITEM
-  }
-  dynamoMock.on(GetItemCommand).resolves(mockDbGetContents as GetItemOutput)
-}
-
-const getDynamoEntryCommandWithoutAttName = {
-  TableName: AUDIT_REQUEST_DYNAMODB,
-  Key: {
-    zendeskId: { S: ZENDESK_TICKET_ID }
-  }
-}
-
-const getDynamoEntryCommandWithAttName = {
-  TableName: AUDIT_REQUEST_DYNAMODB,
-  Key: {
-    zendeskId: { S: ZENDESK_TICKET_ID }
-  },
-  ProjectionExpression: 'athenaQueryId'
-}
-
 describe('dynamoDbGet', () => {
+  const givenDatabaseReturnsData = () => {
+    const mockDbGetContents = {
+      Item: MOCK_ITEM
+    }
+    dynamoMock.on(GetItemCommand).resolves(mockDbGetContents as GetItemOutput)
+  }
+
+  const generateGetDynamoEntryCommand = (attributeName?: string) => {
+    return {
+      TableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
+      Key: {
+        zendeskId: { S: ZENDESK_TICKET_ID }
+      },
+      ...(attributeName && { ProjectionExpression: attributeName })
+    }
+  }
+
   it('dynamo client is called with the correct params (without attributeName)', async () => {
     jest.spyOn(global.console, 'log')
+    const getDynamoEntryCommandWithoutAttName = generateGetDynamoEntryCommand()
     givenDatabaseReturnsData()
 
     const dynamoItem = await dynamoDbGet({ zendeskId: ZENDESK_TICKET_ID })
@@ -56,6 +52,8 @@ describe('dynamoDbGet', () => {
 
   it('dynamo client is called with the correct params (with attributeName)', async () => {
     jest.spyOn(global.console, 'log')
+    const getDynamoEntryCommandWithAttName =
+      generateGetDynamoEntryCommand('athenaQueryId')
     givenDatabaseReturnsData()
 
     const dynamoItem = await dynamoDbGet({

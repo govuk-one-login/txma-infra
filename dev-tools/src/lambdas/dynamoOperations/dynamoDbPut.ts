@@ -8,7 +8,7 @@ export const dynamoDbPut = async (operationParams: OperationParams) => {
     throw Error('No item found to put to db in dynamoDbPut parameters')
 
   const putDynamoEntryCommand = {
-    TableName: getEnv('AUDIT_REQUEST_DYNAMODB_TABLE'),
+    TableName: getEnv('QUERY_REQUEST_DYNAMODB_TABLE_NAME'),
     ReturnValues: 'ALL_OLD',
     Item: operationParams.itemToPut
   }

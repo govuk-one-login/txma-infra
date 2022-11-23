@@ -80,6 +80,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: dynamoOperations.handler
+      Environment:
+        Variables:
+          QUERY_REQUEST_DYNAMODB_TABLE_NAME: '{{resolve:ssm:QueryRequestTableName}}'
       FunctionName: !Sub ${AWS::StackName}-dynamo-operations
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
       Policies:

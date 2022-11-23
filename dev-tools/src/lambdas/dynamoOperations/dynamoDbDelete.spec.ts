@@ -1,7 +1,7 @@
 import { DeleteItemCommand, DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { mockClient } from 'aws-sdk-client-mock'
 import {
-  AUDIT_REQUEST_DYNAMODB,
+  QUERY_REQUEST_DYNAMODB_TABLE_NAME,
   ZENDESK_TICKET_ID
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbDelete } from './dynamoDbDelete'
@@ -11,7 +11,7 @@ const dynamoMock = mockClient(DynamoDBClient)
 
 describe('dynamoDbDelete', () => {
   const deleteDynamoEntryCommand = {
-    TableName: AUDIT_REQUEST_DYNAMODB,
+    TableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
     Key: {
       zendeskId: { S: ZENDESK_TICKET_ID }
     }

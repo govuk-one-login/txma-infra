@@ -8,7 +8,7 @@ export const dynamoDbGet = async (operationParams: OperationParams) => {
     throw Error('No Zendesk ID found in dynamoDbGet parameters')
 
   const getDynamoEntryCommand = {
-    TableName: getEnv('AUDIT_REQUEST_DYNAMODB_TABLE'),
+    TableName: getEnv('QUERY_REQUEST_DYNAMODB_TABLE_NAME'),
     Key: {
       zendeskId: { S: `${operationParams.zendeskId}` }
     },

@@ -1,7 +1,8 @@
 import { AttributeValue } from 'aws-lambda'
 
 export const ZENDESK_TICKET_ID = '123'
-export const AUDIT_REQUEST_DYNAMODB = 'MY_AUDIT_REQUEST_DYNAMODB_TABLE'
+export const QUERY_REQUEST_DYNAMODB_TABLE_NAME =
+  'MY_AUDIT_REQUEST_DYNAMODB_TABLE'
 export const TEST_ATHENA_QUERY_ID = '54321'
 
 export const MOCK_ITEM: Record<string, AttributeValue> = {
