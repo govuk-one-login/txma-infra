@@ -3,10 +3,8 @@ import { dynamoDbDelete } from './dynamoDbDelete'
 import { dynamoDbGet } from './dynamoDbGet'
 import { dynamoDbPut } from './dynamoDbPut'
 
-// delete tryParseJson
 export const handler = async (dynamoOperationParams: DynamoDbOperation) => {
-  // remove log before merge
-  console.log('This is the event: ', dynamoOperationParams)
+  console.log('Function called with following params: ', dynamoOperationParams)
   if (!dynamoOperationParams)
     throw Error('Function called with undefined params')
 
