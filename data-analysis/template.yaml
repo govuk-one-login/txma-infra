@@ -234,7 +234,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub ${AWS::StackName}-query-requests-table
+      TableName: !Sub ${AWS::StackName}-query-request-table
       AttributeDefinitions:
         - AttributeName: zendeskId
           AttributeType: S
