@@ -126,10 +126,17 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-  # EmptyS3BucketsFunctionArnParameter:
-  #   Condition: FeatureBranches
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: EmptyS3BucketsFunctionArn
-  #     Type: String
-  #     Value: !GetAtt EmptyS3BucketsFunction.Arn
+  EmptyS3BucketsFunctionArnParameter:
+    Condition: FeatureBranches
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EmptyS3BucketsFunctionArn
+      Type: String
+      Value: !GetAtt EmptyS3BucketsFunction.Arn
+
+  IntegrationTestDataBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: IntegrationTestDataBucketName
+      Type: String
+      Value: !Ref IntegrationTestDataBucket
