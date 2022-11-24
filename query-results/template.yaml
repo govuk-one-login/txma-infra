@@ -15,6 +15,7 @@ Parameters:
 Conditions:
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
+  IsProduction: !Equals [!Ref Environment, production]
 
 Resources:
   QueryResultsBucket:
@@ -177,6 +178,9 @@ Resources:
   AuditDataRequestEventsQueue:
     Type: AWS::SQS::Queue
     Properties:
+      # We've been asked to use a message retention period of 14 days in production to allow ample time for integration
+      # Elswhere, to save wasted queue entries, we use two hours
+      MessageRetentionPeriod: !If [IsProduction, 1209600, 7200]
       QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-queue
       KmsMasterKeyId: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
       RedrivePolicy:
