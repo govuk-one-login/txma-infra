@@ -1,6 +1,5 @@
 import { PutItemCommand } from '@aws-sdk/client-dynamodb'
 import { OperationParams } from '../../types/dynamoDbOperation'
-import { getEnv } from '../../utils/getEnv'
 import { dynamoDbClient } from './dynamoDbClient'
 
 export const dynamoDbPut = async (operationParams: OperationParams) => {
@@ -8,7 +7,7 @@ export const dynamoDbPut = async (operationParams: OperationParams) => {
     throw Error('No item found to put to db in dynamoDbPut parameters')
 
   const putDynamoEntryCommand = {
-    TableName: getEnv('QUERY_REQUEST_DYNAMODB_TABLE_NAME'),
+    TableName: operationParams.tableName,
     ReturnValues: 'ALL_OLD',
     Item: operationParams.itemToPut
   }

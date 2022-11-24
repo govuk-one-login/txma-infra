@@ -1,6 +1,9 @@
 import { when } from 'jest-when'
 import { DynamoDbOperation, Operation } from '../../types/dynamoDbOperation'
-import { ZENDESK_TICKET_ID } from '../../utils/tests/constants/testConstants'
+import {
+  QUERY_REQUEST_DYNAMODB_TABLE_NAME,
+  ZENDESK_TICKET_ID
+} from '../../utils/tests/constants/testConstants'
 import { dynamoDbDelete } from './dynamoDbDelete'
 import { dynamoDbGet } from './dynamoDbGet'
 import { dynamoDbPut } from './dynamoDbPut'
@@ -21,6 +24,7 @@ describe('handler', () => {
     return {
       operation,
       params: {
+        tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
         ...(operation === 'GET' && {
           zendeskId: ZENDESK_TICKET_ID,
           attributeName: 'athenaQueryId'
@@ -48,6 +52,7 @@ describe('handler', () => {
     const dynamoDbEntry = await handler(generateDynamoOperationParams('GET'))
 
     expect(dynamoDbGet).toHaveBeenCalledWith({
+      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID,
       attributeName: 'athenaQueryId'
     })
@@ -61,6 +66,7 @@ describe('handler', () => {
     await handler(generateDynamoOperationParams('PUT'))
 
     expect(dynamoDbPut).toHaveBeenCalledWith({
+      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       itemToPut: { zendeskId: { S: ZENDESK_TICKET_ID } }
     })
   })
@@ -69,6 +75,7 @@ describe('handler', () => {
     await handler(generateDynamoOperationParams('DELETE'))
 
     expect(dynamoDbDelete).toHaveBeenCalledWith({
+      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID
     })
   })

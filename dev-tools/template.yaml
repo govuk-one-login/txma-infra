@@ -99,7 +99,7 @@ Resources:
                 - dynamodb:PutItem
                 - dynamodb:GetItem
                 - dynamodb:DeleteItem
-              Resource: '{{resolve:ssm:QueryRequestTableArn}}'
+              Resource: '*'
 
   EmptyS3BucketsLogs:
     Condition: FeatureBranches

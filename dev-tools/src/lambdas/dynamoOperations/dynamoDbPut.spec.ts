@@ -6,6 +6,7 @@ import {
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbPut } from './dynamoDbPut'
 import 'aws-sdk-client-mock-jest'
+import { OperationParams } from '../../types/dynamoDbOperation'
 
 const dynamoMock = mockClient(DynamoDBClient)
 
@@ -19,7 +20,10 @@ describe('dynamoDbPut', () => {
     }
     jest.spyOn(global.console, 'log')
 
-    await dynamoDbPut({ itemToPut: item })
+    await dynamoDbPut({
+      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
+      itemToPut: item
+    })
 
     expect(console.log).toHaveBeenCalledWith(
       'Sending PutItemCommand to Dynamo with params: ',
@@ -29,7 +33,7 @@ describe('dynamoDbPut', () => {
   })
 
   it('throws an error if function is called without an itemToPut', async () => {
-    expect(dynamoDbPut({})).rejects.toThrow(
+    expect(dynamoDbPut({} as OperationParams)).rejects.toThrow(
       'No item found to put to db in dynamoDbPut parameters'
     )
   })

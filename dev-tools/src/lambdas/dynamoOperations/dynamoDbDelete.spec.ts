@@ -6,6 +6,7 @@ import {
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbDelete } from './dynamoDbDelete'
 import 'aws-sdk-client-mock-jest'
+import { OperationParams } from '../../types/dynamoDbOperation'
 
 const dynamoMock = mockClient(DynamoDBClient)
 
@@ -20,7 +21,10 @@ describe('dynamoDbDelete', () => {
   it('dynamo client is called with the correct params', async () => {
     jest.spyOn(global.console, 'log')
 
-    await dynamoDbDelete({ zendeskId: ZENDESK_TICKET_ID })
+    await dynamoDbDelete({
+      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
+      zendeskId: ZENDESK_TICKET_ID
+    })
 
     expect(console.log).toHaveBeenCalledWith(
       'Sending DeleteItemCommand to Dynamo with params: ',
@@ -33,7 +37,7 @@ describe('dynamoDbDelete', () => {
   })
 
   it('throws an error when function is called without a zendeskId', async () => {
-    expect(dynamoDbDelete({})).rejects.toThrow(
+    expect(dynamoDbDelete({} as OperationParams)).rejects.toThrow(
       'No Zendesk ID found in dynamoDbDelete parameters'
     )
   })
