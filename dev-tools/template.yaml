@@ -73,6 +73,34 @@ Resources:
                 - s3:PutBucketVersioning
               Resource: '*'
 
+  DynamoOperationsFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
+    #checkov:skip=CKV_AWS_116:DLQ not required as failures will be reported to CloudFormation
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dynamoOperations.handler
+      Environment:
+        Variables:
+          QUERY_REQUEST_DYNAMODB_TABLE_NAME: '{{resolve:ssm:QueryRequestTableName}}'
+      FunctionName: !Sub ${AWS::StackName}-dynamo-operations
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      Policies:
+        - Statement:
+            - Sid: DecryptKmsKeys
+              Effect: Allow
+              Action:
+                - kms:Decrypt
+              Resource:
+                - '{{resolve:ssm:DatabaseKmsKeyArn}}'
+            - Sid: QueryRequestTableReadWrite
+              Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+                - dynamodb:DeleteItem
+              Resource: '{{resolve:ssm:QueryRequestTableArn}}'
+
   EmptyS3BucketsLogs:
     Condition: FeatureBranches
     Type: AWS::Logs::LogGroup
