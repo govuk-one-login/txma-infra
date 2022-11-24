@@ -23,7 +23,7 @@ describe('dynamoDbDelete', () => {
     await dynamoDbDelete({ zendeskId: ZENDESK_TICKET_ID })
 
     expect(console.log).toHaveBeenCalledWith(
-      'Sending DeletetItemCommand to Dynamo with params: ',
+      'Sending DeleteItemCommand to Dynamo with params: ',
       deleteDynamoEntryCommand
     )
     expect(dynamoMock).toHaveReceivedCommandWith(

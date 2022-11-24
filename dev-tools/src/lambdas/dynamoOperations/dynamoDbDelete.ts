@@ -15,7 +15,7 @@ export const dynamoDbDelete = async (operationParams: OperationParams) => {
   }
 
   console.log(
-    'Sending DeletetItemCommand to Dynamo with params: ',
+    'Sending DeleteItemCommand to Dynamo with params: ',
     deleteDynamoEntryCommand
   )
 
