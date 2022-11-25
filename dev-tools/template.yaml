@@ -137,3 +137,10 @@ Resources:
       Name: IntegrationTestDataBucketName
       Type: String
       Value: !Ref IntegrationTestDataBucket
+
+  DynamoOperationsFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: DynamoOperationsFunctionName
+      Type: String
+      Value: !Ref DynamoOperationsFunction
