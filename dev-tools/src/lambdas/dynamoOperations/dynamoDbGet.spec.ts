@@ -11,6 +11,7 @@ import {
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbGet } from './dynamoDbGet'
 import 'aws-sdk-client-mock-jest'
+import { OperationParams } from '../../types/dynamoDbOperation'
 
 const dynamoMock = mockClient(DynamoDBClient)
 
@@ -37,7 +38,10 @@ describe('dynamoDbGet', () => {
     const getDynamoEntryCommandWithoutAttName = generateGetDynamoEntryCommand()
     givenDatabaseReturnsData()
 
-    const dynamoItem = await dynamoDbGet({ zendeskId: ZENDESK_TICKET_ID })
+    const dynamoItem = await dynamoDbGet({
+      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
+      zendeskId: ZENDESK_TICKET_ID
+    })
 
     expect(console.log).toHaveBeenCalledWith(
       'Sending GetItemCommand to Dynamo with params: ',
@@ -57,6 +61,7 @@ describe('dynamoDbGet', () => {
     givenDatabaseReturnsData()
 
     const dynamoItem = await dynamoDbGet({
+      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID,
       attributeName: 'athenaQueryId'
     })
@@ -73,7 +78,7 @@ describe('dynamoDbGet', () => {
   })
 
   it('throws an error when function is called without a zendeskId', async () => {
-    expect(dynamoDbGet({})).rejects.toThrow(
+    expect(dynamoDbGet({} as OperationParams)).rejects.toThrow(
       'No Zendesk ID found in dynamoDbGet parameters'
     )
   })

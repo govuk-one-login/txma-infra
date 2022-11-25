@@ -80,9 +80,6 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: dynamoOperations.handler
-      Environment:
-        Variables:
-          QUERY_REQUEST_DYNAMODB_TABLE_NAME: '{{resolve:ssm:QueryRequestTableName}}'
       FunctionName: !Sub ${AWS::StackName}-dynamo-operations
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
       Policies:
@@ -99,7 +96,7 @@ Resources:
                 - dynamodb:PutItem
                 - dynamodb:GetItem
                 - dynamodb:DeleteItem
-              Resource: '{{resolve:ssm:QueryRequestTableArn}}'
+              Resource: '*'
 
   EmptyS3BucketsLogs:
     Condition: FeatureBranches

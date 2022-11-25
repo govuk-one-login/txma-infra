@@ -1,6 +1,5 @@
 import { GetItemCommand } from '@aws-sdk/client-dynamodb'
 import { OperationParams } from '../../types/dynamoDbOperation'
-import { getEnv } from '../../utils/getEnv'
 import { dynamoDbClient } from './dynamoDbClient'
 
 export const dynamoDbGet = async (operationParams: OperationParams) => {
@@ -8,7 +7,7 @@ export const dynamoDbGet = async (operationParams: OperationParams) => {
     throw Error('No Zendesk ID found in dynamoDbGet parameters')
 
   const getDynamoEntryCommand = {
-    TableName: getEnv('QUERY_REQUEST_DYNAMODB_TABLE_NAME'),
+    TableName: operationParams.tableName,
     Key: {
       zendeskId: { S: `${operationParams.zendeskId}` }
     },
