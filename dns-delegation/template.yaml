@@ -15,6 +15,7 @@ Parameters:
 
 Conditions:
   IsProduction: !Equals [!Ref Environment, production]
+  IsBuild: !Equals [!Ref Environment, build]
 
 Resources:
   ZendeskWebhookApiDnsDelegation:
@@ -43,5 +44,16 @@ Resources:
           !Sub 'results.transaction.${Environment}.account.gov.uk'
         ]
       ResourceRecords: !Ref ResultsApiPublicHostedZoneNameServers
+      TTL: '300'
+      Type: NS
+
+  MockServerDnsDelegation:
+    Type: AWS::Route53::RecordSet
+    Condition: IsBuild
+    Properties:
+      HostedZoneId: !ImportValue RootPublicHostedZoneId
+      Name: !Sub 'mockserver.transaction.${Environment}.account.gov.uk'
+      ResourceRecords:
+        !Split [',', !ImportValue MockServerPublicHostedZoneNameServers]
       TTL: '300'
       Type: NS
