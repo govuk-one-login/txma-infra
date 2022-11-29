@@ -138,6 +138,13 @@ Resources:
       Type: String
       Value: !Ref IntegrationTestDataBucket
 
+  IntegrationTestDataBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/IntegrationTestDataBucketArn
+      Type: String
+      Value: !GetAtt IntegrationTestDataBucket.Arn
+
   DynamoOperationsFunctionNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
