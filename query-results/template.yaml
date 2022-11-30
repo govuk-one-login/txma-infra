@@ -20,11 +20,9 @@ Conditions:
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
   NotTestEnvironment:
-    !Not [
-      !Or [
-        !Equals [!Ref Environment, production],
-        !Equals [!Ref Environment, integration]
-      ]
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration]
     ]
   IsProduction: !Equals [!Ref Environment, production]
 
