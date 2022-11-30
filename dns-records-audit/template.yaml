@@ -81,6 +81,7 @@ Resources:
 
   MockServerDomainName:
     Type: AWS::ApiGateway::DomainName
+    Condition: IsBuild
     Properties:
       DomainName: !Sub 'mockserver.transaction.${Environment}.account.gov.uk'
       EndpointConfiguration:
@@ -91,6 +92,7 @@ Resources:
 
   MockServerAliasRecord:
     Type: AWS::Route53::RecordSet
+    Condition: IsBuild
     Properties:
       AliasTarget:
         DNSName: !GetAtt MockServerDomainName.RegionalDomainName
@@ -101,6 +103,7 @@ Resources:
       Type: A
 
   MockServerDomainNameParameter:
+    Condition: IsBuild
     Type: AWS::SSM::Parameter
     Properties:
       Name: MockServerDomainName
