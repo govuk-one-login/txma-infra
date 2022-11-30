@@ -67,11 +67,13 @@ Outputs:
       Name: ZendeskWebhookApiPublicHostedZoneId
 
   MockServerPublicHostedZoneNameServers:
+    Condition: IsBuild
     Value: !Join [',', !GetAtt MockServerPublicHostedZone.NameServers]
     Export:
       Name: MockServerPublicHostedZoneNameServers
 
   MockServerPublicHostedZoneId:
+    Condition: IsBuild
     Value: !GetAtt MockServerPublicHostedZone.Id
     Export:
       Name: MockServerPublicHostedZoneId
