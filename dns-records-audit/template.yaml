@@ -89,7 +89,7 @@ Resources:
       RegionalCertificateArn: !Ref MockServerCertificate
       SecurityPolicy: TLS_1_2
 
-  MockServerCertificateAliasRecord:
+  MockServerAliasRecord:
     Type: AWS::Route53::RecordSet
     Properties:
       AliasTarget:
