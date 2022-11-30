@@ -12,9 +12,18 @@ Parameters:
       - staging
       - integration
       - production
+  SecureDownloadWebsiteAllowedIps:
+    Type: AWS::SSM::Parameter::Value<List<String>>
+    Default: SecureDownloadWebsiteAllowedIps
+
 Conditions:
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
+  NotTestEnvironment:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration]
+    ]
   IsProduction: !Equals [!Ref Environment, production]
 
 Resources:
@@ -93,11 +102,20 @@ Resources:
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
+  SecureFraudApiWafIpSet:
+    Condition: NotTestEnvironment
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Addresses: !Ref SecureDownloadWebsiteAllowedIps
+      Description: Lock secure download API access to GDS IP ranges
+      IPAddressVersion: IPV4
+      Name: secure-download-api-ip-range
+      Scope: REGIONAL
+
   SecureFraudApiWafAcl:
     Type: AWS::WAFv2::WebACL
     Properties:
-      DefaultAction:
-        Allow: {}
+      DefaultAction: !If [NotTestEnvironment, Block: {}, Allow: {}]
       Scope: REGIONAL
       VisibilityConfig:
         CloudWatchMetricsEnabled: true
@@ -141,6 +159,20 @@ Resources:
             CloudWatchMetricsEnabled: true
             MetricName: SecureFraudApiIpReputationListMetric
             SampledRequestsEnabled: true
+        - !If
+          - NotTestEnvironment
+          - Action:
+              Allow: {}
+            Name: SecureFraudSiteIpRestriction
+            Priority: 3
+            Statement:
+              IPSetReferenceStatement:
+                Arn: !GetAtt SecureFraudApiWafIpSet.Arn
+            VisibilityConfig:
+              CloudWatchMetricsEnabled: true
+              MetricName: SecureFraudSiteIpRestrictionMetric
+              SampledRequestsEnabled: true
+          - !Ref AWS::NoValue
 
   # Need a separate KMS key here for the audit queue because we need to grant access to the event processing account
   # and our main KMS key definitions are in 'core', which is a shared set of definitions across all stacks.
