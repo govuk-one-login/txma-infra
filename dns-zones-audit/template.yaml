@@ -12,6 +12,7 @@ Parameters:
 
 Conditions:
   IsProduction: !Equals [!Ref Environment, production]
+  IsBuild: !Equals [!Ref Environment, build]
 
 Resources:
   RootPublicHostedZone:
@@ -38,6 +39,14 @@ Resources:
           !Sub 'zendesk.transaction.${Environment}.account.gov.uk'
         ]
 
+  MockServerPublicHostedZone:
+    Type: AWS::Route53::HostedZone
+    Condition: IsBuild
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: !Sub 'mockserver.transaction.${Environment}.account.gov.uk'
+
 Outputs:
   RootPublicHostedZoneNameServers:
     Value: !Join [',', !GetAtt RootPublicHostedZone.NameServers]
@@ -56,3 +65,13 @@ Outputs:
     Value: !GetAtt ZendeskWebhookApiPublicHostedZone.Id
     Export:
       Name: ZendeskWebhookApiPublicHostedZoneId
+
+  MockServerPublicHostedZoneNameServers:
+    Value: !Join [',', !GetAtt MockServerPublicHostedZone.NameServers]
+    Export:
+      Name: MockServerPublicHostedZoneNameServers
+
+  MockServerPublicHostedZoneId:
+    Value: !GetAtt MockServerPublicHostedZone.Id
+    Export:
+      Name: MockServerPublicHostedZoneId
