@@ -12,6 +12,7 @@ Parameters:
 
 Conditions:
   IsProduction: !Equals [!Ref Environment, production]
+  IsBuild: !Equals [!Ref Environment, build]
 
 Resources:
   ZendeskWebhookApiCertificate:
@@ -65,3 +66,46 @@ Resources:
       Name: ZendeskWebhookApiDomainName
       Type: String
       Value: !Ref ZendeskWebhookApiDomainName
+
+  # Mock server records
+
+  MockServerCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Condition: IsBuild
+    Properties:
+      DomainName: !Sub 'mockserver.transaction.${Environment}.account.gov.uk'
+      DomainValidationOptions:
+        - DomainName: !Sub 'mockserver.transaction.${Environment}.account.gov.uk'
+          HostedZoneId: !ImportValue MockServerPublicHostedZoneId
+      ValidationMethod: DNS
+
+  MockServerDomainName:
+    Type: AWS::ApiGateway::DomainName
+    Condition: IsBuild
+    Properties:
+      DomainName: !Sub 'mockserver.transaction.${Environment}.account.gov.uk'
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      RegionalCertificateArn: !Ref MockServerCertificate
+      SecurityPolicy: TLS_1_2
+
+  MockServerAliasRecord:
+    Type: AWS::Route53::RecordSet
+    Condition: IsBuild
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt MockServerDomainName.RegionalDomainName
+        EvaluateTargetHealth: false
+        HostedZoneId: !GetAtt MockServerDomainName.RegionalHostedZoneId
+      HostedZoneId: !ImportValue MockServerPublicHostedZoneId
+      Name: !Ref MockServerDomainName
+      Type: A
+
+  MockServerDomainNameParameter:
+    Condition: IsBuild
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: MockServerDomainName
+      Type: String
+      Value: !Ref MockServerDomainName
