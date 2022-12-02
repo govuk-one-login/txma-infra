@@ -19,7 +19,7 @@ jest.mock('./dynamoDbDelete', () => ({
   dynamoDbDelete: jest.fn()
 }))
 
-describe('handler', () => {
+describe('dynamo db operations handler', () => {
   const generateDynamoOperationParams = (operation: Operation) => {
     return {
       operation,
