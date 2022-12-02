@@ -104,7 +104,7 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
-      Handler: sqsOperation.handler
+      Handler: sqsOperations.handler
       FunctionName: !Sub ${AWS::StackName}-sqs-operations
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
       Policies:
