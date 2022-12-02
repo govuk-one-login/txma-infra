@@ -75,7 +75,7 @@ Resources:
 
   DynamoOperationsFunction:
     #checkov:skip=CKV_AWS_115:Defined in Globals
-    #checkov:skip=CKV_AWS_116:DLQ not required as failures will be reported to CloudFormation
+    #checkov:skip=CKV_AWS_116:DLQ not required
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
@@ -97,6 +97,28 @@ Resources:
                 - dynamodb:GetItem
                 - dynamodb:DeleteItem
               Resource: '*'
+
+  SqsOperationsFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
+    #checkov:skip=CKV_AWS_116:DLQ not required
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: sqsOperation.handler
+      FunctionName: !Sub ${AWS::StackName}-sqs-operations
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      Policies:
+        - Statement:
+            - Sid: DecryptKmsKeys
+              Effect: Allow
+              Action:
+                - kms:GenerateDataKey
+                - kms:Decrypt
+              Resource: '*'
+            - Sid: SqsWrite
+              Effect: Allow
+              Action:
+                - sqs:SendMessage
 
   EmptyS3BucketsLogs:
     Condition: FeatureBranches
@@ -151,3 +173,10 @@ Resources:
       Name: /tests/DynamoOperationsFunctionName
       Type: String
       Value: !Ref DynamoOperationsFunction
+
+  SqsOperationsFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/SqsOperationsFunctionName
+      Type: String
+      Value: !Ref SqsOperationsFunction
