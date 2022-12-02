@@ -119,6 +119,7 @@ Resources:
               Effect: Allow
               Action:
                 - sqs:SendMessage
+              Resource: '*'
 
   EmptyS3BucketsLogs:
     Condition: FeatureBranches
