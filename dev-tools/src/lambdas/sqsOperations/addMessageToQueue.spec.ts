@@ -1,10 +1,11 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import { mockClient } from 'aws-sdk-client-mock'
 import { addMessageToQueue } from './addMessageToQueue'
+import 'aws-sdk-client-mock-jest'
+
+const sqsMock = mockClient(SQSClient)
 
 describe('add message to queue', () => {
-  const sqsMock = mockClient(SQSClient)
-
   test('sqs client is called with the correct parameters', async () => {
     const input = {
       MessageBody: 'test message',

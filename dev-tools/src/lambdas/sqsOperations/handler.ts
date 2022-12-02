@@ -2,7 +2,8 @@ import { SqsOperation } from '../../types/sqsOperation'
 import { addMessageToQueue } from './addMessageToQueue'
 
 export const handler = async (params: SqsOperation) => {
-  if (!params) throw Error('Function called with undefined params')
+  if (!params?.message || !params?.queueUrl)
+    throw Error('Function called with invalid parameters')
 
   const addToQueueResponse = await addMessageToQueue(
     params.message,
