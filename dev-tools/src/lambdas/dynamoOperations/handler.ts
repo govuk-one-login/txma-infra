@@ -4,7 +4,11 @@ import { dynamoDbGet } from './dynamoDbGet'
 import { dynamoDbPut } from './dynamoDbPut'
 
 export const handler = async (dynamoOperationParams: DynamoDbOperation) => {
-  console.log('Function called with following params: ', dynamoOperationParams)
+  console.log(
+    'Function called with following params: ',
+    JSON.stringify(dynamoOperationParams)
+  )
+
   if (!dynamoOperationParams)
     throw Error('Function called with undefined params')
 
