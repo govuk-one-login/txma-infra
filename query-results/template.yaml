@@ -376,7 +376,7 @@ Resources:
               Resource: '*'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-close-zendesk-ticket-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-qr-integaration-tests-trigger-role'
             # Otherwise allow anything in the dev audit root account
             - Sid: Enable Decrypt access for Audit dev account
               Effect: Allow
@@ -432,7 +432,7 @@ Resources:
                 AWS: '{{resolve:ssm:AuditAccountRootArn}}'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-close-zendesk-ticket-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-qr-integaration-tests-trigger-role'
             # Otherwise allow anything in the dev audit root account
             - Sid: AllowQRIntegrationTestsTriggerQueueReadForAuditAccount
               Action:
