@@ -531,16 +531,16 @@ Resources:
   QRIntegrationTestsTriggerQueueArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name:  QRIntegrationTestsTriggerQueueArn
+      Name: QRIntegrationTestsTriggerQueueArn
       Type: String
-      Value: !GetAtt  QRIntegrationTestsTriggerQueue.Arn
+      Value: !GetAtt QRIntegrationTestsTriggerQueue.Arn
 
   QRIntegrationTestsTriggerQueueUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name:  QRIntegrationTestsTriggerQueueUrl
+      Name: QRIntegrationTestsTriggerQueueUrl
       Type: String
-      Value: !Ref  QRIntegrationTestsTriggerQueue
+      Value: !Ref QRIntegrationTestsTriggerQueue
 
   QRIntegrationTestsTriggerQueueKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
