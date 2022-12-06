@@ -74,6 +74,9 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${AWS::StackName}-secure-fraud-site-data
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: !If [NotTestEnvironment, false, true]
       AttributeDefinitions:
         - AttributeName: downloadHash
           AttributeType: S

@@ -17,6 +17,11 @@ Conditions:
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
   IsProduction: !Equals [!Ref Environment, 'production']
+  NotTestEnvironment:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration]
+    ]
 
 Resources:
   BatchJobManifestBucket:
@@ -236,6 +241,9 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${AWS::StackName}-query-request-table
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: !If [NotTestEnvironment, false, true]
       AttributeDefinitions:
         - AttributeName: zendeskId
           AttributeType: S
