@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Developer tool infrastructure
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  CodeSigningConfigArn:
+    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
+    Type: String
+    Default: none
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+  PermissionsBoundary:
+    Description: The ARN of the permissions boundary to apply to any role created by the template
+    Type: String
+    Default: none
+
+Conditions:
+  UseCodeSigning: !Not [!Equals [!Ref CodeSigningConfigArn, none]]
+  UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
+
+Globals:
+  Function:
+    CodeSigningConfigArn:
+      !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
+    CodeUri: dist/
+    Environment:
+      Variables:
+        NODE_OPTIONS: --enable-source-maps
+    PermissionsBoundary:
+      !If [UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue]
+    ReservedConcurrentExecutions: 10
+    Runtime: nodejs16.x
+    Timeout: 30
+
+Resources:
+  QueryResultsIntegrationTestsSetupFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals section
+    #checkov:skip=CKV_AWS_116:The SQS queue itself will be responsible for its own DLQ
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: queryResultsIntegrationTestsSetup.handler
+      Role: !GetAtt QueryResultsIntegrationTestsSetupFunctionRole.Arn
+      Environment:
+        Variables:
+          ATHENA_OUTPUT_BUCKET_NAME: '{{resolve:ssm:AthenaQueryOutputBucketName}}'
+      FunctionName: !Sub ${AWS::StackName}-qr-integration-tests-setup
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      Events:
+        QRIntegrationTestsTrigggerEvent:
+          Type: SQS
+          Properties:
+            Queue: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-query-results-${Environment}-qr-integration-tests-trigger-queue'
+            BatchSize: 1
+
+  QueryResultsIntegrationTestsSetupFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-${Environment}-query-results-integration-tests-setup-role
+      PermissionsBoundary:
+        !If [
+          UsePermissionsBoundary,
+          !Ref PermissionsBoundary,
+          !Ref AWS::NoValue
+        ]
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowQRIntegrationTestsSetupActions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: Logs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt QueryResultsIntegrationTestsSetupLogs.Arn
+              - Sid: AllowQRIntegrationsTestsTriggerQueueRead
+                Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-query-results-${Environment}-qr-integration-tests-trigger-queue'
+              - Sid: DecryptKmsKeys
+                Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource:
+                  - '{{resolve:ssm:SecretsKmsKeyArn}}'
+                  - !Sub 'arn:aws:kms:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:*'
+
+  QueryResultsIntegrationTestsSetupLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-query-results-integration-tests-setup'
+      RetentionInDays: 30
+

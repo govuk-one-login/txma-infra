@@ -1,0 +1,36 @@
+{
+  "name": "audit-test-tools",
+  "description": "Test tools for the TxMA project",
+  "author": "GDS",
+  "license": "MIT",
+  "private": true,
+  "packageManager": "yarn@3.2.4",
+  "scripts": {
+    "build": "tsc --noEmit && ts-node ./esbuild.config.ts",
+    "test": "jest",
+    "test:cov": "jest --coverage"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudformation": "3.163.0",
+    "@aws-sdk/client-dynamodb": "3.163.0",
+    "@aws-sdk/client-s3": "3.163.0",
+    "@aws-sdk/client-sqs": "3.170.0",
+    "axios": "0.27.2"
+  },
+  "devDependencies": {
+    "@jest/types": "28.1.3",
+    "@types/aws-lambda": "8.10.102",
+    "@types/jest": "28.1.7",
+    "@types/jest-when": "3.5.2",
+    "@types/node": "18.7.1",
+    "aws-sdk-client-mock": "2.0.0",
+    "aws-sdk-client-mock-jest": "2.0.0",
+    "esbuild": "0.15.12",
+    "jest": "28.1.3",
+    "jest-when": "3.5.1",
+    "ts-jest": "28.0.8",
+    "ts-node": "10.9.1",
+    "typescript": "4.8.4",
+    "yaml-cfn": "0.3.1"
+  }
+}
