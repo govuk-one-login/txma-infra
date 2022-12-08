@@ -542,7 +542,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SSM::Parameter
     Properties:
-      Name: QRIntegrationTestsTriggerQueueArn
+      Name: WriteTestDataToAthenaBucketQueueArn
       Type: String
       Value: !GetAtt WriteTestDataToAthenaBucketQueue.Arn
 
@@ -550,7 +550,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SSM::Parameter
     Properties:
-      Name: QRIntegrationTestsTriggerQueueUrl
+      Name: WriteTestDataToAthenaBucketQueueUrl
       Type: String
       Value: !Ref WriteTestDataToAthenaBucketQueue
 
