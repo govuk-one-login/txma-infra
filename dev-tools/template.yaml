@@ -73,6 +73,14 @@ Resources:
                 - s3:PutBucketVersioning
               Resource: '*'
 
+  EmptyS3BucketsLogs:
+    Condition: FeatureBranches
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-empty-s3-buckets'
+      RetentionInDays: 30
+
   DynamoOperationsFunction:
     #checkov:skip=CKV_AWS_115:Defined in Globals
     #checkov:skip=CKV_AWS_116:DLQ not required
@@ -98,6 +106,13 @@ Resources:
                 - dynamodb:DeleteItem
               Resource: '*'
 
+  DynamoOperationsLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-dynamo-operations'
+      RetentionInDays: 30
+
   SqsOperationsFunction:
     #checkov:skip=CKV_AWS_115:Defined in Globals
     #checkov:skip=CKV_AWS_116:DLQ not required
@@ -121,12 +136,11 @@ Resources:
                 - sqs:SendMessage
               Resource: '*'
 
-  EmptyS3BucketsLogs:
-    Condition: FeatureBranches
+  SqsOperationsLogs:
     Type: AWS::Logs::LogGroup
     Properties:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
-      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-empty-s3-buckets'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-sqs-operations'
       RetentionInDays: 30
 
   IntegrationTestDataBucket:
