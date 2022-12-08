@@ -1,5 +1,3 @@
 export interface EnvironmentVar {
-    name:
-      | 'AWS_REGION'
-      | 'ATHENA_OUTPUT_BUCKET_NAME'
+  name: 'AWS_REGION' | 'ATHENA_OUTPUT_BUCKET_NAME'
 }
