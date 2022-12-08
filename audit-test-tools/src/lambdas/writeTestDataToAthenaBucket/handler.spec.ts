@@ -1,12 +1,14 @@
 import { constructSqsEvent } from '../../utils/tests/constructSqsEvent'
+import {
+  TEST_FILE_CONTENTS,
+  TEST_FILE_NAME
+} from '../../utils/tests/testConstants'
 import { handler } from './handler'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
 jest.mock('./writeTestFileToAthenaOutputBucket', () => ({
   writeTestFileToAthenaOutputBucket: jest.fn()
 }))
 
-const TEST_FILE_NAME = 'myFileName.csv'
-const TEST_FILE_CONTENTS = 'myContents,moreContents'
 describe('writeTestDataToAthenaBucket handler', () => {
   it('should throw an appropriate error if there is no data in the event', async () => {
     await expect(handler({ Records: [] })).rejects.toThrow('No data in event')
