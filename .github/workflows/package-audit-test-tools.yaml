@@ -1,4 +1,4 @@
-name: Package dev tools infrastructure
+name: Package audit test tools infrastructure
 
 on:
   push:
@@ -64,7 +64,6 @@ jobs:
   package:
     strategy:
       matrix:
-        target: [AUDIT_DEV]
         include:
           - target: AUDIT_DEV
             ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_AUDIT_TEST_TOOLS_AUDIT_DEV
