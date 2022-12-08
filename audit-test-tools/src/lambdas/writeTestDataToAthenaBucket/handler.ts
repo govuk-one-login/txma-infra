@@ -3,7 +3,7 @@ import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutput
 
 export const handler = async (event: SQSEvent) => {
   console.log(
-    'Handling QR integration tests trigger setup event',
+    'Handling write test data to athena output bucket event',
     JSON.stringify(event, null, 2)
   )
 
