@@ -19,7 +19,7 @@ export const handler = async (event: SQSEvent) => {
 
 const parseRequestDetails = (event: SQSEvent) => {
   if (!event.Records.length) {
-    throw Error('No records found in event')
+    throw Error('No data in event')
   }
 
   const eventBody = event.Records[0].body
@@ -28,15 +28,11 @@ const parseRequestDetails = (event: SQSEvent) => {
   }
 
   const requestDetails = tryParseJSON(eventBody)
-  if (!requestDetails.fileName) {
-    throw Error('No fileName property set in queue event body')
+  if (!requestDetails.fileName || !requestDetails.fileContents) {
+    throw Error('Event data was not of the correct type')
   }
 
-  if (!requestDetails.fileContents) {
-    throw Error('No fileContents property set in queue event body')
-  }
-
-  return requestDetails.message
+  return requestDetails
 }
 
 const tryParseJSON = (jsonString: string) => {
