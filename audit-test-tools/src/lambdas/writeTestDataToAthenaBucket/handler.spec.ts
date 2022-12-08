@@ -1,12 +1,16 @@
 import { constructSqsEvent } from '../../utils/tests/constructSqsEvent'
 import {
-  TEST_FILE_CONTENTS,
-  TEST_FILE_NAME
+  TEST_ATHENA_QUERY_ID,
+  TEST_FILE_CONTENTS
 } from '../../utils/tests/testConstants'
 import { handler } from './handler'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
+import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage'
 jest.mock('./writeTestFileToAthenaOutputBucket', () => ({
   writeTestFileToAthenaOutputBucket: jest.fn()
+}))
+jest.mock('./sendQueryCompletedQueueMessage', () => ({
+  sendQueryCompletedQueueMessage: jest.fn()
 }))
 
 describe('writeTestDataToAthenaBucket handler', () => {
@@ -26,7 +30,7 @@ describe('writeTestDataToAthenaBucket handler', () => {
   it('should call writeTestFileToAthenaOutputBucket with the correct parameters', async () => {
     const writeTestDataToAthenaBucketEvent = constructSqsEvent(
       JSON.stringify({
-        fileName: TEST_FILE_NAME,
+        athenaQueryId: TEST_ATHENA_QUERY_ID,
         fileContents: TEST_FILE_CONTENTS
       })
     )
@@ -34,8 +38,12 @@ describe('writeTestDataToAthenaBucket handler', () => {
     await handler(writeTestDataToAthenaBucketEvent)
 
     expect(writeTestFileToAthenaOutputBucket).toHaveBeenCalledWith(
-      TEST_FILE_NAME,
+      TEST_ATHENA_QUERY_ID,
       TEST_FILE_CONTENTS
+    )
+
+    expect(sendQueryCompletedQueueMessage).toHaveBeenCalledWith(
+      TEST_ATHENA_QUERY_ID
     )
   })
 })

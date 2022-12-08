@@ -4150,7 +4150,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["audit-test-tools", "workspace:audit-test-tools"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
-            ["@aws-sdk/client-dynamodb", "npm:3.163.0"],\
             ["@aws-sdk/client-s3", "npm:3.163.0"],\
             ["@aws-sdk/client-sqs", "npm:3.170.0"],\
             ["@jest/types", "npm:28.1.3"],\

@@ -1,4 +1,5 @@
 import { SQSEvent } from 'aws-lambda'
+import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
 
 export const handler = async (event: SQSEvent) => {
@@ -7,14 +8,15 @@ export const handler = async (event: SQSEvent) => {
     JSON.stringify(event, null, 2)
   )
 
-  const message = parseRequestDetails(event)
+  const eventDetails = parseRequestDetails(event)
 
   await writeTestFileToAthenaOutputBucket(
-    message.fileName,
-    message.fileContents
+    eventDetails.athenaQueryId,
+    eventDetails.fileContents
   )
 
-  return message
+  await sendQueryCompletedQueueMessage(eventDetails.athenaQueryId)
+  return eventDetails
 }
 
 const parseRequestDetails = (event: SQSEvent) => {
@@ -28,8 +30,10 @@ const parseRequestDetails = (event: SQSEvent) => {
   }
 
   const requestDetails = tryParseJSON(eventBody)
-  if (!requestDetails.fileName || !requestDetails.fileContents) {
-    throw Error('Event data was not of the correct type')
+  if (!requestDetails.athenaQueryId || !requestDetails.fileContents) {
+    throw Error(
+      'Event data was not of the correct type, should have athenaQueryId and fileContents properties'
+    )
   }
 
   return requestDetails
