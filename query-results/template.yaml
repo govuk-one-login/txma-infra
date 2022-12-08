@@ -25,6 +25,7 @@ Conditions:
       !Equals [!Ref Environment, integration]
     ]
   IsProduction: !Equals [!Ref Environment, production]
+  TestEnvironment: !Not [Condition: NotTestEnvironment]
 
 Resources:
   QueryResultsBucket:
@@ -350,6 +351,116 @@ Resources:
       QueueName: !Sub ${AWS::StackName}-${Environment}-close-zendesk-ticket-dead-letter-queue
       KmsMasterKeyId: !GetAtt CloseZendeskTicketQueueKmsKey.Arn
 
+  # Query results integration test resources
+  # Writing test data to athena bucket in audit account
+  # Need a separate KMS key here for the integration tests trigger queue because we need to grant access to the audit account
+  # and our main KMS key definitions are in 'core', which is a shared set of definitions across all stacks.
+  WriteTestDataToAthenaBucketQueueKmsKey:
+    Condition: TestEnvironment
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - !If
+            - LockCrossAccountPermissionsToLambdaRoles
+            # If we are in a non-dev environment so know the lambda role name
+            - Sid: Enable Decrypt access for Audit account write test data to athena bucket lambda
+              Effect: Allow
+              Principal:
+                AWS: '{{resolve:ssm:AuditAccountRootArn}}'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
+              Condition:
+                StringEquals:
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-write-test-data-to-athena-bucket-role'
+            # Otherwise allow anything in the dev audit root account
+            - Sid: Enable Decrypt access for Audit dev account
+              Effect: Allow
+              Principal:
+                AWS: '{{resolve:ssm:AuditAccountRootArn}}'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
+
+  WriteTestDataToAthenaBucketQueueKmsKeyAlias:
+    Condition: TestEnvironment
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/write-test-data-to-athena-bucket-queue-kms-key
+      TargetKeyId: !Ref WriteTestDataToAthenaBucketQueueKmsKey
+
+  WriteTestDataToAthenaBucketQueue:
+    Condition: TestEnvironment
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-write-test-data-to-athena-bucket-queue
+      KmsMasterKeyId: !GetAtt WriteTestDataToAthenaBucketQueueKmsKey.Arn
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt WriteTestDataToAthenaBucketDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  WriteTestDataToAthenaBucketQueuePolicy:
+    Condition: TestEnvironment
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref WriteTestDataToAthenaBucketQueue
+      PolicyDocument:
+        Statement:
+          - !If
+            - LockCrossAccountPermissionsToLambdaRoles
+            # If we are in a non-dev environment so know the lambda role name
+            - Sid: AllowWriteTestDataToAthenaBucketQueueReadForLambdaRole
+              Action:
+                - 'sqs:ChangeMessageVisibility'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+                - 'sqs:ReceiveMessage'
+              Effect: 'Allow'
+              Resource: !GetAtt WriteTestDataToAthenaBucketQueue.Arn
+              Principal:
+                AWS: '{{resolve:ssm:AuditAccountRootArn}}'
+              Condition:
+                StringEquals:
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-write-test-data-to-athena-bucket-role'
+            # Otherwise allow anything in the dev audit root account
+            - Sid: AllowWriteTestDataToAthenaBucketQueueReadForAuditAccount
+              Action:
+                - 'sqs:ChangeMessageVisibility'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+                - 'sqs:ReceiveMessage'
+              Effect: 'Allow'
+              Resource: !GetAtt WriteTestDataToAthenaBucketQueue.Arn
+              Principal:
+                AWS: '{{resolve:ssm:AuditAccountRootArn}}'
+
+  WriteTestDataToAthenaBucketDeadLetterQueue:
+    Condition: TestEnvironment
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-write-test-data-to-athena-bucket-dead-letter-queue
+      KmsMasterKeyId: !GetAtt WriteTestDataToAthenaBucketQueueKmsKey.Arn
+
   QueryResultsBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -426,6 +537,30 @@ Resources:
       Name: CloseZendeskTicketQueueKmsKeyArn
       Type: String
       Value: !GetAtt CloseZendeskTicketQueueKmsKey.Arn
+
+  WriteTestDataToAthenaBucketQueueArnParameter:
+    Condition: TestEnvironment
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QRIntegrationTestsTriggerQueueArn
+      Type: String
+      Value: !GetAtt WriteTestDataToAthenaBucketQueue.Arn
+
+  WriteTestDataToAthenaBucketQueueUrlParameter:
+    Condition: TestEnvironment
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: QRIntegrationTestsTriggerQueueUrl
+      Type: String
+      Value: !Ref WriteTestDataToAthenaBucketQueue
+
+  WriteTestDataToAthenaBucketQueueKmsKeyArnParameter:
+    Condition: TestEnvironment
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: WriteTestDataToAthenaBucketQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt WriteTestDataToAthenaBucketQueueKmsKey.Arn
 
 Outputs:
   QueryResultsBucketName:
