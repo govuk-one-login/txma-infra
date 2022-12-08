@@ -8,8 +8,11 @@ export const handler = async (event: SQSEvent) => {
   )
 
   const message = parseRequestDetails(event)
-  
-  await writeTestFileToAthenaOutputBucket(message.fileName, message.fileContents)
+
+  await writeTestFileToAthenaOutputBucket(
+    message.fileName,
+    message.fileContents
+  )
 
   return message
 }

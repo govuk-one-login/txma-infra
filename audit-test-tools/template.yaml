@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Developer tool infrastructure
+Description: Audit accoun test tool infrastructure
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
@@ -38,30 +38,30 @@ Globals:
     Timeout: 30
 
 Resources:
-  QueryResultsIntegrationTestsSetupFunction:
+  WriteTestDataToAthenaBucketFunction:
     #checkov:skip=CKV_AWS_115:Defined in Globals section
     #checkov:skip=CKV_AWS_116:The SQS queue itself will be responsible for its own DLQ
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
-      Handler: queryResultsIntegrationTestsSetup.handler
-      Role: !GetAtt QueryResultsIntegrationTestsSetupFunctionRole.Arn
+      Handler: writeTestDataToAthenaBucket.handler
+      Role: !GetAtt WriteTestDataToAthenaBucketFunctionRole.Arn
       Environment:
         Variables:
           ATHENA_OUTPUT_BUCKET_NAME: '{{resolve:ssm:AthenaQueryOutputBucketName}}'
-      FunctionName: !Sub ${AWS::StackName}-qr-integration-tests-setup
+      FunctionName: !Sub ${AWS::StackName}-write-test-data-to-athena-bucket
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
       Events:
         QRIntegrationTestsTrigggerEvent:
           Type: SQS
           Properties:
-            Queue: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-query-results-${Environment}-qr-integration-tests-trigger-queue'
+            Queue: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-query-results-${Environment}-write-test-data-to-athena-bucket-queue'
             BatchSize: 1
 
-  QueryResultsIntegrationTestsSetupFunctionRole:
+  WriteTestDataToAthenaBucketFunctionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${AWS::StackName}-${Environment}-query-results-integration-tests-setup-role
+      RoleName: !Sub ${AWS::StackName}-${Environment}-write-test-data-to-athena-bucket-role
       PermissionsBoundary:
         !If [
           UsePermissionsBoundary,
@@ -77,7 +77,7 @@ Resources:
                 - lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: AllowQRIntegrationTestsSetupActions
+        - PolicyName: AllowWriteTestDataToAthenaBucketActions
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -87,14 +87,14 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: !GetAtt QueryResultsIntegrationTestsSetupLogs.Arn
+                Resource: !GetAtt WriteTestDataToAthenaBucketLogs.Arn
               - Sid: AllowQRIntegrationsTestsTriggerQueueRead
                 Effect: Allow
                 Action:
                   - sqs:ReceiveMessage
                   - sqs:DeleteMessage
                   - sqs:GetQueueAttributes
-                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-query-results-${Environment}-qr-integration-tests-trigger-queue'
+                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-query-results-${Environment}-write-test-data-to-athena-bucket-queue'
               - Sid: DecryptKmsKeys
                 Effect: Allow
                 Action:
@@ -103,10 +103,9 @@ Resources:
                   - '{{resolve:ssm:SecretsKmsKeyArn}}'
                   - !Sub 'arn:aws:kms:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:*'
 
-  QueryResultsIntegrationTestsSetupLogs:
+  WriteTestDataToAthenaBucketLogs:
     Type: AWS::Logs::LogGroup
     Properties:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
-      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-query-results-integration-tests-setup'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-write-test-data-to-athena-bucket'
       RetentionInDays: 30
-
