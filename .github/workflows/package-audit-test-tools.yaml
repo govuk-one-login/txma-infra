@@ -1,0 +1,104 @@
+name: Package audit test tools infrastructure
+
+on:
+  push:
+    paths:
+      - audit-test-tools/**
+  workflow_dispatch: {}
+
+env:
+  AWS_REGION: eu-west-2
+
+jobs:
+  validate-build:
+    name: Run tests and validation
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: audit-test-tools
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS Validate role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_AUDIT_TEST_TOOLS }}
+      - name: Node - Enable Corepack
+        run: corepack enable
+      - name: Install ESBuild binaries
+        run: yarn unplug
+      - name: Run tests
+        if: always()
+        run: yarn test
+      - name: Build Lambda functions
+        if: always()
+        run: yarn build
+      - name: Validate SAM template
+        if: always()
+        run: sam validate
+      - name: Run Checkov on SAM template
+        if: always()
+        uses: bridgecrewio/checkov-action@master
+        with:
+          file: audit-test-tools/template.yaml
+          quiet: true
+          framework: cloudformation
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: audit-test-tools-sam-template
+          path: |
+            audit-test-tools/dist/
+            audit-test-tools/template.yaml
+
+  package:
+    strategy:
+      matrix:
+        include:
+          - target: AUDIT_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_AUDIT_TEST_TOOLS_AUDIT_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_TEST_TOOLS_AUDIT_DEV
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_AUDIT_DEV
+          - target: AUDIT_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_AUDIT_TEST_TOOLS_AUDIT_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_AUDIT_TEST_TOOLS_AUDIT_BUILD
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_AUDIT_BUILD
+    name: Package template
+    if: github.ref == 'refs/heads/main'
+    needs: [validate-build]
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: audit-test-tools-sam-template
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
+      - name: Package SAM app
+        uses: alphagov/di-devplatform-upload-action@v2
+        with:
+          artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
+          signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
+          working-directory: '.'
