@@ -382,7 +382,7 @@ Resources:
               Resource: '*'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-write-test-data-to-athena-bucket-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-audit-test-tools-${Environment}-write-test-data-to-athena-bucket-role'
             # Otherwise allow anything in the dev audit root account
             - Sid: Enable Decrypt access for Audit dev account
               Effect: Allow
@@ -441,7 +441,7 @@ Resources:
                 AWS: '{{resolve:ssm:AuditAccountRootArn}}'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-ticf-integration-${Environment}-write-test-data-to-athena-bucket-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-audit-test-tools-${Environment}-write-test-data-to-athena-bucket-role'
             # Otherwise allow anything in the dev audit root account
             - Sid: AllowWriteTestDataToAthenaBucketQueueReadForAuditAccount
               Action:
@@ -542,7 +542,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SSM::Parameter
     Properties:
-      Name: WriteTestDataToAthenaBucketQueueArn
+      Name: /tests/WriteTestDataToAthenaBucketQueueArn
       Type: String
       Value: !GetAtt WriteTestDataToAthenaBucketQueue.Arn
 
@@ -550,7 +550,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SSM::Parameter
     Properties:
-      Name: WriteTestDataToAthenaBucketQueueUrl
+      Name: /tests/WriteTestDataToAthenaBucketQueueUrl
       Type: String
       Value: !Ref WriteTestDataToAthenaBucketQueue
 
@@ -558,7 +558,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SSM::Parameter
     Properties:
-      Name: WriteTestDataToAthenaBucketQueueKmsKeyArn
+      Name: /tests/WriteTestDataToAthenaBucketQueueKmsKeyArn
       Type: String
       Value: !GetAtt WriteTestDataToAthenaBucketQueueKmsKey.Arn
 
