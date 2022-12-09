@@ -382,7 +382,7 @@ Resources:
               Resource: '*'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-audit-test-tools-${Environment}-write-test-data-to-athena-bucket-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-audit-test-tools-${Environment}-write-test-data-to-athena-bucket'
             # Otherwise allow anything in the dev audit root account
             - Sid: Enable Decrypt access for Audit dev account
               Effect: Allow
@@ -441,7 +441,7 @@ Resources:
                 AWS: '{{resolve:ssm:AuditAccountRootArn}}'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-audit-test-tools-${Environment}-write-test-data-to-athena-bucket-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:AuditAccountNumber}}:role/txma-audit-test-tools-${Environment}-write-test-data-to-athena-bucket'
             # Otherwise allow anything in the dev audit root account
             - Sid: AllowWriteTestDataToAthenaBucketQueueReadForAuditAccount
               Action:

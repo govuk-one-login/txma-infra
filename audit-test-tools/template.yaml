@@ -62,7 +62,7 @@ Resources:
   WriteTestDataToAthenaBucketFunctionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${AWS::StackName}-${Environment}-write-test-data-to-athena-bucket-role
+      RoleName: !Sub ${AWS::StackName}-${Environment}-write-test-data-to-athena-bucket
       PermissionsBoundary:
         !If [
           UsePermissionsBoundary,
