@@ -27,7 +27,7 @@ describe('writeTestDataToAthenaBucket handler', () => {
     )
   })
 
-  it('should call writeTestFileToAthenaOutputBucket with the correct parameters', async () => {
+  it('should call writeTestFileToAthenaOutputBucket and sendQueryCompletedQueueMessage with the correct parameters', async () => {
     const writeTestDataToAthenaBucketEvent = constructSqsEvent(
       JSON.stringify({
         athenaQueryId: TEST_ATHENA_QUERY_ID,
