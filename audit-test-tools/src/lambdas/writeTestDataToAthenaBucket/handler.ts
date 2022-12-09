@@ -15,7 +15,10 @@ export const handler = async (event: SQSEvent) => {
     eventDetails.fileContents
   )
 
-  await sendQueryCompletedQueueMessage(eventDetails.athenaQueryId)
+  await sendQueryCompletedQueueMessage(
+    eventDetails.athenaQueryId,
+    eventDetails.zendeskId
+  )
   return eventDetails
 }
 
@@ -30,9 +33,13 @@ const parseRequestDetails = (event: SQSEvent) => {
   }
 
   const requestDetails = tryParseJSON(eventBody)
-  if (!requestDetails.athenaQueryId || !requestDetails.fileContents) {
+  if (
+    !requestDetails.athenaQueryId ||
+    !requestDetails.fileContents ||
+    !requestDetails.zendeskId
+  ) {
     throw Error(
-      'Event data was not of the correct type, should have athenaQueryId and fileContents properties'
+      'Event data was not of the correct type, should have athenaQueryId, fileContents and zendeskId properties'
     )
   }
 

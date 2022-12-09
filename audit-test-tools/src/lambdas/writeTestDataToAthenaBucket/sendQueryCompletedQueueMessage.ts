@@ -7,7 +7,8 @@ import {
 import { getEnv } from '../../utils/getEnv'
 
 export const sendQueryCompletedQueueMessage = async (
-  athenaQueryId: string
+  athenaQueryId: string,
+  zendeskId: string
 ): Promise<string | undefined> => {
   const client = new SQSClient({ region: getEnv('AWS_REGION') })
   const message: SendMessageRequest = {
@@ -16,7 +17,7 @@ export const sendQueryCompletedQueueMessage = async (
       athenaQueryId: athenaQueryId,
       recipientEmail: 'mytestrecipientemail@test.gov.uk',
       recipientName: 'Query Results Test Name',
-      zendeskTicketId: '123'
+      zendeskTicketId: zendeskId
     })
   }
   const result = await client.send(new SendMessageCommand(message))
