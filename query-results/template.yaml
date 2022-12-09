@@ -542,7 +542,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SSM::Parameter
     Properties:
-      Name: WriteTestDataToAthenaBucketQueueArn
+      Name: /tests/WriteTestDataToAthenaBucketQueueArn
       Type: String
       Value: !GetAtt WriteTestDataToAthenaBucketQueue.Arn
 
@@ -550,7 +550,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SSM::Parameter
     Properties:
-      Name: WriteTestDataToAthenaBucketQueueUrl
+      Name: /tests/WriteTestDataToAthenaBucketQueueUrl
       Type: String
       Value: !Ref WriteTestDataToAthenaBucketQueue
 
@@ -558,7 +558,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SSM::Parameter
     Properties:
-      Name: WriteTestDataToAthenaBucketQueueKmsKeyArn
+      Name: /tests/WriteTestDataToAthenaBucketQueueKmsKeyArn
       Type: String
       Value: !GetAtt WriteTestDataToAthenaBucketQueueKmsKey.Arn
 
