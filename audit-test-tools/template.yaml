@@ -117,6 +117,18 @@ Resources:
                   - kms:ReEncrypt*
                 Resource:
                   - '{{resolve:ssm:QueryCompletedQueueKmsKeyArn}}'
+              - Sid: AllowWriteToAthenaOutputBucket
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                Resource: '{{resolve:ssm:AthenaQueryOutputBucketArn}}/*'
+              - Sid: AthenaOutputEncryptKmsKey
+                Effect: Allow
+                Action:
+                  - kms:GenerateDataKey
+                  - kms:Encrypt
+                  - kms:Decrypt
+                Resource: '{{resolve:ssm:AthenaQueryOutputBucketKmsKeyArn}}'
 
   WriteTestDataToAthenaBucketLogs:
     Type: AWS::Logs::LogGroup
