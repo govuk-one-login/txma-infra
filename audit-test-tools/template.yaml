@@ -53,10 +53,10 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-write-test-data-to-athena-bucket
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
       Events:
-        QRIntegrationTestsTrigggerEvent:
+        WriteTestDataToAthenaBucketEvent:
           Type: SQS
           Properties:
-            Queue: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-query-results-${Environment}-write-test-data-to-athena-bucket-queue'
+            Queue: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-qr-infra-${Environment}-write-test-data-to-athena-bucket-queue'
             BatchSize: 1
 
   WriteTestDataToAthenaBucketFunctionRole:
@@ -95,7 +95,7 @@ Resources:
                   - sqs:ReceiveMessage
                   - sqs:DeleteMessage
                   - sqs:GetQueueAttributes
-                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-query-results-${Environment}-write-test-data-to-athena-bucket-queue'
+                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:{{resolve:ssm:QueryResultsAccountNumber}}:txma-qr-infra-${Environment}-write-test-data-to-athena-bucket-queue'
               - Sid: DecryptKmsKeys
                 Effect: Allow
                 Action:
