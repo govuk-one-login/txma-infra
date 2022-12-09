@@ -1,7 +1,8 @@
 import { constructSqsEvent } from '../../utils/tests/constructSqsEvent'
 import {
   TEST_ATHENA_QUERY_ID,
-  TEST_FILE_CONTENTS
+  TEST_FILE_CONTENTS,
+  TEST_ZENDESK_ID
 } from '../../utils/tests/testConstants'
 import { handler } from './handler'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
@@ -31,7 +32,8 @@ describe('writeTestDataToAthenaBucket handler', () => {
     const writeTestDataToAthenaBucketEvent = constructSqsEvent(
       JSON.stringify({
         athenaQueryId: TEST_ATHENA_QUERY_ID,
-        fileContents: TEST_FILE_CONTENTS
+        fileContents: TEST_FILE_CONTENTS,
+        zendeskId: TEST_ZENDESK_ID
       })
     )
 
@@ -43,7 +45,8 @@ describe('writeTestDataToAthenaBucket handler', () => {
     )
 
     expect(sendQueryCompletedQueueMessage).toHaveBeenCalledWith(
-      TEST_ATHENA_QUERY_ID
+      TEST_ATHENA_QUERY_ID,
+      TEST_ZENDESK_ID
     )
   })
 })
