@@ -6,7 +6,8 @@ import {
   TEST_QUERY_COMPLETED_QUEUE_URL,
   TEST_ATHENA_QUERY_ID,
   TEST_MESSAGE_ID,
-  TEST_ZENDESK_ID
+  TEST_ZENDESK_ID,
+  TEST_EMAIL_ADDRESS
 } from '../../utils/tests/testConstants'
 
 const sqsMock = mockClient(SQSClient)
@@ -17,14 +18,15 @@ describe('sendQueryCompletedQueueMessage', () => {
 
     const messageId = await sendQueryCompletedQueueMessage(
       TEST_ATHENA_QUERY_ID,
-      TEST_ZENDESK_ID
+      TEST_ZENDESK_ID,
+      TEST_EMAIL_ADDRESS
     )
     expect(messageId).toEqual(TEST_MESSAGE_ID)
     expect(sqsMock).toHaveReceivedCommandWith(SendMessageCommand, {
       QueueUrl: TEST_QUERY_COMPLETED_QUEUE_URL,
       MessageBody: JSON.stringify({
         athenaQueryId: TEST_ATHENA_QUERY_ID,
-        recipientEmail: 'mytestrecipientemail@test.gov.uk',
+        recipientEmail: TEST_EMAIL_ADDRESS,
         recipientName: 'Query Results Test Name',
         zendeskTicketId: TEST_ZENDESK_ID
       })
