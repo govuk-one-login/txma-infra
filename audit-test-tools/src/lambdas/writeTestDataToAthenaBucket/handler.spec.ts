@@ -1,5 +1,6 @@
 import { constructSqsEvent } from '../../utils/tests/constructSqsEvent'
 import {
+  EXPECTED_DEFAULT_EMAIL_ADDRESS,
   TEST_ATHENA_QUERY_ID,
   TEST_EMAIL_ADDRESS,
   TEST_FILE_CONTENTS,
@@ -50,6 +51,29 @@ describe('writeTestDataToAthenaBucket handler', () => {
       TEST_ATHENA_QUERY_ID,
       TEST_ZENDESK_ID,
       TEST_EMAIL_ADDRESS
+    )
+  })
+
+  it('should call writeTestFileToAthenaOutputBucket and sendQueryCompletedQueueMessage using a default email when a recipient email parameter is not provided', async () => {
+    const writeTestDataToAthenaBucketEvent = constructSqsEvent(
+      JSON.stringify({
+        athenaQueryId: TEST_ATHENA_QUERY_ID,
+        fileContents: TEST_FILE_CONTENTS,
+        zendeskId: TEST_ZENDESK_ID
+      })
+    )
+
+    await handler(writeTestDataToAthenaBucketEvent)
+
+    expect(writeTestFileToAthenaOutputBucket).toHaveBeenCalledWith(
+      TEST_ATHENA_QUERY_ID,
+      TEST_FILE_CONTENTS
+    )
+
+    expect(sendQueryCompletedQueueMessage).toHaveBeenCalledWith(
+      TEST_ATHENA_QUERY_ID,
+      TEST_ZENDESK_ID,
+      EXPECTED_DEFAULT_EMAIL_ADDRESS
     )
   })
 })
