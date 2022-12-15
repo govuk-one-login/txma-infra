@@ -6,3 +6,4 @@ export const TEST_QUERY_COMPLETED_QUEUE_URL =
   'https://my-query-completed-queue-url'
 export const TEST_ZENDESK_ID = '123'
 export const TEST_EMAIL_ADDRESS = 'test@test.gov.uk'
+export const EXPECTED_DEFAULT_EMAIL_ADDRESS = 'mytestrecipientemail@test.gov.uk'
