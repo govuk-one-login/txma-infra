@@ -120,6 +120,7 @@ Resources:
     Type: AWS::WAFv2::WebACL
     Properties:
       DefaultAction: !If [NotTestEnvironment, Block: {}, Allow: {}]
+      Name: SecureFraudApiWafAcl
       Scope: REGIONAL
       VisibilityConfig:
         CloudWatchMetricsEnabled: true
@@ -177,6 +178,22 @@ Resources:
               MetricName: SecureFraudSiteIpRestrictionMetric
               SampledRequestsEnabled: true
           - !Ref AWS::NoValue
+
+  SecureFraudApiWafLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: aws-waf-logs-SecureFraudApiWafAcl
+      RetentionInDays: 30
+
+  SecureFraudApiWafLoggingConfiguration:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      LogDestinationConfigs:
+        # Cannot use Fn::GetAtt here since the ARN of a log group includes ':*' at the end, which is not accepted by the WAF service.
+        # The ARN must not include the ':*'.
+        - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${SecureFraudApiWafLogs}
+      ResourceArn: !GetAtt SecureFraudApiWafAcl.Arn
 
   # Need a separate KMS key here for the audit queue because we need to grant access to the event processing account
   # and our main KMS key definitions are in 'core', which is a shared set of definitions across all stacks.
