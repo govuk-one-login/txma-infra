@@ -105,6 +105,43 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/secrets-kms-key
       TargetKeyId: !Ref SecretsKmsKey
 
+  SnsKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow access for Key User (SNS Service Principal)
+            Effect: Allow
+            Principal:
+              Service: sns.amazonaws.com
+            Action:
+              - kms:GenerateDataKey*
+              - kms:Decrypt
+            Resource: '*'
+          - Sid: Allow access for CloudWatch
+            Effect: Allow
+            Principal:
+              Service: cloudwatch.amazonaws.com
+            Action:
+              - kms:GenerateDataKey*
+              - kms:Decrypt
+            Resource: '*'
+
+  SnsKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/sns-kms-key
+      TargetKeyId: !Ref SnsKmsKey
+
   SqsKmsKey:
     Type: AWS::KMS::Key
     Properties:
@@ -197,3 +234,10 @@ Resources:
       Name: DatabaseKmsKeyArn
       Type: String
       Value: !GetAtt DatabaseKmsKey.Arn
+
+  SnsKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CoreSnsKmsKeyArn
+      Type: String
+      Value: !GetAtt SnsKmsKey.Arn
