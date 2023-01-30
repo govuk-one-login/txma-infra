@@ -9,6 +9,7 @@ import {
 import { handler } from './handler'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
 import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
 jest.mock('./writeTestFileToAthenaOutputBucket', () => ({
   writeTestFileToAthenaOutputBucket: jest.fn()
 }))
@@ -18,16 +19,18 @@ jest.mock('./sendQueryCompletedQueueMessage', () => ({
 
 describe('writeTestDataToAthenaBucket handler', () => {
   it('should throw an appropriate error if there is no data in the event', async () => {
-    await expect(handler({ Records: [] })).rejects.toThrow('No data in event')
+    await expect(handler({ Records: [] }, mockLambdaContext)).rejects.toThrow(
+      'No data in event'
+    )
   })
 
   it('should throw an appropriate error if the request includes data of the wrong shape', async () => {
     const writeTestDataToAthenaBucketEvent = constructSqsEvent(
       JSON.stringify({ someProperty: 'someValue' })
     )
-    await expect(handler(writeTestDataToAthenaBucketEvent)).rejects.toThrow(
-      'Event data was not of the correct type'
-    )
+    await expect(
+      handler(writeTestDataToAthenaBucketEvent, mockLambdaContext)
+    ).rejects.toThrow('Event data was not of the correct type')
   })
 
   it('should call writeTestFileToAthenaOutputBucket and sendQueryCompletedQueueMessage with the correct parameters', async () => {
@@ -40,7 +43,7 @@ describe('writeTestDataToAthenaBucket handler', () => {
       })
     )
 
-    await handler(writeTestDataToAthenaBucketEvent)
+    await handler(writeTestDataToAthenaBucketEvent, mockLambdaContext)
 
     expect(writeTestFileToAthenaOutputBucket).toHaveBeenCalledWith(
       TEST_ATHENA_QUERY_ID,
@@ -63,7 +66,7 @@ describe('writeTestDataToAthenaBucket handler', () => {
       })
     )
 
-    await handler(writeTestDataToAthenaBucketEvent)
+    await handler(writeTestDataToAthenaBucketEvent, mockLambdaContext)
 
     expect(writeTestFileToAthenaOutputBucket).toHaveBeenCalledWith(
       TEST_ATHENA_QUERY_ID,

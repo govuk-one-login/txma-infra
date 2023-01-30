@@ -1,15 +1,21 @@
-import { SQSEvent } from 'aws-lambda'
+import { Context, SQSEvent } from 'aws-lambda'
+import {
+  logger,
+  appendZendeskIdToLogger,
+  initialiseLogger
+} from '../../utils/logger'
 import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
 
-export const handler = async (event: SQSEvent) => {
-  console.log(
+export const handler = async (event: SQSEvent, context: Context) => {
+  initialiseLogger(context)
+  logger.info(
     'Handling write test data to athena output bucket event',
     JSON.stringify(event, null, 2)
   )
 
   const eventDetails = parseRequestDetails(event)
-
+  appendZendeskIdToLogger(eventDetails.zendeskId)
   await writeTestFileToAthenaOutputBucket(
     eventDetails.athenaQueryId,
     eventDetails.fileContents
@@ -51,7 +57,7 @@ const tryParseJSON = (jsonString: string) => {
   try {
     return JSON.parse(jsonString)
   } catch (error) {
-    console.error('Error parsing JSON: ', error)
+    logger.error('Error parsing JSON: ', error as Error)
     return {}
   }
 }
