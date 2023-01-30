@@ -125,7 +125,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-lambda-powertools/logger@npm:1.5.1, @aws-lambda-powertools/logger@npm:^1.5.1":
+"@aws-lambda-powertools/logger@npm:1.5.1":
   version: 1.5.1
   resolution: "@aws-lambda-powertools/logger@npm:1.5.1"
   dependencies:
@@ -3989,7 +3989,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "dev-tools@workspace:dev-tools"
   dependencies:
-    "@aws-lambda-powertools/logger": ^1.5.1
+    "@aws-lambda-powertools/logger": 1.5.1
     "@aws-sdk/client-cloudformation": 3.163.0
     "@aws-sdk/client-dynamodb": 3.163.0
     "@aws-sdk/client-s3": 3.163.0
