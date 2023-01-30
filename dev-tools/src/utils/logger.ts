@@ -13,9 +13,7 @@ export const initialiseLogger = (context: Context) => {
 }
 
 export const appendZendeskIdToLogger = (zendeskId: string) => {
-  if (typeof zendeskId !== 'undefined') {
-    loggerInstance.appendKeys({ zendeskId })
-  }
+  loggerInstance.appendKeys({ zendeskId })
 }
 
 export const logger = loggerInstance
