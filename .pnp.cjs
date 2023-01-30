@@ -4862,6 +4862,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./dev-tools/",\
           "packageDependencies": [\
             ["dev-tools", "workspace:dev-tools"],\
+            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
             ["@aws-sdk/client-dynamodb", "npm:3.163.0"],\
             ["@aws-sdk/client-s3", "npm:3.163.0"],\
