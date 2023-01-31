@@ -17,6 +17,12 @@ Parameters:
     Default: SecureDownloadWebsiteAllowedIps
 
 Conditions:
+  IsProduction: !Equals [!Ref Environment, production]
+  IsProductionOrStaging:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, staging]
+    ]
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
   NotTestEnvironment:
@@ -24,7 +30,6 @@ Conditions:
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration]
     ]
-  IsProduction: !Equals [!Ref Environment, production]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
 
 Resources:
@@ -185,6 +190,14 @@ Resources:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
       LogGroupName: aws-waf-logs-SecureFraudApiWafAcl
       RetentionInDays: 30
+
+  SecureFraudApiWafCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: IsProductionOrStaging
+    Properties:
+      LogGroupName: !Ref SecureFraudApiWafLogs
+      FilterPattern: ''
+      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
 
   SecureFraudApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration

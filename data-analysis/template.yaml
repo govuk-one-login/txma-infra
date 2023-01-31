@@ -17,6 +17,11 @@ Conditions:
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
   IsProduction: !Equals [!Ref Environment, 'production']
+  IsProductionOrStaging:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, staging]
+    ]
   NotTestEnvironment:
     !Or [
       !Equals [!Ref Environment, production],
@@ -328,6 +333,14 @@ Resources:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
       LogGroupName: aws-waf-logs-ZendeskWebhookApiWafAcl
       RetentionInDays: 30
+
+  ZendeskWebhookApiWafCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: IsProductionOrStaging
+    Properties:
+      LogGroupName: !Ref ZendeskWebhookApiWafLogs
+      FilterPattern: ''
+      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
 
   ZendeskWebhookApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
