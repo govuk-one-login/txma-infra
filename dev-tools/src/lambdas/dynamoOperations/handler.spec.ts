@@ -4,6 +4,7 @@ import {
   QUERY_REQUEST_DYNAMODB_TABLE_NAME,
   ZENDESK_TICKET_ID
 } from '../../utils/tests/constants/testConstants'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
 import { dynamoDbDelete } from './dynamoDbDelete'
 import { dynamoDbGet } from './dynamoDbGet'
 import { dynamoDbPut } from './dynamoDbPut'
@@ -49,7 +50,10 @@ describe('dynamo db operations handler', () => {
   it('returns a dynamoDbEntry when handler is called with correct GET params', async () => {
     dynamoDbGetReturnsEntry()
 
-    const dynamoDbEntry = await handler(generateDynamoOperationParams('GET'))
+    const dynamoDbEntry = await handler(
+      generateDynamoOperationParams('GET'),
+      mockLambdaContext
+    )
 
     expect(dynamoDbGet).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
@@ -63,7 +67,7 @@ describe('dynamo db operations handler', () => {
   })
 
   it('calls the dynamoDbPut function when handler is called with PUT operation', async () => {
-    await handler(generateDynamoOperationParams('PUT'))
+    await handler(generateDynamoOperationParams('PUT'), mockLambdaContext)
 
     expect(dynamoDbPut).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
@@ -72,7 +76,7 @@ describe('dynamo db operations handler', () => {
   })
 
   it('calls the dynamoDbDelete function when handler is called with DELETE operation', async () => {
-    await handler(generateDynamoOperationParams('DELETE'))
+    await handler(generateDynamoOperationParams('DELETE'), mockLambdaContext)
 
     expect(dynamoDbDelete).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
@@ -82,13 +86,16 @@ describe('dynamo db operations handler', () => {
 
   it('throws an error when dynamo operation is not recognised', () => {
     expect(
-      handler(generateDynamoOperationParams('something else' as Operation))
+      handler(
+        generateDynamoOperationParams('something else' as Operation),
+        mockLambdaContext
+      )
     ).rejects.toThrow('Dynamo operation not recognised')
   })
 
   it('throws an error when parameter is undefined', () => {
-    expect(handler(undefined as unknown as DynamoDbOperation)).rejects.toThrow(
-      'Function called with undefined params'
-    )
+    expect(
+      handler(undefined as unknown as DynamoDbOperation, mockLambdaContext)
+    ).rejects.toThrow('Function called with undefined params')
   })
 })

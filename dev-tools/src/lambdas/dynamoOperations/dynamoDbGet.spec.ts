@@ -12,6 +12,7 @@ import {
 import { dynamoDbGet } from './dynamoDbGet'
 import 'aws-sdk-client-mock-jest'
 import { OperationParams } from '../../types/dynamoDbOperation'
+import { logger } from '../../utils/logger'
 
 const dynamoMock = mockClient(DynamoDBClient)
 
@@ -34,7 +35,7 @@ describe('dynamoDbGet', () => {
   }
 
   it('dynamo client is called with the correct params (without attributeName)', async () => {
-    jest.spyOn(global.console, 'log')
+    jest.spyOn(logger, 'info')
     const getDynamoEntryCommandWithoutAttName = generateGetDynamoEntryCommand()
     givenDatabaseReturnsData()
 
@@ -43,7 +44,7 @@ describe('dynamoDbGet', () => {
       zendeskId: ZENDESK_TICKET_ID
     })
 
-    expect(console.log).toHaveBeenCalledWith(
+    expect(logger.info).toHaveBeenCalledWith(
       'Sending GetItemCommand to Dynamo with params: ',
       getDynamoEntryCommandWithoutAttName
     )
@@ -55,7 +56,7 @@ describe('dynamoDbGet', () => {
   })
 
   it('dynamo client is called with the correct params (with attributeName)', async () => {
-    jest.spyOn(global.console, 'log')
+    jest.spyOn(logger, 'info')
     const getDynamoEntryCommandWithAttName =
       generateGetDynamoEntryCommand('athenaQueryId')
     givenDatabaseReturnsData()
@@ -66,7 +67,7 @@ describe('dynamoDbGet', () => {
       attributeName: 'athenaQueryId'
     })
 
-    expect(console.log).toHaveBeenCalledWith(
+    expect(logger.info).toHaveBeenCalledWith(
       'Sending GetItemCommand to Dynamo with params: ',
       getDynamoEntryCommandWithAttName
     )

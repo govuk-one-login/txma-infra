@@ -7,6 +7,7 @@ import {
 import { dynamoDbPut } from './dynamoDbPut'
 import 'aws-sdk-client-mock-jest'
 import { OperationParams } from '../../types/dynamoDbOperation'
+import { logger } from '../../utils/logger'
 
 const dynamoMock = mockClient(DynamoDBClient)
 
@@ -18,14 +19,14 @@ describe('dynamoDbPut', () => {
       ReturnValues: 'ALL_OLD',
       Item: item
     }
-    jest.spyOn(global.console, 'log')
+    jest.spyOn(logger, 'info')
 
     await dynamoDbPut({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       itemToPut: item
     })
 
-    expect(console.log).toHaveBeenCalledWith(
+    expect(logger.info).toHaveBeenCalledWith(
       'Sending PutItemCommand to Dynamo with params: ',
       putItemCommand
     )

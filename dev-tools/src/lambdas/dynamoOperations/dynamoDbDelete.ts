@@ -1,5 +1,6 @@
 import { DeleteItemCommand } from '@aws-sdk/client-dynamodb'
 import { OperationParams } from '../../types/dynamoDbOperation'
+import { logger } from '../../utils/logger'
 import { dynamoDbClient } from './dynamoDbClient'
 
 export const dynamoDbDelete = async (operationParams: OperationParams) => {
@@ -13,7 +14,7 @@ export const dynamoDbDelete = async (operationParams: OperationParams) => {
     }
   }
 
-  console.log(
+  logger.info(
     'Sending DeleteItemCommand to Dynamo with params: ',
     deleteDynamoEntryCommand
   )

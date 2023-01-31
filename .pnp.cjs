@@ -172,6 +172,26 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@aws-lambda-powertools/commons", [\
+        ["npm:1.5.1", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-commons-npm-1.5.1-d6037631ee-4bcde9212a.zip/node_modules/@aws-lambda-powertools/commons/",\
+          "packageDependencies": [\
+            ["@aws-lambda-powertools/commons", "npm:1.5.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@aws-lambda-powertools/logger", [\
+        ["npm:1.5.1", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.5.1-c76ac8025e-3bc5e092c6.zip/node_modules/@aws-lambda-powertools/logger/",\
+          "packageDependencies": [\
+            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
+            ["@aws-lambda-powertools/commons", "npm:1.5.1"],\
+            ["lodash.merge", "npm:4.6.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@aws-sdk/abort-controller", [\
         ["npm:3.162.0", {\
           "packageLocation": "./.yarn/cache/@aws-sdk-abort-controller-npm-3.162.0-be56d5fe7b-2292b6673e.zip/node_modules/@aws-sdk/abort-controller/",\
@@ -4149,6 +4169,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./audit-test-tools/",\
           "packageDependencies": [\
             ["audit-test-tools", "workspace:audit-test-tools"],\
+            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
             ["@aws-sdk/client-s3", "npm:3.163.0"],\
             ["@aws-sdk/client-sqs", "npm:3.170.0"],\
@@ -4841,6 +4862,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./dev-tools/",\
           "packageDependencies": [\
             ["dev-tools", "workspace:dev-tools"],\
+            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
             ["@aws-sdk/client-dynamodb", "npm:3.163.0"],\
             ["@aws-sdk/client-s3", "npm:3.163.0"],\
