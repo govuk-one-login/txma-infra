@@ -17,12 +17,13 @@ Parameters:
     Default: SecureDownloadWebsiteAllowedIps
 
 Conditions:
-  IsProduction: !Equals [!Ref Environment, production]
-  IsProductionOrStaging:
+  CslsEgress:
     !Or [
       !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration],
       !Equals [!Ref Environment, staging]
     ]
+  IsProduction: !Equals [!Ref Environment, production]
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
   NotTestEnvironment:
@@ -193,7 +194,7 @@ Resources:
 
   SecureFraudApiWafCslsSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
-    Condition: IsProductionOrStaging
+    Condition: CslsEgress
     Properties:
       LogGroupName: !Ref SecureFraudApiWafLogs
       FilterPattern: ''
