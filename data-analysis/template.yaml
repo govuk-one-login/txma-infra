@@ -337,7 +337,7 @@ Resources:
 
   ZendeskWebhookApiWafCslsSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
-    Condition: CslsEgresss
+    Condition: CslsEgress
     Properties:
       LogGroupName: !Ref ZendeskWebhookApiWafLogs
       FilterPattern: ''
