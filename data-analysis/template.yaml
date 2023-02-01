@@ -14,14 +14,15 @@ Parameters:
       - production
 
 Conditions:
+  CslsEgress:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration],
+      !Equals [!Ref Environment, staging]
+    ]
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
   IsProduction: !Equals [!Ref Environment, 'production']
-  IsProductionOrStaging:
-    !Or [
-      !Equals [!Ref Environment, production],
-      !Equals [!Ref Environment, staging]
-    ]
   NotTestEnvironment:
     !Or [
       !Equals [!Ref Environment, production],
@@ -336,7 +337,7 @@ Resources:
 
   ZendeskWebhookApiWafCslsSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
-    Condition: IsProductionOrStaging
+    Condition: CslsEgress
     Properties:
       LogGroupName: !Ref ZendeskWebhookApiWafLogs
       FilterPattern: ''
