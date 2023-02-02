@@ -171,7 +171,7 @@ Resources:
         ResultConfiguration:
           EncryptionConfiguration:
             EncryptionOption: SSE_S3
-          OutputLocation: !Sub s3://${AthenaQueryOutputBucket}/manual-audit-data-queries
+          OutputLocation: !Sub s3://${AthenaQueryOutputBucket}/manual-audit-data-queries/
 
   TicfAutomatedDataQueriesWorkgroup:
     Type: AWS::Athena::WorkGroup
@@ -185,7 +185,7 @@ Resources:
         ResultConfiguration:
           EncryptionConfiguration:
             EncryptionOption: SSE_S3
-          OutputLocation: !Sub s3://${AthenaQueryOutputBucket}/ticf-automated-audit-data-queries
+          OutputLocation: !Sub s3://${AthenaQueryOutputBucket}/ticf-automated-audit-data-queries/
 
   AthenaQueryOutputBucket:
     Type: AWS::S3::Bucket
