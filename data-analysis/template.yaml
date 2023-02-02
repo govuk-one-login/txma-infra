@@ -141,7 +141,7 @@ Resources:
       CatalogId: !Ref AWS::AccountId
       DatabaseInput:
         Description: TxMA - Event Message Analysis Database
-        Name: txma-audit-analysis
+        Name: txma_audit_analysis
 
   #TODO: Remove once scaled audit tool is using new workgroup
   AthenaAnalysisWorkgroup:
