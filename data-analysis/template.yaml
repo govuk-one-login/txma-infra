@@ -119,22 +119,6 @@ Resources:
   # Data Analysis Athena Resources
   ################################
 
-  #TODO: Replace when scaled audit tool is using new database
-  AuditAnalysisDatabase:
-    Type: AWS::Glue::Database
-    Properties:
-      CatalogId: !Ref AWS::AccountId
-      DatabaseInput:
-        Description: TxMA - Event Message Analysis Database
-        Name:
-          !Join [
-            '',
-            [
-              !Join ['', !Split ['-', !Ref AWS::StackName]],
-              !Sub '_${Environment}_analysis_database'
-            ]
-          ]
-
   AuditDataAnalysisGlueDatabase:
     Type: AWS::Glue::Database
     Properties:
@@ -142,22 +126,6 @@ Resources:
       DatabaseInput:
         Description: TxMA - Event Message Analysis Database
         Name: txma-audit-analysis
-
-  #TODO: Remove once scaled audit tool is using new workgroup
-  AthenaAnalysisWorkgroup:
-    Type: AWS::Athena::WorkGroup
-    Properties:
-      Description: The workgroup for TxMA queries
-      Name: !Sub ${AWS::StackName}-${Environment}-analysis-queries-workgroup
-      RecursiveDeleteOption: true
-      WorkGroupConfiguration:
-        EnforceWorkGroupConfiguration: true
-        PublishCloudWatchMetricsEnabled: false
-        ResultConfiguration:
-          EncryptionConfiguration:
-            EncryptionOption: SSE_S3
-          OutputLocation:
-            !Join ['', ['s3://', !Ref AthenaQueryOutputBucket, '/']]
 
   ManualAuditDataQueriesWorkgroup:
     Type: AWS::Athena::WorkGroup
@@ -598,22 +566,6 @@ Resources:
   # SSM Parameters
   ################
 
-  #TODO: Remove once solution is using new workgroup
-  AthenaAnalysisWorkgroupArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AthenaAnalysisWorkgroupArn
-      Type: String
-      Value: !Sub arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${AthenaAnalysisWorkgroup}
-
-  #TODO: Remove once solution is using new workgroup
-  AthenaAnalysisWorkgroupNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AthenaAnalysisWorkgroupName
-      Type: String
-      Value: !Ref AthenaAnalysisWorkgroup
-
   AthenaQueryOutputBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -634,22 +586,6 @@ Resources:
       Name: AthenaQueryOutputBucketName
       Type: String
       Value: !Ref AthenaQueryOutputBucket
-
-  #TODO: Remove once solution is using new database
-  AuditAnalysisDatabaseArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AuditAnalysisDatabaseArn
-      Type: String
-      Value: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/${AuditAnalysisDatabase}
-
-  #TODO: Remove once solution is using new database
-  AuditAnalysisDatabaseNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AuditAnalysisDatabaseName
-      Type: String
-      Value: !Ref AuditAnalysisDatabase
 
   AuditDataAnalysisGlueDatabaseArnParameter:
     Type: AWS::SSM::Parameter
