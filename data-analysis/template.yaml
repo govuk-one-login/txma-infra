@@ -30,6 +30,10 @@ Conditions:
     ]
 
 Resources:
+  #####################
+  # Batch Job Resources
+  #####################
+
   BatchJobManifestBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -90,6 +94,10 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  ######################################
+  # TICF Queries Email Recipients Bucket
+  ######################################
+
   ValidEmailRecipientsLogsBucket:
     #checkov:skip=CKV_AWS_18:This is the logs bucket
     Type: AWS::S3::Bucket
@@ -107,6 +115,11 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  ################################
+  # Data Analysis Athena Resources
+  ################################
+
+  #TODO: Replace when scaled audit tool is using new database
   AuditAnalysisDatabase:
     Type: AWS::Glue::Database
     Properties:
@@ -122,6 +135,15 @@ Resources:
             ]
           ]
 
+  AuditDataAnalysisGlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Description: TxMA - Event Message Analysis Database
+        Name: txma-audit-analysis
+
+  #TODO: Remove once scaled audit tool is using new workgroup
   AthenaAnalysisWorkgroup:
     Type: AWS::Athena::WorkGroup
     Properties:
@@ -137,6 +159,34 @@ Resources:
           OutputLocation:
             !Join ['', ['s3://', !Ref AthenaQueryOutputBucket, '/']]
 
+  ManualAuditDataQueriesWorkgroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Description: Workgroup for manual queries on TxMA audit data
+      Name: manual-audit-data-queries
+      RecursiveDeleteOption: true
+      WorkGroupConfiguration:
+        EnforceWorkGroupConfiguration: true
+        PublishCloudWatchMetricsEnabled: false
+        ResultConfiguration:
+          EncryptionConfiguration:
+            EncryptionOption: SSE_S3
+          OutputLocation: !Sub s3://${AthenaQueryOutputBucket}/manual-audit-data-queries/
+
+  TicfAutomatedDataQueriesWorkgroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Description: Workgroup for automated queries on TxMA audit data by TICF/Zendesk integration
+      Name: ticf-automated-audit--data-queries
+      RecursiveDeleteOption: true
+      WorkGroupConfiguration:
+        EnforceWorkGroupConfiguration: true
+        PublishCloudWatchMetricsEnabled: false
+        ResultConfiguration:
+          EncryptionConfiguration:
+            EncryptionOption: SSE_S3
+          OutputLocation: !Sub s3://${AthenaQueryOutputBucket}/ticf-automated-audit-data-queries/
+
   AthenaQueryOutputBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -150,10 +200,12 @@ Resources:
         Rules:
           - Id: AnalysisCleanupRule
             Status: Enabled
-            ExpirationInDays: 30
+            ExpirationInDays: 7
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 1
       LoggingConfiguration:
         DestinationBucketName: !Ref AthenaQueryOutputLogsBucket
-        LogFilePrefix: String
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-athena-query-output-bucket
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -184,8 +236,7 @@ Resources:
               - s3:GetObjectAcl
               - s3:GetObjectTagging
             Effect: Allow
-            Resource:
-              !Join ['', ['arn:aws:s3:::', !Ref AthenaQueryOutputBucket, '/*']]
+            Resource: !Sub ${AthenaQueryOutputBucket.Arn}/*
             Principal:
               AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
 
@@ -241,6 +292,10 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/athena-query-output-bucket-kms-key
       TargetKeyId: !Ref AthenaQueryOutputBucketKmsKey
 
+  ####################
+  # DynamoDB Resources
+  ####################
+
   QueryRequestTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -277,6 +332,10 @@ Resources:
         SSEEnabled: true
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
+  ###############
+  # WAF Resources
+  ###############
 
   ZendeskWebhookApiWafAcl:
     Type: AWS::WAFv2::WebACL
@@ -351,6 +410,10 @@ Resources:
         # The ARN must not include the ':*'.
         - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${ZendeskWebhookApiWafLogs}
       ResourceArn: !GetAtt ZendeskWebhookApiWafAcl.Arn
+
+  ###################################
+  # TICF Automated Queries SQS Queues
+  ###################################
 
   # Need a separate KMS key here for the audit queue because we need to grant access to the event processing account
   # and our main KMS key definitions are in 'core', which is a shared set of definitions across all stacks.
@@ -531,6 +594,98 @@ Resources:
       QueueName: !Sub ${AWS::StackName}-${Environment}-query-completed-dead-letter-queue
       KmsMasterKeyId: !GetAtt QueryCompletedQueueKmsKey.Arn
 
+  ################
+  # SSM Parameters
+  ################
+
+  #TODO: Remove once solution is using new workgroup
+  AthenaAnalysisWorkgroupArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaAnalysisWorkgroupArn
+      Type: String
+      Value: !Sub arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${AthenaAnalysisWorkgroup}
+
+  #TODO: Remove once solution is using new workgroup
+  AthenaAnalysisWorkgroupNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaAnalysisWorkgroupName
+      Type: String
+      Value: !Ref AthenaAnalysisWorkgroup
+
+  AthenaQueryOutputBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaQueryOutputBucketArn
+      Type: String
+      Value: !GetAtt AthenaQueryOutputBucket.Arn
+
+  AthenaQueryOutputBucketKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaQueryOutputBucketKmsKeyArn
+      Type: String
+      Value: !GetAtt AthenaQueryOutputBucketKmsKey.Arn
+
+  AthenaQueryOutputBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AthenaQueryOutputBucketName
+      Type: String
+      Value: !Ref AthenaQueryOutputBucket
+
+  #TODO: Remove once solution is using new database
+  AuditAnalysisDatabaseArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditAnalysisDatabaseArn
+      Type: String
+      Value: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/${AuditAnalysisDatabase}
+
+  #TODO: Remove once solution is using new database
+  AuditAnalysisDatabaseNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditAnalysisDatabaseName
+      Type: String
+      Value: !Ref AuditAnalysisDatabase
+
+  AuditDataAnalysisGlueDatabaseArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataAnalysisGlueDatabaseArn
+      Type: String
+      Value: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/${AuditDataAnalysisGlueDatabase}
+
+  AuditDataAnalysisGlueDatabaseNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataAnalysisGlueDatabaseName
+      Type: String
+      Value: !Ref AuditDataAnalysisGlueDatabase
+
+  AuditDataRequestEventsQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataRequestEventsQueueArn
+      Type: String
+      Value: !GetAtt AuditDataRequestEventsQueue.Arn
+
+  AuditDataRequestEventsQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataRequestEventsQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
+
+  AuditDataRequestEventsQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditDataRequestEventsQueueUrl
+      Type: String
+      Value: !Ref AuditDataRequestEventsQueue
+
   BatchJobManifestBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -545,61 +700,40 @@ Resources:
       Type: String
       Value: !Ref BatchJobManifestBucket
 
-  ValidEmailRecipientsBucketNameParameter:
+  ManualAuditDataQueriesWorkgroupArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: ValidEmailRecipientsBucketName
+      Name: ManualAuditDataQueriesWorkgroupArn
       Type: String
-      Value: !Ref ValidEmailRecipientsBucket
+      Value: !Sub arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${ManualAuditDataQueriesWorkgroup}
 
-  ValidEmailRecipientsBucketArnParameter:
+  ManualAuditDataQueriesWorkgroupNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: ValidEmailRecipientsBucketArn
+      Name: ManualAuditDataQueriesWorkgroupName
       Type: String
-      Value: !GetAtt ValidEmailRecipientsBucket.Arn
+      Value: !Ref ManualAuditDataQueriesWorkgroup
 
-  AuditAnalysisDatabaseArnParameter:
+  QueryCompletedQueueArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: AuditAnalysisDatabaseArn
+      Name: QueryCompletedQueueArn
       Type: String
-      Value: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/${AuditAnalysisDatabase}
+      Value: !GetAtt QueryCompletedQueue.Arn
 
-  AuditAnalysisDatabaseNameParameter:
+  QueryCompletedQueueKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: AuditAnalysisDatabaseName
+      Name: QueryCompletedQueueKmsKeyArn
       Type: String
-      Value: !Ref AuditAnalysisDatabase
+      Value: !GetAtt QueryCompletedQueueKmsKey.Arn
 
-  AthenaAnalysisWorkgroupArnParameter:
+  QueryCompletedQueueUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: AthenaAnalysisWorkgroupArn
+      Name: QueryCompletedQueueUrl
       Type: String
-      Value: !Sub arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${AthenaAnalysisWorkgroup}
-
-  AthenaAnalysisWorkgroupNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AthenaAnalysisWorkgroupName
-      Type: String
-      Value: !Ref AthenaAnalysisWorkgroup
-
-  AthenaQueryOutputBucketNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AthenaQueryOutputBucketName
-      Type: String
-      Value: !Ref AthenaQueryOutputBucket
-
-  AthenaQueryOutputBucketArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AthenaQueryOutputBucketArn
-      Type: String
-      Value: !GetAtt AthenaQueryOutputBucket.Arn
+      Value: !Ref QueryCompletedQueue
 
   QueryRequestTableArnParameter:
     Type: AWS::SSM::Parameter
@@ -615,58 +749,37 @@ Resources:
       Type: String
       Value: !Ref QueryRequestTable
 
+  TicfAutomatedDataQueriesWorkgroupArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: TicfAutomatedDataQueriesWorkgroupArn
+      Type: String
+      Value: !Sub arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${TicfAutomatedDataQueriesWorkgroup}
+
+  TicfAutomatedDataQueriesWorkgroupNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: TicfAutomatedDataQueriesWorkgroupName
+      Type: String
+      Value: !Ref TicfAutomatedDataQueriesWorkgroup
+
+  ValidEmailRecipientsBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ValidEmailRecipientsBucketArn
+      Type: String
+      Value: !GetAtt ValidEmailRecipientsBucket.Arn
+
+  ValidEmailRecipientsBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ValidEmailRecipientsBucketName
+      Type: String
+      Value: !Ref ValidEmailRecipientsBucket
+
   ZendeskWebhookApiWafAclArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: ZendeskWebhookApiWafAclArn
       Type: String
       Value: !GetAtt ZendeskWebhookApiWafAcl.Arn
-
-  AuditDataRequestEventsQueueArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AuditDataRequestEventsQueueArn
-      Type: String
-      Value: !GetAtt AuditDataRequestEventsQueue.Arn
-
-  AuditDataRequestEventsQueueUrlParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AuditDataRequestEventsQueueUrl
-      Type: String
-      Value: !Ref AuditDataRequestEventsQueue
-
-  AuditDataRequestEventsQueueKmsKeyArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AuditDataRequestEventsQueueKmsKeyArn
-      Type: String
-      Value: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
-
-  QueryCompletedQueueArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: QueryCompletedQueueArn
-      Type: String
-      Value: !GetAtt QueryCompletedQueue.Arn
-
-  QueryCompletedQueueUrlParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: QueryCompletedQueueUrl
-      Type: String
-      Value: !Ref QueryCompletedQueue
-
-  QueryCompletedQueueKmsKeyArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: QueryCompletedQueueKmsKeyArn
-      Type: String
-      Value: !GetAtt QueryCompletedQueueKmsKey.Arn
-
-  AthenaQueryOutputBucketKmsKeyArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: AthenaQueryOutputBucketKmsKeyArn
-      Type: String
-      Value: !GetAtt AthenaQueryOutputBucketKmsKey.Arn
