@@ -10,7 +10,7 @@ export const writeTestFileToAthenaOutputBucket = (
   logger.info(`Writing test output file to ${athenaQueryId}.csv`)
   return client.send(
     new PutObjectCommand({
-      Key: `${athenaQueryId}.csv`,
+      Key: `ticf-automated-audit-data-queries/${athenaQueryId}.csv`,
       Bucket: getEnv('ATHENA_OUTPUT_BUCKET_NAME'),
       Body: fileContents
     })

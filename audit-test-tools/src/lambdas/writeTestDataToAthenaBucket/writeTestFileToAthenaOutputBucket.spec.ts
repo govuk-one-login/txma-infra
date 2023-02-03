@@ -18,7 +18,7 @@ describe('writeTestFileToAthenaOutputBucket', () => {
     expect(s3ClientMock).toHaveReceivedCommandWith(PutObjectCommand, {
       Body: TEST_FILE_CONTENTS,
       Bucket: TEST_ATHENA_OUTPUT_BUCKET_NAME,
-      Key: `${TEST_ATHENA_QUERY_ID}.csv`
+      Key: `ticf-automated-audit-data-queries/${TEST_ATHENA_QUERY_ID}.csv`
     })
   })
 })
