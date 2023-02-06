@@ -200,6 +200,42 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/database-kms-key
       TargetKeyId: !Ref DatabaseKmsKey
 
+  EncryptionGeneratorKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Decrypt
+            Resource: '*'
+
+  EncryptionGeneratorKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/encryption-generator-kms-key
+      TargetKeyId: !Ref EncryptionGeneratorKmsKey
+
+  EncryptionGeneratorKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EncryptionGeneratorKmsKeyArn
+      Type: String
+      Value: !GetAtt EncryptionGeneratorKmsKey.Arn
+
   LambdaKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
