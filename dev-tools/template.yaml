@@ -39,6 +39,29 @@ Globals:
     Timeout: 30
 
 Resources:
+  AddFirehoseRecordFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
+    #checkov:skip=CKV_AWS_116:DLQ not required
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: addFirehoseRecord.handler
+      FunctionName: !Sub ${AWS::StackName}-add-firehose-record
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - firehose:PutRecord
+              Resource: '*'
+
+  AddFirehoseRecordLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-add-firehose-record
+      RetentionInDays: 30
+
   EmptyS3BucketsFunction:
     #checkov:skip=CKV_AWS_115:Defined in Globals
     #checkov:skip=CKV_AWS_116:DLQ not required as failures will be reported to CloudFormation
@@ -159,6 +182,13 @@ Resources:
         RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
+
+  AddFirehoseRecordFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/AddFirehoseRecordFunctionName
+      Type: String
+      Value: !Ref AddFirehoseRecordFunction
 
   EmptyS3BucketsFunctionArnParameter:
     Condition: FeatureBranches
