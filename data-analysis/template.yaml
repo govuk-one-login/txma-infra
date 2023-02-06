@@ -145,7 +145,7 @@ Resources:
     Type: AWS::Athena::WorkGroup
     Properties:
       Description: Workgroup for automated queries on TxMA audit data by TICF/Zendesk integration
-      Name: ticf-automated-audit--data-queries
+      Name: ticf-automated-audit-data-queries
       RecursiveDeleteOption: true
       WorkGroupConfiguration:
         EnforceWorkGroupConfiguration: true
