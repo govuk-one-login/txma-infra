@@ -1,5 +1,6 @@
 import { when } from 'jest-when'
 import { jsonToUint8Array } from '../../utils/helpers'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
 import { handler } from './handler'
 import { putFirehoseRecord } from './putFirehoseRecord'
 
@@ -8,10 +9,11 @@ jest.mock('./putFirehoseRecord', () => ({
 }))
 
 describe('add firehose record handler', () => {
-  const firehose = 'test-firehose-stream'
-
-  const validData = {
-    foo: 'bar'
+  const params = {
+    firehose: 'test-firehose-stream',
+    data: {
+      foo: 'bar'
+    }
   }
 
   it('returns record id when called with valid parameters', async () => {
@@ -19,11 +21,11 @@ describe('add firehose record handler', () => {
       RecordId: '12345',
       $metadata: {}
     })
-    const recordId = await handler(firehose, validData)
+    const recordId = await handler(params, mockLambdaContext)
 
     expect(putFirehoseRecord).toHaveBeenCalledWith(
-      firehose,
-      jsonToUint8Array(validData)
+      params.firehose,
+      jsonToUint8Array(params.data)
     )
     expect(recordId).toEqual('12345')
   })
@@ -31,7 +33,7 @@ describe('add firehose record handler', () => {
   it('logs error an error if Firehose command fails', async () => {
     when(putFirehoseRecord).mockRejectedValue(new Error('Some firehose error'))
 
-    await expect(handler(firehose, validData)).rejects.toThrow(
+    await expect(handler(params, mockLambdaContext)).rejects.toThrow(
       'Some firehose error'
     )
   })

@@ -1,12 +1,11 @@
-import { FirehoseClient, PutRecordCommand } from '@aws-sdk/client-firehose'
+import { PutRecordCommand } from '@aws-sdk/client-firehose'
+import { firehoseClient } from './firehoseClient'
 
 export const putFirehoseRecord = async (firehose: string, data: Uint8Array) => {
-  const client = new FirehoseClient({ region: 'REGION' })
-
   const input = {
     DeliveryStreamName: firehose,
     Record: { Data: data }
   }
 
-  return await client.send(new PutRecordCommand(input))
+  return await firehoseClient.send(new PutRecordCommand(input))
 }
