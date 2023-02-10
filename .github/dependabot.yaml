@@ -7,3 +7,17 @@ updates:
     commit-message:
       prefix: dependabot
       include: scope
+  - package-ecosystem: npm
+    directory: /audit-test-tools
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: dependabot
+      include: scope
+  - package-ecosystem: npm
+    directory: /dev-tools
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: dependabot
+      include: scope
