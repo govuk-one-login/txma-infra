@@ -11,6 +11,7 @@ updates:
       - dependency-name: '*'
         update-types:
           - version-update:semver-major
+      - dependency-name: '@aws-sdk/*'
   - package-ecosystem: npm
     directory: /audit-test-tools
     schedule:
