@@ -3,7 +3,7 @@
   "author": "GDS",
   "license": "MIT",
   "private": true,
-  "packageManager": "yarn@3.2.4",
+  "packageManager": "yarn@3.4.1",
   "workspaces": [
     "dev-tools",
     "audit-test-tools"
