@@ -4333,21 +4333,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],\
           "linkType": "HARD"\
         }],\
-        ["npm:7.1.2", {\
-          "packageLocation": "./.yarn/cache/@sinonjs-fake-timers-npm-7.1.2-2a6b119ac7-c84773d797.zip/node_modules/@sinonjs/fake-timers/",\
+        ["npm:9.1.2", {\
+          "packageLocation": "./.yarn/cache/@sinonjs-fake-timers-npm-9.1.2-3ff37ab7fb-7d3aef54e1.zip/node_modules/@sinonjs/fake-timers/",\
           "packageDependencies": [\
-            ["@sinonjs/fake-timers", "npm:7.1.2"],\
+            ["@sinonjs/fake-timers", "npm:9.1.2"],\
             ["@sinonjs/commons", "npm:1.8.3"]\
           ],\
           "linkType": "HARD"\
         }]\
       ]],\
       ["@sinonjs/samsam", [\
-        ["npm:6.1.1", {\
-          "packageLocation": "./.yarn/cache/@sinonjs-samsam-npm-6.1.1-06e18132d0-a09b0914bf.zip/node_modules/@sinonjs/samsam/",\
+        ["npm:7.0.1", {\
+          "packageLocation": "./.yarn/cache/@sinonjs-samsam-npm-7.0.1-d14786a4c3-291efb158d.zip/node_modules/@sinonjs/samsam/",\
           "packageDependencies": [\
-            ["@sinonjs/samsam", "npm:6.1.1"],\
-            ["@sinonjs/commons", "npm:1.8.3"],\
+            ["@sinonjs/samsam", "npm:7.0.1"],\
+            ["@sinonjs/commons", "npm:2.0.0"],\
             ["lodash.get", "npm:4.4.2"],\
             ["type-detect", "npm:4.0.8"]\
           ],\
@@ -5152,8 +5152,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/jest", "npm:29.4.0"],\
             ["@types/jest-when", "npm:3.5.2"],\
             ["@types/node", "npm:18.13.0"],\
-            ["aws-sdk-client-mock", "npm:2.0.0"],\
-            ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.0.0"],\
+            ["aws-sdk-client-mock", "npm:2.0.1"],\
+            ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.0.1"],\
             ["axios", "npm:0.27.2"],\
             ["esbuild", "npm:0.17.8"],\
             ["jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:29.4.2"],\
@@ -5167,32 +5167,32 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["aws-sdk-client-mock", [\
-        ["npm:2.0.0", {\
-          "packageLocation": "./.yarn/cache/aws-sdk-client-mock-npm-2.0.0-e450c5de3a-e6081ca6bb.zip/node_modules/aws-sdk-client-mock/",\
+        ["npm:2.0.1", {\
+          "packageLocation": "./.yarn/cache/aws-sdk-client-mock-npm-2.0.1-ea5b74f647-447502ba92.zip/node_modules/aws-sdk-client-mock/",\
           "packageDependencies": [\
-            ["aws-sdk-client-mock", "npm:2.0.0"],\
+            ["aws-sdk-client-mock", "npm:2.0.1"],\
             ["@types/sinon", "npm:10.0.13"],\
-            ["sinon", "npm:11.1.2"],\
+            ["sinon", "npm:14.0.2"],\
             ["tslib", "npm:2.4.0"]\
           ],\
           "linkType": "HARD"\
         }]\
       ]],\
       ["aws-sdk-client-mock-jest", [\
-        ["npm:2.0.0", {\
-          "packageLocation": "./.yarn/cache/aws-sdk-client-mock-jest-npm-2.0.0-5763988398-57dc95b52f.zip/node_modules/aws-sdk-client-mock-jest/",\
+        ["npm:2.0.1", {\
+          "packageLocation": "./.yarn/cache/aws-sdk-client-mock-jest-npm-2.0.1-6c76fdf93a-7a45ace039.zip/node_modules/aws-sdk-client-mock-jest/",\
           "packageDependencies": [\
-            ["aws-sdk-client-mock-jest", "npm:2.0.0"]\
+            ["aws-sdk-client-mock-jest", "npm:2.0.1"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.0.0", {\
-          "packageLocation": "./.yarn/__virtual__/aws-sdk-client-mock-jest-virtual-f680a740ce/0/cache/aws-sdk-client-mock-jest-npm-2.0.0-5763988398-57dc95b52f.zip/node_modules/aws-sdk-client-mock-jest/",\
+        ["virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.0.1", {\
+          "packageLocation": "./.yarn/__virtual__/aws-sdk-client-mock-jest-virtual-cd2ec600de/0/cache/aws-sdk-client-mock-jest-npm-2.0.1-6c76fdf93a-7a45ace039.zip/node_modules/aws-sdk-client-mock-jest/",\
           "packageDependencies": [\
-            ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.0.0"],\
+            ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.0.1"],\
             ["@types/aws-sdk-client-mock", null],\
             ["@types/jest", "npm:28.1.8"],\
-            ["aws-sdk-client-mock", "npm:2.0.0"],\
+            ["aws-sdk-client-mock", "npm:2.0.1"],\
             ["tslib", "npm:2.4.0"]\
           ],\
           "packagePeers": [\
@@ -5853,8 +5853,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/jest", "npm:29.4.0"],\
             ["@types/jest-when", "npm:3.5.2"],\
             ["@types/node", "npm:18.13.0"],\
-            ["aws-sdk-client-mock", "npm:2.0.0"],\
-            ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.0.0"],\
+            ["aws-sdk-client-mock", "npm:2.0.1"],\
+            ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.0.1"],\
             ["axios", "npm:0.27.2"],\
             ["esbuild", "npm:0.17.8"],\
             ["jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:29.4.2"],\
@@ -8285,11 +8285,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["nise", [\
-        ["npm:5.1.1", {\
-          "packageLocation": "./.yarn/cache/nise-npm-5.1.1-210b3fdf40-d8be29e84a.zip/node_modules/nise/",\
+        ["npm:5.1.4", {\
+          "packageLocation": "./.yarn/cache/nise-npm-5.1.4-66667508d6-bc57c10eae.zip/node_modules/nise/",\
           "packageDependencies": [\
-            ["nise", "npm:5.1.1"],\
-            ["@sinonjs/commons", "npm:1.8.3"],\
+            ["nise", "npm:5.1.4"],\
+            ["@sinonjs/commons", "npm:2.0.0"],\
             ["@sinonjs/fake-timers", "npm:10.0.2"],\
             ["@sinonjs/text-encoding", "npm:0.7.2"],\
             ["just-extend", "npm:4.2.1"],\
@@ -8962,15 +8962,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["sinon", [\
-        ["npm:11.1.2", {\
-          "packageLocation": "./.yarn/cache/sinon-npm-11.1.2-5325724cb2-1d01377e23.zip/node_modules/sinon/",\
+        ["npm:14.0.2", {\
+          "packageLocation": "./.yarn/cache/sinon-npm-14.0.2-76bb0b1579-de7730cd77.zip/node_modules/sinon/",\
           "packageDependencies": [\
-            ["sinon", "npm:11.1.2"],\
-            ["@sinonjs/commons", "npm:1.8.3"],\
-            ["@sinonjs/fake-timers", "npm:7.1.2"],\
-            ["@sinonjs/samsam", "npm:6.1.1"],\
+            ["sinon", "npm:14.0.2"],\
+            ["@sinonjs/commons", "npm:2.0.0"],\
+            ["@sinonjs/fake-timers", "npm:9.1.2"],\
+            ["@sinonjs/samsam", "npm:7.0.1"],\
             ["diff", "npm:5.1.0"],\
-            ["nise", "npm:5.1.1"],\
+            ["nise", "npm:5.1.4"],\
             ["supports-color", "npm:7.2.0"]\
           ],\
           "linkType": "HARD"\
