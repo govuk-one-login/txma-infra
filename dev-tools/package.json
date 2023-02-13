@@ -24,7 +24,7 @@
     "@types/aws-lambda": "8.10.110",
     "@types/jest": "28.1.7",
     "@types/jest-when": "3.5.2",
-    "@types/node": "18.7.1",
+    "@types/node": "18.13.0",
     "aws-sdk-client-mock": "2.0.0",
     "aws-sdk-client-mock-jest": "2.0.0",
     "esbuild": "0.17.8",
