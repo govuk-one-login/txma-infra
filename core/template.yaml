@@ -14,6 +14,23 @@ Parameters:
       - production
 
 Resources:
+  ChatbotAlarmRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'chatbot.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+
+  ChatbotAlarmServiceLinkedRole:
+    Type: AWS::IAM::ServiceLinkedRole
+    Properties:
+      AWSServiceName: management.chatbot.amazonaws.com
+
   LambdaKmsKey:
     Type: AWS::KMS::Key
     Properties:
@@ -241,3 +258,10 @@ Resources:
       Name: CoreSnsKmsKeyArn
       Type: String
       Value: !GetAtt SnsKmsKey.Arn
+
+  ChatbotAlarmRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ChatbotAlarmRoleArn
+      Type: String
+      Value: !GetAtt ChatbotAlarmRole.Arn
