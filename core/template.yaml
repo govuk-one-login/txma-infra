@@ -40,11 +40,6 @@ Resources:
             Action:
               - 'sts:AssumeRole'
 
-  ChatbotAlarmServiceLinkedRole:
-    Type: AWS::IAM::ServiceLinkedRole
-    Properties:
-      AWSServiceName: management.chatbot.amazonaws.com
-
   LambdaKmsKey:
     Type: AWS::KMS::Key
     Properties:
