@@ -21,6 +21,10 @@ Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
 
 Resources:
+  #############
+  # AWS Chatbot
+  #############
+
   ChatbotAlarmRole:
     Type: AWS::IAM::Role
     Properties:
@@ -39,6 +43,38 @@ Resources:
               Service: 'chatbot.amazonaws.com'
             Action:
               - 'sts:AssumeRole'
+
+  ##########
+  # KMS Keys
+  ##########
+
+  DatabaseKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+
+  DatabaseKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/database-kms-key
+      TargetKeyId: !Ref DatabaseKmsKey
 
   LambdaKmsKey:
     Type: AWS::KMS::Key
@@ -198,33 +234,64 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/queue-kms-key
       TargetKeyId: !Ref SqsKmsKey
 
-  DatabaseKmsKey:
-    Type: AWS::KMS::Key
-    Properties:
-      EnableKeyRotation: true
-      KeyPolicy:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: Enable Root access
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action:
-              - kms:*
-            Resource: '*'
-          - Sid: Allow AWS Lambda access
-            Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action:
-              - kms:Decrypt
-            Resource: '*'
+  #########
+  # S3 Logs
+  #########
 
-  DatabaseKmsKeyAlias:
-    Type: AWS::KMS::Alias
+  S3LogsBucket:
+    #checkov:skip=CKV_AWS_18:This is the logs bucket
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
     Properties:
-      AliasName: !Sub alias/${AWS::StackName}/${Environment}/database-kms-key
-      TargetKeyId: !Ref DatabaseKmsKey
+      BucketName:
+        !Join [
+          '-',
+          [
+            !Ref AWS::StackName,
+            !Ref Environment,
+            s3-logs,
+            !Select [
+              4,
+              !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]
+            ]
+          ]
+        ]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireLogsRule
+            Status: Enabled
+            ExpirationInDays: 30
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 7
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  ################
+  # SSM Parameters
+  ################
+
+  ChatbotAlarmRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ChatbotAlarmRoleArn
+      Type: String
+      Value: !GetAtt ChatbotAlarmRole.Arn
+
+  DatabaseKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: DatabaseKmsKeyArn
+      Type: String
+      Value: !GetAtt DatabaseKmsKey.Arn
 
   LambdaKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
@@ -240,6 +307,13 @@ Resources:
       Type: String
       Value: !GetAtt LogsKmsKey.Arn
 
+  S3LogsBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: S3LogsBucketName
+      Type: String
+      Value: !Ref S3LogsBucket
+
   SecretsKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -254,23 +328,9 @@ Resources:
       Type: String
       Value: !GetAtt SqsKmsKey.Arn
 
-  DatabaseKmsKeyArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: DatabaseKmsKeyArn
-      Type: String
-      Value: !GetAtt DatabaseKmsKey.Arn
-
   SnsKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: CoreSnsKmsKeyArn
       Type: String
       Value: !GetAtt SnsKmsKey.Arn
-
-  ChatbotAlarmRoleArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: ChatbotAlarmRoleArn
-      Type: String
-      Value: !GetAtt ChatbotAlarmRole.Arn
