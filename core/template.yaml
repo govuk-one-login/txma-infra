@@ -241,6 +241,7 @@ Resources:
   S3LogsBucket:
     #checkov:skip=CKV_AWS_18:This is the logs bucket
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
     Properties:
       BucketName:
         !Join [
