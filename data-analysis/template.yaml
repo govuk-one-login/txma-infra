@@ -48,44 +48,8 @@ Resources:
             Status: Enabled
             ExpirationInDays: 5
       LoggingConfiguration:
-        DestinationBucketName: !Ref BatchJobBucketLogsBucket
-        LogFilePrefix: String
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      VersioningConfiguration:
-        Status: Enabled
-
-  BatchJobBucketLogsBucket:
-    #checkov:skip=CKV_AWS_18:This is the logs bucket
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub ${AWS::StackName}-${Environment}-batch-job-bucket-logs
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      VersioningConfiguration:
-        Status: Enabled
-
-  ValidEmailRecipientsBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      BucketName: !Sub ${AWS::StackName}-${Environment}-email-recipients
-      LoggingConfiguration:
-        DestinationBucketName: !Ref ValidEmailRecipientsLogsBucket
-        LogFilePrefix: String
+        DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-batch-job-manifest-bucket
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -98,15 +62,17 @@ Resources:
   # TICF Queries Email Recipients Bucket
   ######################################
 
-  ValidEmailRecipientsLogsBucket:
-    #checkov:skip=CKV_AWS_18:This is the logs bucket
+  ValidEmailRecipientsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${AWS::StackName}-${Environment}-email-recipients-logs
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-email-recipients
+      LoggingConfiguration:
+        DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-email-recipients
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -172,7 +138,7 @@ Resources:
             NoncurrentVersionExpiration:
               NoncurrentDays: 1
       LoggingConfiguration:
-        DestinationBucketName: !Ref AthenaQueryOutputLogsBucket
+        DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
         LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-athena-query-output-bucket
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
@@ -190,14 +156,14 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Sid: 'AllowSSLRequestsOnly'
-            Effect: 'Deny'
-            'Action': 's3:*'
+            Effect: Deny
+            Action: s3:*
             Resource:
               - !Sub '${AthenaQueryOutputBucket.Arn}/*'
             Principal: '*'
             Condition:
               Bool:
-                'aws:SecureTransport': 'false'
+                aws:SecureTransport: 'false'
           - Sid: AllowQueryResultsAccountAccess
             Action:
               - s3:GetObject
@@ -207,23 +173,6 @@ Resources:
             Resource: !Sub ${AthenaQueryOutputBucket.Arn}/*
             Principal:
               AWS: '{{resolve:ssm:QueryResultsAccountRootArn}}'
-
-  AthenaQueryOutputLogsBucket:
-    #checkov:skip=CKV_AWS_18:This is the query results logs bucket
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub ${AWS::StackName}-${Environment}-athena-query-output-logs
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      VersioningConfiguration:
-        Status: Enabled
 
   AthenaQueryOutputBucketKmsKey:
     Type: AWS::KMS::Key
