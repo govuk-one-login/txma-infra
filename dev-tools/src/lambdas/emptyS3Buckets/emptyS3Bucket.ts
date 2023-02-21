@@ -4,6 +4,7 @@ import {
   PutBucketVersioningCommand,
   S3Client
 } from '@aws-sdk/client-s3'
+import { logger } from '../../utils/logger'
 import { listS3Files } from './listS3Files'
 import { listS3ObjectVersions } from './listS3ObjectVersions'
 
@@ -47,7 +48,11 @@ const disableVersioning = async (bucketName: string) => {
     Bucket: bucketName,
     VersioningConfiguration: { Status: 'Suspended' }
   })
-  await s3Client.send(suspendVersioningCommand)
+  const response = await s3Client.send(suspendVersioningCommand)
+  logger.info('Attempt to disable versioning', {
+    Bucket: bucketName,
+    result: response
+  })
 }
 
 const deleteObject = (bucketName: string, key: string) => {
@@ -55,5 +60,10 @@ const deleteObject = (bucketName: string, key: string) => {
     Bucket: bucketName,
     Key: key
   })
-  return s3Client.send(command)
+  const response = s3Client.send(command)
+  logger.info('Attempt to delete object', {
+    bucket: bucketName,
+    key,
+    result: response
+  })
 }
