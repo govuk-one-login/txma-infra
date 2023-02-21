@@ -275,6 +275,27 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  S3LogsBucketAllowLoggingPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3LogsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLogging
+            Effect: Allow
+            Resource:
+              - !Sub ${S3LogsBucket.Arn}/*
+            Principal:
+              Service: logging.s3.amazonaws.com
+            Action:
+              - s3:PutObject
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              Bool:
+                aws:SecureTransport: true
+
   ################
   # SSM Parameters
   ################

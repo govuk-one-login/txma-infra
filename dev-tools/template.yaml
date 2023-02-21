@@ -167,7 +167,6 @@ Resources:
       RetentionInDays: 30
 
   IntegrationTestDataBucket:
-    #checkov:skip=CKV_AWS_18: Logging not required for test resource
     Type: AWS::S3::Bucket
     Properties:
       BucketEncryption:
@@ -175,6 +174,9 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       BucketName: !Sub ${AWS::StackName}-${Environment}-test-data-bucket
+      LoggingConfiguration:
+        DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-test-data-bucket
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
