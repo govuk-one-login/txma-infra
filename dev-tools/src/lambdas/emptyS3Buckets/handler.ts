@@ -1,32 +1,48 @@
-import { CloudFormationCustomResourceEvent } from 'aws-lambda'
+import { CloudFormationCustomResourceEvent, Context } from 'aws-lambda'
 import { emptyS3Bucket } from './emptyS3Bucket'
 import { listS3Buckets } from './listS3Buckets'
 import url from 'node:url'
 import axios from 'axios'
+import { initialiseLogger, logger } from '../../utils/logger'
 
 export const handler = async (
-  event: CloudFormationCustomResourceEvent
+  event: CloudFormationCustomResourceEvent,
+  context: Context
 ): Promise<void> => {
+  initialiseLogger(context)
+  logger.info('Handling CloudFormationCustomResourceEvent', {
+    handledEvent: event
+  })
   try {
-    if (event.RequestType !== 'Delete')
+    if (event.RequestType !== 'Delete') {
+      logger.info('RequestType is not Delete')
       return await sendResponse(event, 'SUCCESS')
+    }
 
     const stackId = event.StackId
     const s3Buckets = await listS3Buckets(stackId)
-    if (s3Buckets.length === 0) return await sendResponse(event, 'SUCCESS')
 
+    if (s3Buckets.length === 0) {
+      logger.info('No S3 buckets found')
+      return await sendResponse(event, 'SUCCESS')
+    }
+
+    logger.info('Buckets found', { bucketsFound: s3Buckets })
     await Promise.all(
       s3Buckets.map((bucket) => {
         emptyS3Bucket(bucket)
       })
     )
 
-    return await sendResponse(event, 'SUCCESS')
+    await sendResponse(event, 'SUCCESS')
+    logger.info('Successfully emptied all buckets')
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return await sendResponse(event, 'FAILED', error.message)
+      await sendResponse(event, 'FAILED', error.message)
+      logger.info(`Lambda error occurred with '${error.message}'`)
     } else {
-      return await sendResponse(event, 'FAILED', 'Unknown error')
+      await sendResponse(event, 'FAILED', 'Unknown error')
+      logger.info(`Lambda error occurred with 'Unknown error'`)
     }
   }
 }
@@ -37,7 +53,7 @@ const sendResponse = async (
   reason?: string
 ) => {
   const parsedUrl = url.parse(event.ResponseURL)
-  console.log('Response URL: ', parsedUrl)
+  logger.info('Response URL', { responseUrl: parsedUrl })
 
   const data = {
     LogicalResourceId: event.LogicalResourceId,
@@ -51,6 +67,7 @@ const sendResponse = async (
         : formatStackId(event.StackId)
   }
 
+  logger.info('Data sent with request', { data })
   await axios.put(event.ResponseURL, data)
 }
 

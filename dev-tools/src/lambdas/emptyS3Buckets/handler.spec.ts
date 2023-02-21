@@ -4,6 +4,7 @@ import { listS3Buckets } from './listS3Buckets'
 import { defaultCustomResourceDeleteEvent } from '../../utils/tests/events/defaultCustomResourceDeleteEvent'
 import { handler } from './handler'
 import axios from 'axios'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
 
 jest.mock('./listS3Buckets', () => ({
   listS3Buckets: jest.fn()
@@ -48,7 +49,7 @@ describe('empty s3 buckets handler', () => {
       RequestType: 'Update'
     } as CloudFormationCustomResourceUpdateEvent
 
-    await handler(updateEvent)
+    await handler(updateEvent, mockLambdaContext)
 
     expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
   })
@@ -56,7 +57,7 @@ describe('empty s3 buckets handler', () => {
   test('does nothing if stack contains no s3 buckets', async () => {
     givenNoS3Buckets()
 
-    await handler(defaultCustomResourceDeleteEvent)
+    await handler(defaultCustomResourceDeleteEvent, mockLambdaContext)
 
     expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
   })
@@ -65,7 +66,7 @@ describe('empty s3 buckets handler', () => {
     givenS3Buckets()
     mockEmptyS3Bucket.mockImplementationOnce(() => Promise.resolve())
 
-    await handler(defaultCustomResourceDeleteEvent)
+    await handler(defaultCustomResourceDeleteEvent, mockLambdaContext)
 
     expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
     expect(emptyS3Bucket).toHaveBeenCalledWith('example-bucket')
@@ -77,7 +78,7 @@ describe('empty s3 buckets handler', () => {
       throw new Error('error message')
     })
 
-    await handler(defaultCustomResourceDeleteEvent)
+    await handler(defaultCustomResourceDeleteEvent, mockLambdaContext)
 
     const errorPayload = {
       ...successPayload,
