@@ -55,15 +55,16 @@ const disableVersioning = async (bucketName: string) => {
   })
 }
 
-const deleteObject = (bucketName: string, key: string) => {
+const deleteObject = async (bucketName: string, key: string) => {
   const command = new DeleteObjectCommand({
     Bucket: bucketName,
     Key: key
   })
-  const response = s3Client.send(command)
+  const response = await s3Client.send(command)
   logger.info('Attempt to delete object', {
     bucket: bucketName,
     key,
     result: response
   })
+  return response
 }
