@@ -28,11 +28,8 @@ export const handler = async (
     }
 
     logger.info('Buckets found', { bucketsFound: s3Buckets })
-    await Promise.all(
-      s3Buckets.map((bucket) => {
-        emptyS3Bucket(bucket)
-      })
-    )
+
+    await Promise.all(s3Buckets.map((bucket) => emptyS3Bucket(bucket)))
 
     await sendResponse(event, 'SUCCESS')
     logger.info('Successfully emptied all buckets')
