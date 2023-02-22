@@ -66,4 +66,5 @@ const deleteObject = (bucketName: string, key: string) => {
     key,
     result: response
   })
+  return response
 }
