@@ -1,6 +1,7 @@
 import {
   ListObjectVersionsCommand,
   ListObjectVersionsCommandInput,
+  ListObjectVersionsCommandOutput,
   S3Client
 } from '@aws-sdk/client-s3'
 
@@ -12,25 +13,21 @@ export const listS3ObjectVersions = async (
   const command = new ListObjectVersionsCommand(input)
   const response = await client.send(command)
 
-  if (!response.DeleteMarkers && !response.Versions)
-    return { deleteMarkers: [], versions: [] }
+  response.Versions?.forEach((item) =>
+    objectVersions.versions.push({
+      Key: item.Key as string,
+      VersionId: item.VersionId as string
+    })
+  )
 
-  if (response.DeleteMarkers) {
-    response.DeleteMarkers.map((item) => item.Key).forEach((item) =>
-      objectVersions.deleteMarkers.push(item as string)
-    )
-  }
+  response.DeleteMarkers?.forEach((item) =>
+    objectVersions.deleteMarkers.push({
+      Key: item.Key as string,
+      VersionId: item.VersionId as string
+    })
+  )
 
-  if (response.Versions) {
-    response.Versions.map((item) => item.Key).forEach((item) =>
-      objectVersions.versions.push(item as string)
-    )
-  }
-
-  if (
-    response.IsTruncated &&
-    (response.NextKeyMarker || response.NextVersionIdMarker)
-  ) {
+  if (isPaginated(response)) {
     input.VersionIdMarker = response.NextVersionIdMarker || undefined
     input.KeyMarker = response.NextKeyMarker || undefined
     await listS3ObjectVersions(input, objectVersions)
@@ -39,7 +36,14 @@ export const listS3ObjectVersions = async (
   return objectVersions
 }
 
+const isPaginated = (response: ListObjectVersionsCommandOutput) => {
+  return (
+    response.IsTruncated &&
+    (response.NextKeyMarker || response.NextVersionIdMarker)
+  )
+}
+
 type S3ObjectVersions = {
-  deleteMarkers: string[]
-  versions: string[]
+  deleteMarkers: { Key: string; VersionId: string }[]
+  versions: { Key: string; VersionId: string }[]
 }

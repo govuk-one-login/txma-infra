@@ -1,97 +1,97 @@
 import { emptyS3Bucket } from './emptyS3Bucket'
 import { mockClient } from 'aws-sdk-client-mock'
 import 'aws-sdk-client-mock-jest'
-import {
-  DeleteObjectCommand,
-  GetBucketVersioningCommand,
-  PutBucketVersioningCommand,
-  S3Client,
-  _Object
-} from '@aws-sdk/client-s3'
-import { listS3Files } from './listS3Files'
+import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { listS3ObjectVersions } from './listS3ObjectVersions'
+import {
+  TEST_KEY,
+  TEST_LIST_OF_S3_OBJECT_VERSIONS,
+  TEST_VERSION_ID
+} from '../../utils/tests/constants/testConstants'
 
 const s3Mock = mockClient(S3Client)
-
-jest.mock('./listS3Files', () => ({
-  listS3Files: jest.fn()
-}))
-const mocklistS3Files = listS3Files as jest.Mock<Promise<_Object[]>>
 
 jest.mock('./listS3ObjectVersions', () => ({
   listS3ObjectVersions: jest.fn()
 }))
-const mocklistS3ObjectVersions = listS3ObjectVersions as jest.Mock<
-  Promise<{ deleteMarkers: string[]; versions: string[] }>
+const mockListS3ObjectVersions = listS3ObjectVersions as jest.Mock<
+  Promise<{
+    deleteMarkers: { Key: string; VersionId: string }[]
+    versions: { Key: string; VersionId: string }[]
+  }>
 >
 
 const bucketName = 'example-bucket'
 
-describe('empty s3 bucket', () => {
+describe('emptyS3Bucket', () => {
   beforeEach(() => {
     s3Mock.reset()
-    mocklistS3ObjectVersions.mockReset()
-    mocklistS3Files.mockReset()
+    mockListS3ObjectVersions.mockReset()
   })
 
-  test('s3 bucket does not have versioning enabled', async () => {
-    s3Mock.on(GetBucketVersioningCommand).resolves({})
-    mocklistS3Files.mockResolvedValue([{ Key: 'object-1' }])
+  test('delete object command is called for each version and delete marker', async () => {
+    mockListS3ObjectVersions.mockResolvedValue(TEST_LIST_OF_S3_OBJECT_VERSIONS)
     s3Mock.on(DeleteObjectCommand).resolves({})
 
     await emptyS3Bucket(bucketName)
+
     expect(s3Mock).toHaveReceivedCommandWith(DeleteObjectCommand, {
-      Key: 'object-1'
-    })
-  })
-
-  test('s3 bucket has versioning enabled', async () => {
-    s3Mock.on(GetBucketVersioningCommand).resolves({
-      Status: 'Enabled'
-    })
-    s3Mock.on(PutBucketVersioningCommand).resolves({})
-    s3Mock.on(DeleteObjectCommand).resolves({})
-    mocklistS3Files.mockResolvedValue([{ Key: 'object-1' }])
-    mocklistS3ObjectVersions.mockResolvedValue({
-      deleteMarkers: ['version-1'],
-      versions: ['version-1']
-    })
-
-    await emptyS3Bucket(bucketName)
-
-    expect(s3Mock).toHaveReceivedCommandWith(PutBucketVersioningCommand, {
       Bucket: bucketName,
-      VersioningConfiguration: { Status: 'Suspended' }
+      Key: TEST_KEY,
+      VersionId: TEST_VERSION_ID
     })
-    expect(s3Mock).toHaveReceivedCommandTimes(DeleteObjectCommand, 3)
+    expect(s3Mock).toHaveReceivedCommandTimes(
+      DeleteObjectCommand,
+      TEST_LIST_OF_S3_OBJECT_VERSIONS.versions.length +
+        TEST_LIST_OF_S3_OBJECT_VERSIONS.deleteMarkers.length
+    )
   })
 
-  test('No objects in unversioned s3 bucket', async () => {
-    s3Mock.on(GetBucketVersioningCommand).resolves({})
-    mocklistS3Files.mockResolvedValue([])
+  test('delete object command is called for versions when delete markers not present', async () => {
+    const listOfObjectVersionsWithNoDeleteMarkers = {
+      ...TEST_LIST_OF_S3_OBJECT_VERSIONS
+    }
+    listOfObjectVersionsWithNoDeleteMarkers.deleteMarkers = []
+    mockListS3ObjectVersions.mockResolvedValue(
+      listOfObjectVersionsWithNoDeleteMarkers
+    )
+    s3Mock.on(DeleteObjectCommand).resolves({})
 
     await emptyS3Bucket(bucketName)
 
-    expect(s3Mock).toHaveReceivedCommandTimes(DeleteObjectCommand, 0)
+    expect(s3Mock).toHaveReceivedCommandTimes(
+      DeleteObjectCommand,
+      listOfObjectVersionsWithNoDeleteMarkers.versions.length
+    )
+  })
+
+  test('delete object command is called for delete markers when versions not present', async () => {
+    const listOfObjectVersionsWithNoDeleteMarkers = {
+      ...TEST_LIST_OF_S3_OBJECT_VERSIONS
+    }
+    listOfObjectVersionsWithNoDeleteMarkers.versions = []
+    mockListS3ObjectVersions.mockResolvedValue(
+      listOfObjectVersionsWithNoDeleteMarkers
+    )
+    s3Mock.on(DeleteObjectCommand).resolves({})
+
+    await emptyS3Bucket(bucketName)
+
+    expect(s3Mock).toHaveReceivedCommandTimes(
+      DeleteObjectCommand,
+      listOfObjectVersionsWithNoDeleteMarkers.deleteMarkers.length
+    )
   })
 
   test('No objects in versioned s3 bucket', async () => {
-    s3Mock.on(GetBucketVersioningCommand).resolves({
-      Status: 'Enabled'
+    mockListS3ObjectVersions.mockResolvedValue({
+      versions: [],
+      deleteMarkers: []
     })
-    s3Mock.on(PutBucketVersioningCommand).resolves({})
-    mocklistS3Files.mockResolvedValue([])
-    mocklistS3ObjectVersions.mockResolvedValue({
-      deleteMarkers: [],
-      versions: []
-    })
+    s3Mock.on(DeleteObjectCommand).resolves({})
 
     await emptyS3Bucket(bucketName)
 
-    expect(s3Mock).toHaveReceivedCommandWith(PutBucketVersioningCommand, {
-      Bucket: bucketName,
-      VersioningConfiguration: { Status: 'Suspended' }
-    })
     expect(s3Mock).toHaveReceivedCommandTimes(DeleteObjectCommand, 0)
   })
 })

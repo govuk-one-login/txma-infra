@@ -23,3 +23,28 @@ export const MOCK_ITEM: Record<string, AttributeValue> = {
   zendeskId: { S: '12' },
   athenaQueryId: { S: TEST_ATHENA_QUERY_ID }
 }
+
+export const TEST_VERSION_ID = 'aTestObjectVersionId123'
+export const TEST_KEY = 'aTestObjectKey'
+export const TEST_LIST_OF_S3_OBJECT_VERSIONS = {
+  versions: [
+    {
+      Key: TEST_KEY,
+      VersionId: TEST_VERSION_ID
+    },
+    {
+      Key: TEST_KEY,
+      VersionId: TEST_VERSION_ID
+    }
+  ],
+  deleteMarkers: [
+    {
+      Key: TEST_KEY,
+      VersionId: TEST_VERSION_ID
+    },
+    {
+      Key: TEST_KEY,
+      VersionId: TEST_VERSION_ID
+    }
+  ]
+}
