@@ -5,6 +5,11 @@ import {
   ListObjectVersionsCommand,
   ListObjectVersionsCommandInput
 } from '@aws-sdk/client-s3'
+import {
+  TEST_KEY,
+  TEST_VERSION_ID
+} from '../../utils/tests/constants/testConstants'
+import 'aws-sdk-client-mock-jest'
 
 const s3Mock = mockClient(S3Client)
 
@@ -17,60 +22,93 @@ describe('list S3 objects', () => {
     s3Mock.reset()
   })
 
-  test('response has no delete markers or versions', async () => {
-    s3Mock.on(ListObjectVersionsCommand).resolves({})
+  test('response has versions and delete markers', async () => {
+    s3Mock.on(ListObjectVersionsCommand).resolves({
+      DeleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
+      Versions: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }]
+    })
 
     const result = await listS3ObjectVersions(input)
-    expect(result).toEqual({ deleteMarkers: [], versions: [] })
+
+    expect(s3Mock).toHaveReceivedCommandWith(ListObjectVersionsCommand, input)
+    expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 1)
+    expect(result).toEqual({
+      deleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
+      versions: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }]
+    })
   })
 
   test('response has no delete markers but does have versions', async () => {
     s3Mock.on(ListObjectVersionsCommand).resolves({
-      Versions: [{ Key: 'version-1' }]
+      Versions: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }]
     })
 
     const result = await listS3ObjectVersions(input)
-    expect(result).toEqual({ deleteMarkers: [], versions: ['version-1'] })
+
+    expect(s3Mock).toHaveReceivedCommandWith(ListObjectVersionsCommand, input)
+    expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 1)
+    expect(result).toEqual({
+      deleteMarkers: [],
+      versions: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }]
+    })
   })
 
   test('response has no versions but does have delete markers', async () => {
     s3Mock.on(ListObjectVersionsCommand).resolves({
-      DeleteMarkers: [{ Key: 'version-1' }]
+      DeleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }]
     })
 
     const result = await listS3ObjectVersions(input)
-    expect(result).toEqual({ deleteMarkers: ['version-1'], versions: [] })
+
+    expect(s3Mock).toHaveReceivedCommandWith(ListObjectVersionsCommand, input)
+    expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 1)
+    expect(result).toEqual({
+      deleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
+      versions: []
+    })
   })
 
-  test('response has versions and delete markers', async () => {
-    s3Mock.on(ListObjectVersionsCommand).resolves({
-      DeleteMarkers: [{ Key: 'version-1' }],
-      Versions: [{ Key: 'version-1' }]
-    })
+  test('response has no delete markers or versions', async () => {
+    s3Mock.on(ListObjectVersionsCommand).resolves({})
 
     const result = await listS3ObjectVersions(input)
-    expect(result).toEqual({
-      deleteMarkers: ['version-1'],
-      versions: ['version-1']
-    })
+
+    expect(s3Mock).toHaveReceivedCommandWith(ListObjectVersionsCommand, input)
+    expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 1)
+    expect(result).toEqual({ deleteMarkers: [], versions: [] })
   })
 
   test('response has NextKeyMarker', async () => {
     s3Mock
       .on(ListObjectVersionsCommand)
       .resolvesOnce({
-        DeleteMarkers: [{ Key: 'version-1' }],
+        Versions: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
+        DeleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
         IsTruncated: true,
-        NextKeyMarker: 'page-2'
+        NextKeyMarker: TEST_KEY + 1
       })
       .resolves({
-        DeleteMarkers: [{ Key: 'version-2' }]
+        DeleteMarkers: [{ Key: TEST_KEY + 1, VersionId: TEST_VERSION_ID + 1 }]
       })
 
     const result = await listS3ObjectVersions(input)
+
+    expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 2)
+    expect(s3Mock).toHaveReceivedNthCommandWith(
+      1,
+      ListObjectVersionsCommand,
+      input
+    )
+    expect(s3Mock).toHaveReceivedNthCommandWith(2, ListObjectVersionsCommand, {
+      ...input,
+      KeyMarker: TEST_KEY + 1
+    })
     expect(result).toEqual({
-      deleteMarkers: ['version-1', 'version-2'],
-      versions: []
+      deleteMarkers: [
+        { Key: TEST_KEY, VersionId: TEST_VERSION_ID },
+        { Key: TEST_KEY + 1, VersionId: TEST_VERSION_ID + 1 }
+      ],
+      versions: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }]
     })
   })
 
@@ -78,18 +116,33 @@ describe('list S3 objects', () => {
     s3Mock
       .on(ListObjectVersionsCommand)
       .resolvesOnce({
+        Versions: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
+        DeleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
         IsTruncated: true,
-        NextVersionIdMarker: 'page-2',
-        Versions: [{ Key: 'version-1' }]
+        NextVersionIdMarker: TEST_VERSION_ID + 1
       })
       .resolves({
-        Versions: [{ Key: 'version-2' }]
+        Versions: [{ Key: TEST_KEY + 1, VersionId: TEST_VERSION_ID + 1 }]
       })
 
     const result = await listS3ObjectVersions(input)
+
+    expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 2)
+    expect(s3Mock).toHaveReceivedNthCommandWith(
+      1,
+      ListObjectVersionsCommand,
+      input
+    )
+    expect(s3Mock).toHaveReceivedNthCommandWith(2, ListObjectVersionsCommand, {
+      ...input,
+      VersionIdMarker: TEST_VERSION_ID + 1
+    })
     expect(result).toEqual({
-      deleteMarkers: [],
-      versions: ['version-1', 'version-2']
+      deleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
+      versions: [
+        { Key: TEST_KEY, VersionId: TEST_VERSION_ID },
+        { Key: TEST_KEY + 1, VersionId: TEST_VERSION_ID + 1 }
+      ]
     })
   })
 
@@ -97,21 +150,34 @@ describe('list S3 objects', () => {
     s3Mock
       .on(ListObjectVersionsCommand)
       .resolvesOnce({
-        DeleteMarkers: [{ Key: 'version-1' }],
+        Versions: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
+        DeleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
         IsTruncated: true,
-        NextKeyMarker: 'page-2',
-        NextVersionIdMarker: 'page-2',
-        Versions: [{ Key: 'version-1' }]
+        NextKeyMarker: TEST_KEY + 1,
+        NextVersionIdMarker: TEST_VERSION_ID + 1
       })
       .resolves({
-        DeleteMarkers: [{ Key: 'version-2' }],
-        Versions: [{ Key: 'version-2' }]
+        Versions: [{ Key: TEST_KEY + 1, VersionId: TEST_VERSION_ID + 1 }]
       })
 
     const result = await listS3ObjectVersions(input)
+
+    expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 2)
+    expect(s3Mock).toHaveReceivedNthCommandWith(
+      1,
+      ListObjectVersionsCommand,
+      input
+    )
+    expect(s3Mock).toHaveReceivedNthCommandWith(2, ListObjectVersionsCommand, {
+      ...input,
+      VersionIdMarker: TEST_VERSION_ID + 1
+    })
     expect(result).toEqual({
-      deleteMarkers: ['version-1', 'version-2'],
-      versions: ['version-1', 'version-2']
+      deleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
+      versions: [
+        { Key: TEST_KEY, VersionId: TEST_VERSION_ID },
+        { Key: TEST_KEY + 1, VersionId: TEST_VERSION_ID + 1 }
+      ]
     })
   })
 })

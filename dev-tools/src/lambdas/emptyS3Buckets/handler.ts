@@ -1,7 +1,6 @@
 import { CloudFormationCustomResourceEvent, Context } from 'aws-lambda'
 import { emptyS3Bucket } from './emptyS3Bucket'
 import { listS3Buckets } from './listS3Buckets'
-import url from 'node:url'
 import axios from 'axios'
 import { initialiseLogger, logger } from '../../utils/logger'
 
@@ -49,9 +48,6 @@ const sendResponse = async (
   status: 'SUCCESS' | 'FAILED',
   reason?: string
 ) => {
-  const parsedUrl = url.parse(event.ResponseURL)
-  logger.info('Response URL', { responseUrl: parsedUrl })
-
   const data = {
     LogicalResourceId: event.LogicalResourceId,
     Reason: reason,
@@ -64,7 +60,6 @@ const sendResponse = async (
         : formatStackId(event.StackId)
   }
 
-  logger.info('Data sent with request', { data })
   await axios.put(event.ResponseURL, data)
 }
 
