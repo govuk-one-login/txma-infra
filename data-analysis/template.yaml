@@ -49,7 +49,7 @@ Resources:
             ExpirationInDays: 5
       LoggingConfiguration:
         DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
-        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-batch-job-manifest-bucket
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-batch-job-manifest-bucket/
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -72,7 +72,7 @@ Resources:
       BucketName: !Sub ${AWS::StackName}-${Environment}-email-recipients
       LoggingConfiguration:
         DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
-        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-email-recipients
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-email-recipients/
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -139,7 +139,7 @@ Resources:
               NoncurrentDays: 1
       LoggingConfiguration:
         DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
-        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-athena-query-output-bucket
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-athena-query-output-bucket/
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true

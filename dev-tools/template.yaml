@@ -176,7 +176,7 @@ Resources:
       BucketName: !Sub ${AWS::StackName}-${Environment}-test-data-bucket
       LoggingConfiguration:
         DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
-        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-test-data-bucket
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-test-data-bucket/
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
