@@ -4,6 +4,13 @@ import { listS3ObjectVersions } from './listS3ObjectVersions'
 
 export const emptyS3Bucket = async (bucketName: string): Promise<void> => {
   const objects = await listS3ObjectVersions({ Bucket: bucketName })
+  logger.info(
+    `Retrieved following objects from ${bucketName}. Attempting deletion.`,
+    {
+      bucket: bucketName,
+      result: objects
+    }
+  )
   await Promise.all(
     objects.deleteMarkers.map((object) =>
       deleteObject(bucketName, object.Key, object.VersionId)
@@ -28,10 +35,5 @@ const deleteObject = async (
     VersionId: versionId
   })
   const response = await s3Client.send(command)
-  logger.info('Attempt to delete object', {
-    bucket: bucketName,
-    key,
-    result: response
-  })
   return response
 }
