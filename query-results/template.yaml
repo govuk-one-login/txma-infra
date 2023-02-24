@@ -49,7 +49,7 @@ Resources:
             ExpirationInDays: 30
       LoggingConfiguration:
         DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
-        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-query-results-bucket
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-query-results-bucket/
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
