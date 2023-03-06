@@ -9,11 +9,6 @@ export const handler = async (
   context: Context
 ) => {
   initialiseLogger(context)
-  logger.info(
-    'Function called with parameters',
-    JSON.stringify(firehosePutParams)
-  )
-
   const putRecordResponse = await putFirehoseRecord(
     firehosePutParams.firehose,
     jsonToUint8Array(firehosePutParams.data)

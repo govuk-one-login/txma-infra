@@ -1,13 +1,14 @@
+import { Context } from 'aws-lambda'
 import { SqsOperation } from '../../types/sqsOperation'
-import { logger } from '../../utils/logger'
+import { initialiseLogger, logger } from '../../utils/logger'
 import { addMessageToQueue } from './addMessageToQueue'
 
-export const handler = async (params: SqsOperation) => {
-  logger.info('Function called with following params: ', JSON.stringify(params))
-
+export const handler = async (params: SqsOperation, context: Context) => {
+  initialiseLogger(context)
   if (!params?.message || !params?.queueUrl)
     throw Error('Function called with invalid parameters')
 
+  logger.info('Adding message to queue', { queueUrl: params.queueUrl })
   const addToQueueResponse = await addMessageToQueue(
     params.message,
     params.queueUrl

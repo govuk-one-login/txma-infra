@@ -1,5 +1,4 @@
 import { Context } from 'aws-lambda'
-//console.logs in here
 
 export const mockLambdaContext: Context = {
   callbackWaitsForEmptyEventLoop: false,
