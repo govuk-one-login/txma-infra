@@ -18,10 +18,7 @@ export const handler = async (
     throw Error('Function called with undefined params')
   }
   if (dynamoOperationParams.params.zendeskId) {
-    appendZendeskIdToLogger(
-      dynamoOperationParams.params.zendeskId ??
-        dynamoOperationParams.params.itemToPut?.zendeskId
-    )
+    appendZendeskIdToLogger(dynamoOperationParams.params.zendeskId)
   }
 
   switch (dynamoOperationParams.operation) {
