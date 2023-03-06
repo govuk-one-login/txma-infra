@@ -14,24 +14,25 @@ export const handler = async (
   context: Context
 ) => {
   initialiseLogger(context)
-  logger.info(
-    'Function called with following params: ',
-    JSON.stringify(dynamoOperationParams)
-  )
-
   if (!dynamoOperationParams) {
     throw Error('Function called with undefined params')
   }
   if (dynamoOperationParams.params.zendeskId) {
-    appendZendeskIdToLogger(dynamoOperationParams.params.zendeskId)
+    appendZendeskIdToLogger(
+      dynamoOperationParams.params.zendeskId ??
+        dynamoOperationParams.params.itemToPut?.zendeskId
+    )
   }
 
   switch (dynamoOperationParams.operation) {
     case 'GET':
+      logger.info('Sending GetItemCommand to Dynamo')
       return await dynamoDbGet(dynamoOperationParams.params)
     case 'PUT':
+      logger.info('Sending PutItemCommand to Dynamo')
       return await dynamoDbPut(dynamoOperationParams.params)
     case 'DELETE':
+      logger.info('Sending DeleteItemCommand to Dynamo')
       return await dynamoDbDelete(dynamoOperationParams.params)
     default:
       throw Error('Dynamo operation not recognised')
