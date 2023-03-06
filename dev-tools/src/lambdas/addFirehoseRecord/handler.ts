@@ -10,7 +10,7 @@ export const handler = async (
 ) => {
   initialiseLogger(context)
   logger.info(
-    'Function called with paramseters',
+    'Function called with parameters',
     JSON.stringify(firehosePutParams)
   )
 
