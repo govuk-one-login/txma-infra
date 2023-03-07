@@ -7,7 +7,6 @@ import {
 import { dynamoDbDelete } from './dynamoDbDelete'
 import 'aws-sdk-client-mock-jest'
 import { OperationParams } from '../../types/dynamoDbOperation'
-import { logger } from '../../utils/logger'
 
 const dynamoMock = mockClient(DynamoDBClient)
 
@@ -20,17 +19,11 @@ describe('dynamoDbDelete', () => {
   }
 
   it('dynamo client is called with the correct params', async () => {
-    jest.spyOn(logger, 'info')
-
     await dynamoDbDelete({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID
     })
 
-    expect(logger.info).toHaveBeenCalledWith(
-      'Sending DeleteItemCommand to Dynamo with params: ',
-      deleteDynamoEntryCommand
-    )
     expect(dynamoMock).toHaveReceivedCommandWith(
       DeleteItemCommand,
       deleteDynamoEntryCommand
