@@ -9,13 +9,14 @@ export const handler = async (
   context: Context
 ) => {
   initialiseLogger(context)
+  logger.info('Attempting to putFirehoseRecord', {
+    eventId: (firehosePutParams.data as { event_id: string })?.event_id
+  })
   const putRecordResponse = await putFirehoseRecord(
     firehosePutParams.firehose,
     jsonToUint8Array(firehosePutParams.data)
   )
-  logger.info(
-    `Record added to ${firehosePutParams.firehose} with id: ${putRecordResponse.RecordId}`
-  )
+  logger.info(`Record added to ${firehosePutParams.firehose}`)
 
   return putRecordResponse.RecordId
 }
