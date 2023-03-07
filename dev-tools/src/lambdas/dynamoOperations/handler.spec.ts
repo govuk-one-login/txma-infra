@@ -1,7 +1,9 @@
 import { when } from 'jest-when'
 import { DynamoDbOperation, Operation } from '../../types/dynamoDbOperation'
+import { logger } from '../../utils/logger'
 import {
   QUERY_REQUEST_DYNAMODB_TABLE_NAME,
+  TEST_ATHENA_QUERY_ID,
   ZENDESK_TICKET_ID
 } from '../../utils/tests/constants/testConstants'
 import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
@@ -9,6 +11,7 @@ import { dynamoDbDelete } from './dynamoDbDelete'
 import { dynamoDbGet } from './dynamoDbGet'
 import { dynamoDbPut } from './dynamoDbPut'
 import { handler } from './handler'
+import 'aws-sdk-client-mock-jest'
 
 jest.mock('./dynamoDbGet', () => ({
   dynamoDbGet: jest.fn()
@@ -21,6 +24,8 @@ jest.mock('./dynamoDbDelete', () => ({
 }))
 
 describe('dynamo db operations handler', () => {
+  beforeEach(() => jest.spyOn(logger, 'info'))
+
   const generateDynamoOperationParams = (operation: Operation) => {
     return {
       operation,
@@ -31,6 +36,7 @@ describe('dynamo db operations handler', () => {
           attributeName: 'athenaQueryId'
         }),
         ...(operation === 'PUT' && {
+          zendeskId: ZENDESK_TICKET_ID,
           itemToPut: { zendeskId: { S: ZENDESK_TICKET_ID } }
         }),
         ...(operation === 'DELETE' && {
@@ -43,7 +49,7 @@ describe('dynamo db operations handler', () => {
   const dynamoDbGetReturnsEntry = () => {
     when(dynamoDbGet).mockResolvedValue({
       zendeskId: { S: ZENDESK_TICKET_ID },
-      athenaQueryId: { S: '123' }
+      athenaQueryId: { S: TEST_ATHENA_QUERY_ID }
     })
   }
 
@@ -55,6 +61,7 @@ describe('dynamo db operations handler', () => {
       mockLambdaContext
     )
 
+    expect(logger.info).toHaveBeenCalledWith('Sending GetItemCommand to Dynamo')
     expect(dynamoDbGet).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID,
@@ -62,15 +69,17 @@ describe('dynamo db operations handler', () => {
     })
     expect(dynamoDbEntry).toEqual({
       zendeskId: { S: ZENDESK_TICKET_ID },
-      athenaQueryId: { S: '123' }
+      athenaQueryId: { S: TEST_ATHENA_QUERY_ID }
     })
   })
 
   it('calls the dynamoDbPut function when handler is called with PUT operation', async () => {
     await handler(generateDynamoOperationParams('PUT'), mockLambdaContext)
 
+    expect(logger.info).toHaveBeenCalledWith('Sending PutItemCommand to Dynamo')
     expect(dynamoDbPut).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
+      zendeskId: ZENDESK_TICKET_ID,
       itemToPut: { zendeskId: { S: ZENDESK_TICKET_ID } }
     })
   })
@@ -78,6 +87,9 @@ describe('dynamo db operations handler', () => {
   it('calls the dynamoDbDelete function when handler is called with DELETE operation', async () => {
     await handler(generateDynamoOperationParams('DELETE'), mockLambdaContext)
 
+    expect(logger.info).toHaveBeenCalledWith(
+      'Sending DeleteItemCommand to Dynamo'
+    )
     expect(dynamoDbDelete).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID
