@@ -9,14 +9,15 @@ export const handler = async (
   context: Context
 ): Promise<void> => {
   initialiseLogger(context)
-  logger.info('Handling CloudFormationCustomResourceEvent', {
-    handledEvent: event
-  })
   try {
     if (event.RequestType !== 'Delete') {
       logger.info('RequestType is not Delete')
       return await sendResponse(event, 'SUCCESS')
     }
+
+    logger.info(
+      'CloudFormationCustomResourceEvent is Delete. Attempting to empty S3 Buckets'
+    )
 
     const stackId = event.StackId
     const s3Buckets = await listS3Buckets(stackId)
@@ -25,8 +26,6 @@ export const handler = async (
       logger.info('No S3 buckets found')
       return await sendResponse(event, 'SUCCESS')
     }
-
-    logger.info('Buckets found', { bucketsFound: s3Buckets })
 
     await Promise.all(s3Buckets.map((bucket) => emptyS3Bucket(bucket)))
 

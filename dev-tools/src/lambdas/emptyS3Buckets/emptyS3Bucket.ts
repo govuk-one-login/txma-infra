@@ -5,11 +5,9 @@ import { listS3ObjectVersions } from './listS3ObjectVersions'
 export const emptyS3Bucket = async (bucketName: string): Promise<void> => {
   const objects = await listS3ObjectVersions({ Bucket: bucketName })
   logger.info(
-    `Retrieved following objects from ${bucketName}. Attempting deletion.`,
-    {
-      bucket: bucketName,
-      result: objects
-    }
+    `Found ${
+      objects.versions.length + objects.deleteMarkers.length
+    } objects in ${bucketName}. Attempting deletion of all objects.`
   )
   await Promise.all(
     objects.deleteMarkers.map((object) =>
