@@ -17,7 +17,7 @@ export const handler = async (params: SqsOperation, context: Context) => {
   if (!addToQueueResponse.MessageId) throw Error('No message id returned')
 
   logger.info(
-    `Message "${params.message}" added to queue "${params.queueUrl}" with id "${addToQueueResponse.MessageId}"`
+    `Message with id "${addToQueueResponse.MessageId}" added to queue "${params.queueUrl}"`
   )
 
   return addToQueueResponse.MessageId
