@@ -21,17 +21,22 @@ export const handler = async (
     appendZendeskIdToLogger(dynamoOperationParams.params.zendeskId)
   }
 
+  let result
   switch (dynamoOperationParams.operation) {
     case 'GET':
-      logger.info('Sending GetItemCommand to Dynamo')
-      return await dynamoDbGet(dynamoOperationParams.params)
+      result = await dynamoDbGet(dynamoOperationParams.params)
+      logger.info('Sent GetItemCommand to Dynamo')
+      break
     case 'PUT':
-      logger.info('Sending PutItemCommand to Dynamo')
-      return await dynamoDbPut(dynamoOperationParams.params)
+      result = await dynamoDbPut(dynamoOperationParams.params)
+      logger.info('Sent PutItemCommand to Dynamo')
+      break
     case 'DELETE':
-      logger.info('Sending DeleteItemCommand to Dynamo')
-      return await dynamoDbDelete(dynamoOperationParams.params)
+      result = await dynamoDbDelete(dynamoOperationParams.params)
+      logger.info('Sent DeleteItemCommand to Dynamo')
+      break
     default:
       throw Error('Dynamo operation not recognised')
   }
+  return result
 }

@@ -61,7 +61,7 @@ describe('dynamo db operations handler', () => {
       mockLambdaContext
     )
 
-    expect(logger.info).toHaveBeenCalledWith('Sending GetItemCommand to Dynamo')
+    expect(logger.info).toHaveBeenCalledWith('Sent GetItemCommand to Dynamo')
     expect(dynamoDbGet).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID,
@@ -76,7 +76,7 @@ describe('dynamo db operations handler', () => {
   it('calls the dynamoDbPut function when handler is called with PUT operation', async () => {
     await handler(generateDynamoOperationParams('PUT'), mockLambdaContext)
 
-    expect(logger.info).toHaveBeenCalledWith('Sending PutItemCommand to Dynamo')
+    expect(logger.info).toHaveBeenCalledWith('Sent PutItemCommand to Dynamo')
     expect(dynamoDbPut).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID,
@@ -87,9 +87,7 @@ describe('dynamo db operations handler', () => {
   it('calls the dynamoDbDelete function when handler is called with DELETE operation', async () => {
     await handler(generateDynamoOperationParams('DELETE'), mockLambdaContext)
 
-    expect(logger.info).toHaveBeenCalledWith(
-      'Sending DeleteItemCommand to Dynamo'
-    )
+    expect(logger.info).toHaveBeenCalledWith('Sent DeleteItemCommand to Dynamo')
     expect(dynamoDbDelete).toHaveBeenCalledWith({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       zendeskId: ZENDESK_TICKET_ID
