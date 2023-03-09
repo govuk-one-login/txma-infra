@@ -1,5 +1,6 @@
 import { when } from 'jest-when'
 import { SqsOperation } from '../../types/sqsOperation'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
 import { addMessageToQueue } from './addMessageToQueue'
 import { handler } from './handler'
 
@@ -22,7 +23,7 @@ describe('sqs operations handler', () => {
 
   it('returns message id when handler called with valid parameters', async () => {
     messageAddedToQueue()
-    const messageId = await handler(validParameters)
+    const messageId = await handler(validParameters, mockLambdaContext)
 
     expect(addMessageToQueue).toHaveBeenCalledWith(
       validParameters.message,
@@ -33,13 +34,13 @@ describe('sqs operations handler', () => {
 
   it('returns error with invalid parameters', async () => {
     expect(
-      handler({ invalid: 'test' } as unknown as SqsOperation)
+      handler({ invalid: 'test' } as unknown as SqsOperation, mockLambdaContext)
     ).rejects.toThrow('Function called with invalid parameters')
   })
 
   it('returns error when no parameters sent', async () => {
-    expect(handler(undefined as unknown as SqsOperation)).rejects.toThrow(
-      'Function called with invalid parameters'
-    )
+    expect(
+      handler(undefined as unknown as SqsOperation, mockLambdaContext)
+    ).rejects.toThrow('Function called with invalid parameters')
   })
 })
