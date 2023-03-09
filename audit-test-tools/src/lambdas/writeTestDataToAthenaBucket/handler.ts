@@ -9,7 +9,6 @@ import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutput
 
 export const handler = async (event: SQSEvent, context: Context) => {
   initialiseLogger(context)
-  logger.info('Handling write test data to athena output bucket event')
 
   const eventDetails = parseRequestDetails(event)
   appendZendeskIdToLogger(eventDetails.zendeskId)
@@ -23,6 +22,7 @@ export const handler = async (event: SQSEvent, context: Context) => {
     eventDetails.zendeskId,
     eventDetails.recipientEmail ?? 'mytestrecipientemail@test.gov.uk'
   )
+  logger.info('Successfully sent Query Completed Message to SQS')
   return eventDetails
 }
 
