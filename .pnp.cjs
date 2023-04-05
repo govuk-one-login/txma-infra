@@ -4617,6 +4617,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:18.13.0"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:18.15.11", {\
+          "packageLocation": "./.yarn/cache/@types-node-npm-18.15.11-fd8ceaaffd-977b4ad047.zip/node_modules/@types/node/",\
+          "packageDependencies": [\
+            ["@types/node", "npm:18.15.11"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["@types/prettier", [\
@@ -5275,7 +5282,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/aws-lambda", "npm:8.10.114"],\
             ["@types/jest", "npm:29.5.0"],\
             ["@types/jest-when", "npm:3.5.2"],\
-            ["@types/node", "npm:18.13.0"],\
+            ["@types/node", "npm:18.15.11"],\
             ["aws-sdk-client-mock", "npm:2.1.1"],\
             ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.1.1"],\
             ["axios", "npm:0.27.2"],\
@@ -5983,7 +5990,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/aws-lambda", "npm:8.10.114"],\
             ["@types/jest", "npm:29.5.0"],\
             ["@types/jest-when", "npm:3.5.2"],\
-            ["@types/node", "npm:18.13.0"],\
+            ["@types/node", "npm:18.15.11"],\
             ["aws-sdk-client-mock", "npm:2.1.1"],\
             ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.1.1"],\
             ["axios", "npm:0.27.2"],\
@@ -9631,7 +9638,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@tsconfig/node12", "npm:1.0.11"],\
             ["@tsconfig/node14", "npm:1.0.3"],\
             ["@tsconfig/node16", "npm:1.0.3"],\
-            ["@types/node", "npm:18.13.0"],\
+            ["@types/node", "npm:18.15.11"],\
             ["@types/swc__core", null],\
             ["@types/swc__wasm", null],\
             ["@types/typescript", null],\
