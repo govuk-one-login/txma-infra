@@ -197,6 +197,14 @@ Resources:
               - kms:GenerateDataKey*
               - kms:Decrypt
             Resource: '*'
+          - Sid: Allow access for lambda
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey*
+              - kms:Decrypt
+            Resource: '*'
 
   SnsKmsKeyAlias:
     Type: AWS::KMS::Alias
