@@ -20,7 +20,7 @@
     "axios": "0.27.2"
   },
   "devDependencies": {
-    "@types/aws-lambda": "8.10.110",
+    "@types/aws-lambda": "8.10.114",
     "@types/jest": "29.4.0",
     "@types/jest-when": "3.5.2",
     "@types/node": "18.13.0",
