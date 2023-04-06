@@ -512,6 +512,30 @@ Resources:
       KmsMasterKeyId: !GetAtt QueryCompletedQueueKmsKey.Arn
 
   ################
+  # Email to Slack
+  ################
+
+  SlackNotificationsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub '${AWS::StackName}-slack-notifications-topic'
+      KmsMasterKeyId: '{{resolve:ssm:CoreSnsKmsKeyArn}}'
+
+  SlackNotificationsSubscriptionGeneric:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: '{{resolve:ssm:EmailToSlackEmailAddress:}}'
+      Protocol: 'email'
+      TopicArn: !GetAtt EmailToSlackSNSTopic.TopicArn
+
+  EmailToSlackSNSTopicArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CoreSnsKmsKeyArn
+      Type: String
+      Value: !GetAtt EmailToSlackSNSTopic.TopicArn
+
+  ################
   # SSM Parameters
   ################
 
