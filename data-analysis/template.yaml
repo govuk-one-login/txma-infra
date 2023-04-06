@@ -526,14 +526,14 @@ Resources:
     Properties:
       Endpoint: '{{resolve:ssm:EmailToSlackEmailAddress:}}'
       Protocol: 'email'
-      TopicArn: !GetAtt EmailToSlackSNSTopic.TopicArn
+      TopicArn: !GetAtt SlackNotificationsTopic.TopicArn
 
   EmailToSlackSNSTopicArn:
     Type: AWS::SSM::Parameter
     Properties:
       Name: CoreSnsKmsKeyArn
       Type: String
-      Value: !GetAtt EmailToSlackSNSTopic.TopicArn
+      Value: !GetAtt SlackNotificationsTopic.TopicArn
 
   ################
   # SSM Parameters
