@@ -518,7 +518,7 @@ Resources:
   SlackNotificationsTopic:
     Type: AWS::SNS::Topic
     Properties:
-      TopicName: !Sub '${AWS::StackName}-email-to-slack-topic'
+      TopicName: !Sub '${AWS::StackName}-slack-notifications-topic'
       KmsMasterKeyId: '{{resolve:ssm:CoreSnsKmsKeyArn}}'
 
   SlackNotificationsSubscriptionGeneric:
