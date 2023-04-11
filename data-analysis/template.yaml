@@ -524,7 +524,7 @@ Resources:
   SlackNotificationsSubscriptionGeneric:
     Type: AWS::SNS::Subscription
     Properties:
-      Endpoint: '{{resolve:ssm:EmailToSlackEmailAddress:}}'
+      Endpoint: '{{resolve:ssm:EmailToSlackEmailAddress}}'
       Protocol: 'email'
       TopicArn: !GetAtt SlackNotificationsTopic.TopicArn
 
