@@ -524,14 +524,14 @@ Resources:
   SlackNotificationsSubscriptionGeneric:
     Type: AWS::SNS::Subscription
     Properties:
-      Endpoint: '{{resolve:ssm:EmailToSlackEmailAddress}}'
+      Endpoint: '{{resolve:ssm:EmailToSlackAddress}}'
       Protocol: 'email'
       TopicArn: !GetAtt SlackNotificationsTopic.TopicArn
 
   EmailToSlackSNSTopicArn:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: CoreSnsKmsKeyArn
+      Name: EmailToSlackSNSTopicArn
       Type: String
       Value: !GetAtt SlackNotificationsTopic.TopicArn
 
