@@ -531,7 +531,7 @@ Resources:
   EmailToSlackSNSTopicArn:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: CoreSnsKmsKeyArn
+      Name: EmailToSlackSNSTopicArn
       Type: String
       Value: !GetAtt SlackNotificationsTopic.TopicArn
 
