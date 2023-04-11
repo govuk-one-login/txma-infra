@@ -230,6 +230,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-lambda-powertools/commons", "npm:1.5.1"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:1.8.0", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-commons-npm-1.8.0-15b644fd44-50a6231d1b.zip/node_modules/@aws-lambda-powertools/commons/",\
+          "packageDependencies": [\
+            ["@aws-lambda-powertools/commons", "npm:1.8.0"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["@aws-lambda-powertools/logger", [\
@@ -238,6 +245,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
             ["@aws-lambda-powertools/commons", "npm:1.5.1"],\
+            ["lodash.merge", "npm:4.6.2"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:1.7.0", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.7.0-f2dfd439f2-ba4400d093.zip/node_modules/@aws-lambda-powertools/logger/",\
+          "packageDependencies": [\
+            ["@aws-lambda-powertools/logger", "npm:1.7.0"],\
+            ["@aws-lambda-powertools/commons", "npm:1.8.0"],\
             ["lodash.merge", "npm:4.6.2"]\
           ],\
           "linkType": "HARD"\
@@ -5981,7 +5997,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./dev-tools/",\
           "packageDependencies": [\
             ["dev-tools", "workspace:dev-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
+            ["@aws-lambda-powertools/logger", "npm:1.7.0"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
             ["@aws-sdk/client-dynamodb", "npm:3.163.0"],\
             ["@aws-sdk/client-firehose", "npm:3.264.0"],\
