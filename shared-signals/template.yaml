@@ -72,4 +72,4 @@ Resources:
     Properties:
       Name: UserConfigTableArn
       Type: String
-      Value: !GetAtt ZendeskWebhookApiWafAcl.Arn
+      Value: !GetAtt UserConfigTable.Arn
