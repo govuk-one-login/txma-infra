@@ -27,3 +27,7 @@ jobs:
         run: yarn unplug
       - name: Check Yarn cache
         run: yarn install --immutable --immutable-cache --check-cache
+      - name: Run tests (dev-tools)
+        run: yarn workspace dev-tools test
+      - name: Run tests (audit-test-tools)
+        run: yarn workspace audit-test-tools test
