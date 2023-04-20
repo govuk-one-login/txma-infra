@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static infrastructure for TICF Zendesk integration
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, 'production']
+  NotTestEnvironment:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration]
+    ]
+
+Resources:
+  ####################
+  # DynamoDB Resources
+  ####################
+
+  UserConfigTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub ${AWS::StackName}-user-config-table
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: !If [NotTestEnvironment, false, true]
+      AttributeDefinitions:
+        - AttributeName: zendeskId
+          AttributeType: S
+        - AttributeName: athenaQueryId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: zendeskId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: athenaQueryIdIndex
+          KeySchema:
+            - AttributeName: athenaQueryId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
+  ################
+  # SSM Parameters
+  ################
+
+  UserConfigTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableArn
+      Type: String
+      Value: !GetAtt ZendeskWebhookApiWafAcl.Arn
