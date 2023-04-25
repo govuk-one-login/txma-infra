@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Static infrastructure for TICF Zendesk integration
+Description: Static infrastructure for Shared Signal Framework
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
@@ -26,33 +26,21 @@ Resources:
   # DynamoDB Resources
   ####################
 
-  UserConfigTable:
+  SharedSignalsUserConfigTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub ${AWS::StackName}-user-config-table
+      TableName: !Sub ${AWS::StackName}-user-config
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: !If [NotTestEnvironment, false, true]
       AttributeDefinitions:
-        - AttributeName: zendeskId
-          AttributeType: S
-        - AttributeName: athenaQueryId
+        - AttributeName: client_id
           AttributeType: S
       KeySchema:
-        - AttributeName: zendeskId
+        - AttributeName: client_id
           KeyType: HASH
-      GlobalSecondaryIndexes:
-        - IndexName: athenaQueryIdIndex
-          KeySchema:
-            - AttributeName: athenaQueryId
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
-          ProvisionedThroughput:
-            ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -72,4 +60,4 @@ Resources:
     Properties:
       Name: UserConfigTableArn
       Type: String
-      Value: !GetAtt UserConfigTable.Arn
+      Value: !GetAtt SharedSignalsUserConfigTable.Arn
