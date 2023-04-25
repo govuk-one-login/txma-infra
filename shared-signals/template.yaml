@@ -26,7 +26,7 @@ Resources:
   # DynamoDB Resources
   ####################
 
-  SharedSignalsUserConfigTable:
+  UserConfigTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -51,6 +51,21 @@ Resources:
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
+  ####################
+  # Cognito Resources
+  ####################
+
+  SSFUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AWS::StackName}-ssf-user-pool
+
+  SSFUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref SSFUserPool
+      Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
+
   ################
   # SSM Parameters
   ################
@@ -60,4 +75,18 @@ Resources:
     Properties:
       Name: UserConfigTableArn
       Type: String
-      Value: !GetAtt SharedSignalsUserConfigTable.Arn
+      Value: !GetAtt UserConfigTable.Arn
+
+  SSFUserPoolIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SSFUserPoolId
+      Type: String
+      Value: !Ref SSFUserPool
+
+  SSFUserPoolArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SSFUserPoolArn
+      Type: String
+      Value: !GetAtt SSFUserPool.Arn
