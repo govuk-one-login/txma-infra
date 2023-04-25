@@ -63,6 +63,21 @@ Resources:
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
+  ####################
+  # Cognito Resources
+  ####################
+
+  SSFUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AWS::StackName}-ssf-user-pool
+
+  SSFUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref SSFUserPool
+      Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
+
   ################
   # SSM Parameters
   ################
@@ -73,3 +88,17 @@ Resources:
       Name: UserConfigTableArn
       Type: String
       Value: !GetAtt UserConfigTable.Arn
+
+  SSFUserPoolIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SSFUserPoolId
+      Type: String
+      Value: !Ref SSFUserPool
+
+  SSFUserPoolArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SSFUserPoolArn
+      Type: String
+      Value: !GetAtt SSFUserPool.Arn
