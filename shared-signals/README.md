@@ -9,5 +9,5 @@ The CI/CD pipeline will deploy the resources in the dev environment as well as a
 > the command below will update the main `shared-signals-infra` stack as managed by the pipeline. You **MUST** change the name of the stack to deploy a separate instance of the stack.
 
 ```bash
-sam deploy --stack-name shared-signals-infra --parameter-overrides ParameterKey=Environment,ParameterValue=dev --resolve-s3 --capabilities CAPABILITY_NAMED_IAM --template-file "shared-signals/template.yaml"
+sam deploy --stack-name <REPLACE ME> --parameter-overrides ParameterKey=Environment,ParameterValue=dev --resolve-s3 --capabilities CAPABILITY_NAMED_IAM --template-file "shared-signals/template.yaml"
 ```
