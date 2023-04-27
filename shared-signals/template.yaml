@@ -77,6 +77,13 @@ Resources:
       Type: String
       Value: !GetAtt UserConfigTable.Arn
 
+  UserConfigTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableName
+      Type: String
+      Value: !Ref UserConfigTable
+
   SSFUserPoolIdParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -90,3 +97,11 @@ Resources:
       Name: SSFUserPoolArn
       Type: String
       Value: !GetAtt SSFUserPool.Arn
+
+Outputs:
+  SSFUserPoolId:
+    Description: 'user pool id for cognito'
+    Value: !Ref SSFUserPool
+  UserConfigTableName:
+    Description: 'table name for user config table'
+    Value: !Ref UserConfigTable
