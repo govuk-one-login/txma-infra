@@ -98,6 +98,13 @@ Resources:
       Type: String
       Value: !GetAtt SSFUserPool.Arn
 
+  PreGeneratedCognitoTestUsers:
+  Type: AWS::SecretsManager::Secret
+  Properties:
+    Description: 'A set of cognito users that can be used to authenticate against shared signals API Gateway'
+    KmsKeyId: '{{resolve:ssm:SecretsKmsKeyArn}}'
+    Name: APIGatewayTestUsers
+
 Outputs:
   SSFUserPoolId:
     Description: 'user pool id for cognito'
@@ -105,3 +112,6 @@ Outputs:
   UserConfigTableName:
     Description: 'table name for user config table'
     Value: !Ref UserConfigTable
+  PreGeneratedCognitoUsersSecretARN:
+    Description: 'ARN of secret that stores test cognito users for API gateway testing'
+    Value: !Ref PreGeneratedCognitoTestUsers
