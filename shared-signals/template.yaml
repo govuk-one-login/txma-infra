@@ -66,6 +66,17 @@ Resources:
       UserPoolId: !Ref SSFUserPool
       Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
 
+  ##################
+  # Secrets Manager
+  ##################
+
+  CognitoTestUsers:
+    #checkov:skip=CKV_AWS_149:We will use aws managed kms key
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: 'A set of cognito users that can be used to authenticate against shared signals API Gateway'
+      Name: APIGatewayTestUserCredentials
+
   ################
   # SSM Parameters
   ################
@@ -98,12 +109,12 @@ Resources:
       Type: String
       Value: !GetAtt SSFUserPool.Arn
 
-  PreGeneratedCognitoTestUsers:
-  Type: AWS::SecretsManager::Secret
-  Properties:
-    Description: 'A set of cognito users that can be used to authenticate against shared signals API Gateway'
-    KmsKeyId: '{{resolve:ssm:SecretsKmsKeyArn}}'
-    Name: APIGatewayTestUsers
+  CognitoTestUsersSecretArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CognitoTestUsersArn
+      Type: String
+      Value: !Ref CognitoTestUsers
 
 Outputs:
   SSFUserPoolId:
@@ -112,6 +123,3 @@ Outputs:
   UserConfigTableName:
     Description: 'table name for user config table'
     Value: !Ref UserConfigTable
-  PreGeneratedCognitoUsersSecretARN:
-    Description: 'ARN of secret that stores test cognito users for API gateway testing'
-    Value: !Ref PreGeneratedCognitoTestUsers
