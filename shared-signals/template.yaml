@@ -66,6 +66,16 @@ Resources:
       UserPoolId: !Ref SSFUserPool
       Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
 
+  SharedSignalsStreamResourceServer:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties:
+      UserPoolId: !Ref SSFUserPool
+      Identifier: 'stream'
+      Name: !Sub '${AWS::StackName}-stream-resource-server'
+      Scopes:
+        - ScopeDescription: 'Allows read access to the SSF stream config'
+          ScopeName: 'read'
+
   ##################
   # Secrets Manager
   ##################
