@@ -126,6 +126,13 @@ Resources:
       Type: String
       Value: !Ref CognitoTestUsers
 
+  CognitoDomainURLParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CognitoDomainUrl
+      Type: String
+      Value: !Sub https://di-txma-${AWS::StackName}-${Environment}-ssf-auth.auth.eu-west-2.amazoncognito.com
+
 Outputs:
   SSFUserPoolId:
     Description: 'user pool id for cognito'
