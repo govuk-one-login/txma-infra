@@ -114,7 +114,7 @@ Resources:
     Properties:
       Name: CognitoDomainUrl
       Type: String
-      Value: !Sub https://di-txma-${AWS::StackName}-${Environment}-ssf-auth.auth.eu-west-2.amazoncognito.com
+      Value: !Sub https://${SSFUserPoolDomain}.auth.eu-west-2.amazoncognito.com
 
   #############################
   # Integration test Resources
