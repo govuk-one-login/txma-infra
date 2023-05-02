@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Static infrastructure for TICF Zendesk integration
+Description: Static infrastructure for Shared Signal Framework
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
@@ -20,6 +20,7 @@ Conditions:
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration]
     ]
+  TestEnvironment: !Not [Condition: NotTestEnvironment]
 
 Resources:
   ####################
@@ -31,28 +32,16 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub ${AWS::StackName}-user-config-table
+      TableName: !Sub ${AWS::StackName}-user-config
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: !If [NotTestEnvironment, false, true]
       AttributeDefinitions:
-        - AttributeName: zendeskId
-          AttributeType: S
-        - AttributeName: athenaQueryId
+        - AttributeName: client_id
           AttributeType: S
       KeySchema:
-        - AttributeName: zendeskId
+        - AttributeName: client_id
           KeyType: HASH
-      GlobalSecondaryIndexes:
-        - IndexName: athenaQueryIdIndex
-          KeySchema:
-            - AttributeName: athenaQueryId
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
-          ProvisionedThroughput:
-            ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -99,6 +88,13 @@ Resources:
       Type: String
       Value: !GetAtt UserConfigTable.Arn
 
+  UserConfigTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableName
+      Type: String
+      Value: !Ref UserConfigTable
+
   SSFUserPoolIdParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -112,3 +108,37 @@ Resources:
       Name: SSFUserPoolArn
       Type: String
       Value: !GetAtt SSFUserPool.Arn
+
+  CognitoDomainURLParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CognitoDomainUrl
+      Type: String
+      Value: !Sub https://${SSFUserPoolDomain}.auth.eu-west-2.amazoncognito.com
+
+  #############################
+  # Integration test Resources
+  ############################
+
+  CognitoTestUsers:
+    #checkov:skip=CKV_AWS_149:We will use aws managed kms key
+    Type: AWS::SecretsManager::Secret
+    Condition: TestEnvironment
+    Properties:
+      Description: 'A set of TEST cognito users that can be used to authenticate against shared signals API Gateway. Used for testing only'
+      Name: APIGatewayTestUserCredentials
+
+  CognitoTestUsersSecretArnParameter:
+    Type: AWS::SSM::Parameter
+    Condition: TestEnvironment
+    Properties:
+      Name: CognitoTestUsersArn
+      Type: String
+      Value: !Ref CognitoTestUsers
+Outputs:
+  SSFUserPoolId:
+    Description: 'user pool id for cognito'
+    Value: !Ref SSFUserPool
+  UserConfigTableName:
+    Description: 'table name for user config table'
+    Value: !Ref UserConfigTable
