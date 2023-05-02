@@ -77,18 +77,6 @@ Resources:
         - ScopeDescription: 'Allows read access to the SSF stream config'
           ScopeName: 'read'
 
-  ##################
-  # Secrets Manager
-  ##################
-
-  CognitoTestUsers:
-    #checkov:skip=CKV_AWS_149:We will use aws managed kms key
-    Type: AWS::SecretsManager::Secret
-    Condition: TestEnvironment
-    Properties:
-      Description: 'A set of TEST cognito users that can be used to authenticate against shared signals API Gateway. Used for testing only'
-      Name: APIGatewayTestUserCredentials
-
   ################
   # SSM Parameters
   ################
@@ -121,14 +109,6 @@ Resources:
       Type: String
       Value: !GetAtt SSFUserPool.Arn
 
-  CognitoTestUsersSecretArnParameter:
-    Type: AWS::SSM::Parameter
-    Condition: TestEnvironment
-    Properties:
-      Name: CognitoTestUsersArn
-      Type: String
-      Value: !Ref CognitoTestUsers
-
   CognitoDomainURLParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -136,6 +116,25 @@ Resources:
       Type: String
       Value: !Sub https://di-txma-${AWS::StackName}-${Environment}-ssf-auth.auth.eu-west-2.amazoncognito.com
 
+  #############################
+  # Integration test Resources
+  ############################
+
+  CognitoTestUsers:
+    #checkov:skip=CKV_AWS_149:We will use aws managed kms key
+    Type: AWS::SecretsManager::Secret
+    Condition: TestEnvironment
+    Properties:
+      Description: 'A set of TEST cognito users that can be used to authenticate against shared signals API Gateway. Used for testing only'
+      Name: APIGatewayTestUserCredentials
+
+  CognitoTestUsersSecretArnParameter:
+    Type: AWS::SSM::Parameter
+    Condition: TestEnvironment
+    Properties:
+      Name: CognitoTestUsersArn
+      Type: String
+      Value: !Ref CognitoTestUsers
 Outputs:
   SSFUserPoolId:
     Description: 'user pool id for cognito'
