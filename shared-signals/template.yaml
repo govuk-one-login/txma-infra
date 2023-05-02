@@ -20,7 +20,7 @@ Conditions:
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration]
     ]
-  TestEnvironment: !Not NotTestEnvironment
+  TestEnvironment: !Not [Condition: NotTestEnvironment]
 
 Resources:
   ####################
@@ -84,6 +84,7 @@ Resources:
   CognitoTestUsers:
     #checkov:skip=CKV_AWS_149:We will use aws managed kms key
     Type: AWS::SecretsManager::Secret
+    Condition: TestEnvironment
     Properties:
       Description: 'A set of TEST cognito users that can be used to authenticate against shared signals API Gateway. Used for testing only'
       Name: APIGatewayTestUserCredentials
