@@ -233,19 +233,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@aws-lambda-powertools/logger", [\
-        ["npm:1.5.1", {\
-          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.5.1-c76ac8025e-3bc5e092c6.zip/node_modules/@aws-lambda-powertools/logger/",\
+        ["npm:1.8.0", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.8.0-4b994f1acc-3e8b082979.zip/node_modules/@aws-lambda-powertools/logger/",\
           "packageDependencies": [\
-            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
-            ["@aws-lambda-powertools/commons", "npm:1.8.0"],\
-            ["lodash.merge", "npm:4.6.2"]\
-          ],\
-          "linkType": "HARD"\
-        }],\
-        ["npm:1.7.0", {\
-          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.7.0-f2dfd439f2-ba4400d093.zip/node_modules/@aws-lambda-powertools/logger/",\
-          "packageDependencies": [\
-            ["@aws-lambda-powertools/logger", "npm:1.7.0"],\
+            ["@aws-lambda-powertools/logger", "npm:1.8.0"],\
             ["@aws-lambda-powertools/commons", "npm:1.8.0"],\
             ["lodash.merge", "npm:4.6.2"]\
           ],\
@@ -5159,7 +5150,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./audit-test-tools/",\
           "packageDependencies": [\
             ["audit-test-tools", "workspace:audit-test-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
+            ["@aws-lambda-powertools/logger", "npm:1.8.0"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
             ["@aws-sdk/client-s3", "npm:3.163.0"],\
             ["@aws-sdk/client-sqs", "npm:3.170.0"],\
@@ -5865,7 +5856,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./dev-tools/",\
           "packageDependencies": [\
             ["dev-tools", "workspace:dev-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.7.0"],\
+            ["@aws-lambda-powertools/logger", "npm:1.8.0"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
             ["@aws-sdk/client-dynamodb", "npm:3.163.0"],\
             ["@aws-sdk/client-firehose", "npm:3.264.0"],\
@@ -5881,7 +5872,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["esbuild", "npm:0.17.15"],\
             ["jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:29.5.0"],\
             ["jest-when", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:3.5.2"],\
-            ["ts-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:29.0.5"],\
+            ["ts-jest", "virtual:377b828a23a6077cae1ab2af9e9b9141fa3c41aeb7b7156cd82cbd89b2b5334eebf7afe3926ccb316b54c44ab68108bcd0426e1253d734efb05bfa0a91728cae#npm:29.1.0"],\
             ["ts-node", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:10.9.1"],\
             ["typescript", "patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=23ec76"],\
             ["yaml-cfn", "npm:0.3.2"]\
@@ -9373,6 +9364,54 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["ts-jest", "npm:29.0.5"]\
           ],\
           "linkType": "SOFT"\
+        }],\
+        ["npm:29.1.0", {\
+          "packageLocation": "./.yarn/cache/ts-jest-npm-29.1.0-ede119702b-535dc42ad5.zip/node_modules/ts-jest/",\
+          "packageDependencies": [\
+            ["ts-jest", "npm:29.1.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:377b828a23a6077cae1ab2af9e9b9141fa3c41aeb7b7156cd82cbd89b2b5334eebf7afe3926ccb316b54c44ab68108bcd0426e1253d734efb05bfa0a91728cae#npm:29.1.0", {\
+          "packageLocation": "./.yarn/__virtual__/ts-jest-virtual-c5b2732d2b/0/cache/ts-jest-npm-29.1.0-ede119702b-535dc42ad5.zip/node_modules/ts-jest/",\
+          "packageDependencies": [\
+            ["ts-jest", "virtual:377b828a23a6077cae1ab2af9e9b9141fa3c41aeb7b7156cd82cbd89b2b5334eebf7afe3926ccb316b54c44ab68108bcd0426e1253d734efb05bfa0a91728cae#npm:29.1.0"],\
+            ["@babel/core", null],\
+            ["@jest/types", null],\
+            ["@types/babel-jest", null],\
+            ["@types/babel__core", null],\
+            ["@types/esbuild", null],\
+            ["@types/jest", "npm:29.5.0"],\
+            ["@types/jest__types", null],\
+            ["@types/typescript", null],\
+            ["babel-jest", null],\
+            ["bs-logger", "npm:0.2.6"],\
+            ["esbuild", "npm:0.17.15"],\
+            ["fast-json-stable-stringify", "npm:2.1.0"],\
+            ["jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:29.5.0"],\
+            ["jest-util", "npm:29.5.0"],\
+            ["json5", "npm:2.2.3"],\
+            ["lodash.memoize", "npm:4.1.2"],\
+            ["make-error", "npm:1.3.6"],\
+            ["semver", "npm:7.3.8"],\
+            ["typescript", "patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=23ec76"],\
+            ["yargs-parser", "npm:21.1.1"]\
+          ],\
+          "packagePeers": [\
+            "@babel/core",\
+            "@jest/types",\
+            "@types/babel-jest",\
+            "@types/babel__core",\
+            "@types/esbuild",\
+            "@types/jest",\
+            "@types/jest__types",\
+            "@types/typescript",\
+            "babel-jest",\
+            "esbuild",\
+            "jest",\
+            "typescript"\
+          ],\
+          "linkType": "HARD"\
         }],\
         ["virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:29.0.5", {\
           "packageLocation": "./.yarn/__virtual__/ts-jest-virtual-abcf3467a0/0/cache/ts-jest-npm-29.0.5-30e5da5c24-f60f129c22.zip/node_modules/ts-jest/",\
