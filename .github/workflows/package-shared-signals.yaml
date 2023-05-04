@@ -32,7 +32,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN_SHARED_SIGNALS_BUILD }}
+          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_SHARED_SIGNALS}}
       - name: Validate SAM template
         if: always()
         run: sam validate
