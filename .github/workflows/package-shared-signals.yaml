@@ -1,4 +1,4 @@
-name: Package data analysis infrastructure
+name: Package Shared Signals infrastructure
 
 on:
   push:
