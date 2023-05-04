@@ -233,19 +233,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@aws-lambda-powertools/logger", [\
-        ["npm:1.5.1", {\
-          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.5.1-c76ac8025e-3bc5e092c6.zip/node_modules/@aws-lambda-powertools/logger/",\
+        ["npm:1.8.0", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.8.0-4b994f1acc-3e8b082979.zip/node_modules/@aws-lambda-powertools/logger/",\
           "packageDependencies": [\
-            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
-            ["@aws-lambda-powertools/commons", "npm:1.8.0"],\
-            ["lodash.merge", "npm:4.6.2"]\
-          ],\
-          "linkType": "HARD"\
-        }],\
-        ["npm:1.7.0", {\
-          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.7.0-f2dfd439f2-ba4400d093.zip/node_modules/@aws-lambda-powertools/logger/",\
-          "packageDependencies": [\
-            ["@aws-lambda-powertools/logger", "npm:1.7.0"],\
+            ["@aws-lambda-powertools/logger", "npm:1.8.0"],\
             ["@aws-lambda-powertools/commons", "npm:1.8.0"],\
             ["lodash.merge", "npm:4.6.2"]\
           ],\
@@ -5168,7 +5159,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./audit-test-tools/",\
           "packageDependencies": [\
             ["audit-test-tools", "workspace:audit-test-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.5.1"],\
+            ["@aws-lambda-powertools/logger", "npm:1.8.0"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
             ["@aws-sdk/client-s3", "npm:3.163.0"],\
             ["@aws-sdk/client-sqs", "npm:3.170.0"],\
@@ -5874,7 +5865,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./dev-tools/",\
           "packageDependencies": [\
             ["dev-tools", "workspace:dev-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.7.0"],\
+            ["@aws-lambda-powertools/logger", "npm:1.8.0"],\
             ["@aws-sdk/client-cloudformation", "npm:3.163.0"],\
             ["@aws-sdk/client-dynamodb", "npm:3.163.0"],\
             ["@aws-sdk/client-firehose", "npm:3.264.0"],\
