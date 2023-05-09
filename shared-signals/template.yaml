@@ -34,9 +34,6 @@ Resources:
     Properties:
       TableName: !Sub ${AWS::StackName}-user-config
       BillingMode: PAY_PER_REQUEST
-      TimeToLiveSpecification:
-        AttributeName: ttl
-        Enabled: !If [NotTestEnvironment, false, true]
       AttributeDefinitions:
         - AttributeName: client_id
           AttributeType: S
