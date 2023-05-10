@@ -36,6 +36,8 @@ Globals:
     ReservedConcurrentExecutions: 10
     Runtime: nodejs18.x
     Timeout: 30
+    Architectures:
+      - 'arm64'
 
 Resources:
   WriteTestDataToAthenaBucketFunction:
