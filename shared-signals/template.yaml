@@ -12,6 +12,10 @@ Parameters:
       - staging
       - integration
       - production
+  AudienceGSI:
+    Description: Name of the audience GSI
+    Type: String
+    Default: audGSI
 
 Conditions:
   IsProduction: !Equals [!Ref Environment, 'production']
@@ -40,7 +44,7 @@ Resources:
         - AttributeName: aud
           AttributeType: S
       GlobalSecondaryIndexes:
-        - IndexName: audGSI
+        - IndexName: !Ref AudienceGSI
           KeySchema:
             - AttributeName: aud
               KeyType: HASH
@@ -98,6 +102,13 @@ Resources:
       Name: UserConfigTableName
       Type: String
       Value: !Ref UserConfigTable
+
+  UserConfigTableAudienceGSIParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableAudienceGSI
+      Type: String
+      Value: !Ref AudienceGSI
 
   SSFUserPoolIdParameter:
     Type: AWS::SSM::Parameter
