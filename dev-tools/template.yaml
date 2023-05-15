@@ -254,3 +254,10 @@ Resources:
       Name: /tests/SqsOperationsFunctionName
       Type: String
       Value: !Ref SqsOperationsFunction
+
+  ReadS3FileToStringFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/ReadS3FileToStringFunctionName
+      Type: String
+      Value: !Ref ReadS3FileToStringFunction
