@@ -313,6 +313,7 @@ Resources:
     #checkov:skip=CKV_AWS_18:This is the logs bucket
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       BucketName:
         !Join [
@@ -387,7 +388,7 @@ Resources:
     Properties:
       Name: CriticalAlarmSnsTopicArn
       Type: String
-      Value: !GetAtt SNSCriticalAlarmTopic.Arn
+      Value: !GetAtt SNSCriticalAlarmTopic.TopicArn
 
   DatabaseKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
