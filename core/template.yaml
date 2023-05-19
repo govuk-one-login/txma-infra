@@ -21,9 +21,9 @@ Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
 
 Resources:
-  #############
-  # AWS Chatbot
-  #############
+  #################################
+  # Start: Slack Alerts resources #
+  #################################
 
   ChatbotAlarmRole:
     Type: AWS::IAM::Role
@@ -44,9 +44,38 @@ Resources:
             Action:
               - 'sts:AssumeRole'
 
-  ##########
-  # KMS Keys
-  ##########
+  SNSCriticalAlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      KmsMasterKeyId: !GetAtt SnsKmsKey.Arn
+      TopicName: !Sub ${AWS::StackName}-${Environment}-critical-alarm-topic
+
+  SNSCriticalAlarmTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudwatch.amazonaws.com
+            Action: 'sns:Publish'
+            Resource: !GetAtt SNSCriticalAlarmTopic.TopicArn
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:*
+              StringEquals:
+                aws:SourceAccount: !Sub ${AWS::AccountId}
+      Topics:
+        - !Ref SNSCriticalAlarmTopic
+
+  ###############################
+  # End: Slack Alerts resources #
+  ###############################
+
+  ###################
+  # Start: KMS Keys #
+  ###################
 
   DatabaseKmsKey:
     Type: AWS::KMS::Key
@@ -75,6 +104,36 @@ Resources:
     Properties:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/database-kms-key
       TargetKeyId: !Ref DatabaseKmsKey
+
+  FirehoseKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource:
+              - '*'
+          - Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+
+  FirehoseKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${AWS::StackName}/${Environment}/firehose-kms-key'
+      TargetKeyId: !Ref FirehoseKmsKey
 
   LambdaKmsKey:
     Type: AWS::KMS::Key
@@ -242,14 +301,19 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/queue-kms-key
       TargetKeyId: !Ref SqsKmsKey
 
-  #########
-  # S3 Logs
-  #########
+  #################
+  # End: KMS Keys #
+  #################
+
+  ############################
+  # Start: S3 Logs resources #
+  ############################
 
   S3LogsBucket:
     #checkov:skip=CKV_AWS_18:This is the logs bucket
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       BucketName:
         !Join [
@@ -304,9 +368,13 @@ Resources:
               Bool:
                 aws:SecureTransport: true
 
-  ################
-  # SSM Parameters
-  ################
+  ##########################
+  # End: S3 Logs resources #
+  ##########################
+
+  #########################
+  # Start: SSM Parameters #
+  #########################
 
   ChatbotAlarmRoleArnParameter:
     Type: AWS::SSM::Parameter
@@ -315,12 +383,26 @@ Resources:
       Type: String
       Value: !GetAtt ChatbotAlarmRole.Arn
 
+  CriticalAlarmSnsTopicArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CriticalAlarmSnsTopicArn
+      Type: String
+      Value: !GetAtt SNSCriticalAlarmTopic.TopicArn
+
   DatabaseKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: DatabaseKmsKeyArn
       Type: String
       Value: !GetAtt DatabaseKmsKey.Arn
+
+  FirehoseKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: FirehoseKmsKeyArn
+      Type: String
+      Value: !GetAtt FirehoseKmsKey.Arn
 
   LambdaKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
@@ -363,3 +445,7 @@ Resources:
       Name: CoreSnsKmsKeyArn
       Type: String
       Value: !GetAtt SnsKmsKey.Arn
+
+  #######################
+  # End: SSM Parameters #
+  #######################
