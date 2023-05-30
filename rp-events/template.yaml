@@ -44,6 +44,8 @@ Resources:
       KeySchema:
         - AttributeName: client_id
           KeyType: HASH
+        - AttributeName: event_name
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
