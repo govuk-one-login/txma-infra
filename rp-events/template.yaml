@@ -39,28 +39,14 @@ Resources:
       AttributeDefinitions:
         - AttributeName: securityEventName
           AttributeType: S
-        - AttributeName: subscribedRps
-          AttributeType: S
       KeySchema:
         - AttributeName: securityEventName
           KeyType: HASH
-        - AttributeName: subscribedRps
-          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
-      GlobalSecondaryIndexes:
-        - IndexName: rp-events
-          KeySchema:
-            - AttributeName: subscribedRps
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL #maybe change this
-          ProvisionedThroughput:
-            ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
       SSESpecification:
         SSEEnabled: true
         SSEType: KMS
