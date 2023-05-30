@@ -37,14 +37,14 @@ Resources:
         AttributeName: ttl
         Enabled: !If [NotTestEnvironment, false, true]
       AttributeDefinitions:
-        - AttributeName: event_name
+        - AttributeName: securityEventName
           AttributeType: S
-        - AttributeName: client_id
+        - AttributeName: subscribedRps
           AttributeType: S
       KeySchema:
-        - AttributeName: client_id
+        - AttributeName: securityEventName
           KeyType: HASH
-        - AttributeName: event_name
+        - AttributeName: subscribedRps
           KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -54,10 +54,13 @@ Resources:
       GlobalSecondaryIndexes:
         - IndexName: rp-events
           KeySchema:
-            - AttributeName: client_id
+            - AttributeName: subscribedRps
               KeyType: HASH
           Projection:
             ProjectionType: ALL #maybe change this
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
       SSESpecification:
         SSEEnabled: true
         SSEType: KMS
