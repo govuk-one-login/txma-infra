@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static infrastructure for Relying Party Event Processing
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, 'production']
+  NotTestEnvironment:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration]
+    ]
+  TestEnvironment: !Not [Condition: NotTestEnvironment]
+
+Resources:
+  ####################
+  # DynamoDB Resources
+  ####################
+
+  RelyingPartyConfigTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub ${AWS::StackName}-rp-config-table
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: !If [NotTestEnvironment, false, true]
+      AttributeDefinitions:
+        - AttributeName: event_name
+          AttributeType: S
+        - AttributeName: client_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: client_id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      GlobalSecondaryIndexes:
+        - IndexName: rp-events
+          KeySchema:
+            - AttributeName: client_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL #maybe change this
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
+  ################
+  # SSM Parameters
+  ################
+
+  RelyingPartyConfigTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RelyingPartyConfigTableArn
+      Type: String
+      Value: !GetAtt RelyingPartyConfigTable.Arn
+
+  RelyingPartyConfigTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RelyingPartyConfigTableName
+      Type: String
+      Value: !Ref RelyingPartyConfigTable
