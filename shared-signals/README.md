@@ -1,6 +1,6 @@
 # About
 
-Sets up common infrastructure used for implemneting Shared Signals
+Sets up common infrastructure used for implementing Shared Signals
 
 # Deploying
 
