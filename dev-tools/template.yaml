@@ -37,6 +37,8 @@ Globals:
     ReservedConcurrentExecutions: 10
     Runtime: nodejs18.x
     Timeout: 30
+    Architectures:
+      - 'arm64'
 
 Resources:
   AddFirehoseRecordFunction:
@@ -60,6 +62,31 @@ Resources:
     Properties:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
       LogGroupName: !Sub /aws/lambda/${AWS::StackName}-add-firehose-record
+      RetentionInDays: 30
+
+  ReadS3FileToStringFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals section
+    #checkov:skip=CKV_AWS_116:Lambda will be called by integration test, so repeated processing of the same message isn't a problem
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: readS3FileToString.handler
+      FunctionName: !Sub ${AWS::StackName}-read-s3-file
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject*
+                # Adding the ListBucket permission ensures that when a file doesn't exist, we get a 404 instead of a 403
+                - s3:ListBucket
+              Resource: '*'
+
+  ReadS3FileToStringLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-read-s3-file
       RetentionInDays: 30
 
   EmptyS3BucketsFunction:
@@ -227,3 +254,10 @@ Resources:
       Name: /tests/SqsOperationsFunctionName
       Type: String
       Value: !Ref SqsOperationsFunction
+
+  ReadS3FileToStringFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/ReadS3FileToStringFunctionName
+      Type: String
+      Value: !Ref ReadS3FileToStringFunction
