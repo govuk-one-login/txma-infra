@@ -189,8 +189,7 @@ Resources:
     Properties:
       QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-dead-letter-queue
       KmsMasterKeyId: !GetAtt RPEventsQueueKmsKey.Arn
-  
-  
+
   ################
   # SSM Parameters
   ################
@@ -208,7 +207,7 @@ Resources:
       Name: RelyingPartyConfigTableName
       Type: String
       Value: !Ref RelyingPartyConfigTable
-  
+
   RPEventsQueueArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
