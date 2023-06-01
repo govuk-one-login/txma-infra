@@ -23,7 +23,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub ${AWS::StackName}-rp-config-table
+      TableName: !Sub ${AWS::StackName}-${Environment}-rp-config-table
       AttributeDefinitions:
         - AttributeName: securityEventName
           AttributeType: S
@@ -45,7 +45,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub ${AWS::StackName}-rp-pairwise-mapping-table
+      TableName: !Sub ${AWS::StackName}-${Environment}-rp-pairwise-mapping-table
       AttributeDefinitions:
         - AttributeName: userId
           AttributeType: S
