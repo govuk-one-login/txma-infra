@@ -13,15 +13,6 @@ Parameters:
       - integration
       - production
 
-Conditions:
-  IsProduction: !Equals [!Ref Environment, 'production']
-  NotTestEnvironment:
-    !Or [
-      !Equals [!Ref Environment, production],
-      !Equals [!Ref Environment, integration]
-    ]
-  TestEnvironment: !Not [Condition: NotTestEnvironment]
-
 Resources:
   ####################
   # DynamoDB Resources
@@ -32,7 +23,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub ${AWS::StackName}-rp-config-table
+      TableName: !Sub ${AWS::StackName}-${Environment}-rp-config-table
       AttributeDefinitions:
         - AttributeName: securityEventName
           AttributeType: S
@@ -42,6 +33,41 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
+  RelyingPartyPairwiseMappingTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub ${AWS::StackName}-${Environment}-rp-pairwise-mapping-table
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: clientId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: clientId
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      GlobalSecondaryIndexes:
+        - IndexName: ClientIdIndex
+          KeySchema:
+            - AttributeName: clientId
+              KeyType: HASH
+            - AttributeName: userId
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
       SSESpecification:
