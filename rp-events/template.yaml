@@ -95,3 +95,17 @@ Resources:
       Name: RelyingPartyConfigTableName
       Type: String
       Value: !Ref RelyingPartyConfigTable
+
+  RelyingPartyPairwiseMappingTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RelyingPartyPairwiseMappingTableArn
+      Type: String
+      Value: !GetAtt RelyingPartyPairwiseMappingTable.Arn
+
+  RelyingPartyPairwiseMappingTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RelyingPartyPairwiseMappingTableName
+      Type: String
+      Value: !Ref RelyingPartyPairwiseMappingTable
