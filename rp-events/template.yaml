@@ -13,6 +13,10 @@ Parameters:
       - integration
       - production
 
+Conditions:
+  LockCrossAccountPermissionsToLambdaRoles:
+    !Not [!Equals [!Ref Environment, dev]]
+
 Resources:
   ####################
   # DynamoDB Resources
@@ -79,6 +83,114 @@ Resources:
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
   ################
+  # SQS Resources
+  ################
+
+  # Need a separate KMS key here for the RP events queue because we need to grant access to the shared signals account
+  # and our main KMS key definitions are shared across all stacks.
+  RPEventsQueueKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - !If
+            - LockCrossAccountPermissionsToLambdaRoles
+            # If we are in a non-dev environment so know the lambda role name
+            - Sid: Enable Decrypt access for Shared Signals account generate set Lambda
+              Effect: Allow
+              Principal:
+                AWS: '{{resolve:ssm:SharedSignalsAccountRootArn}}'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
+              Condition:
+                StringEquals:
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:SharedSignalsAccountNumber}}:role/shared-signals-create-set-role'
+            # Otherwise allow anything in the dev query results account root account
+            - Sid: Enable Decrypt access for Shared Signals dev account
+              Effect: Allow
+              Principal:
+                AWS: '{{resolve:ssm:SharedSignalsAccountRootArn}}'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
+
+  RPEventsQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/rp-events-queue-kms-key
+      TargetKeyId: !Ref RPEventsQueueKmsKey
+
+  RPEventsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-queue
+      KmsMasterKeyId: !GetAtt RPEventsQueueKmsKey.Arn
+      VisibilityTimeout: 60
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt RPEventsDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  RPEventsQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref RPEventsQueue
+      PolicyDocument:
+        Statement:
+          - !If
+            - LockCrossAccountPermissionsToLambdaRoles
+            # If we are in a non-dev environment so know the lambda role name
+            - Sid: AllowRPEventsQueueReadForLambdaRole
+              Action:
+                - 'sqs:ChangeMessageVisibility'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+                - 'sqs:ReceiveMessage'
+              Effect: 'Allow'
+              Resource: !GetAtt RPEventsQueue.Arn
+              Principal:
+                AWS: '{{resolve:ssm:SharedSignalsAccountRootArn}}'
+              Condition:
+                StringEquals:
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:SharedSignalsAccountNumber}}:role/shared-signals-create-set-role'
+            # Otherwise allow anything in the dev query results account root account
+            - Sid: AllowRPEventsQueueReadForSharedSignalsAccount
+              Action:
+                - 'sqs:ChangeMessageVisibility'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+                - 'sqs:ReceiveMessage'
+              Effect: 'Allow'
+              Resource: !GetAtt RPEventsQueue.Arn
+              Principal:
+                AWS: '{{resolve:ssm:SharedSignalsAccountRootArn}}'
+
+  RPEventsDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-dead-letter-queue
+      KmsMasterKeyId: !GetAtt RPEventsQueueKmsKey.Arn
+
+  ################
   # SSM Parameters
   ################
 
@@ -95,3 +207,24 @@ Resources:
       Name: RelyingPartyConfigTableName
       Type: String
       Value: !Ref RelyingPartyConfigTable
+
+  RPEventsQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RPEventsQueueArn
+      Type: String
+      Value: !GetAtt RPEventsQueue.Arn
+
+  RPEventsQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RPEventsQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt RPEventsQueueKmsKey.Arn
+
+  RPEventsQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RPEventsQueueUrl
+      Type: String
+      Value: !Ref RPEventsQueue
