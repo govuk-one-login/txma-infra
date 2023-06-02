@@ -12,6 +12,10 @@ Parameters:
       - staging
       - integration
       - production
+  AudienceGSI:
+    Description: Name of the audience GSI
+    Type: String
+    Default: audGSI
 
 Conditions:
   IsProduction: !Equals [!Ref Environment, 'production']
@@ -33,18 +37,22 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${AWS::StackName}-user-config
-      TimeToLiveSpecification:
-        AttributeName: ttl
-        Enabled: !If [NotTestEnvironment, false, true]
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: client_id
           AttributeType: S
+        - AttributeName: aud
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: !Ref AudienceGSI
+          KeySchema:
+            - AttributeName: aud
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
       KeySchema:
         - AttributeName: client_id
           KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
       SSESpecification:
@@ -94,6 +102,13 @@ Resources:
       Name: UserConfigTableName
       Type: String
       Value: !Ref UserConfigTable
+
+  UserConfigTableAudienceGSIParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableAudienceGSI
+      Type: String
+      Value: !Ref AudienceGSI
 
   SSFUserPoolIdParameter:
     Type: AWS::SSM::Parameter
