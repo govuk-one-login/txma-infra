@@ -114,7 +114,7 @@ Resources:
               Resource: '*'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:SharedSignalsAccountNumber}}:role/shared-signals-${Environment}-create-set-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:SharedSignalsAccountNumber}}:role/shared-signals-create-set-role'
             # Otherwise allow anything in the dev query results account root account
             - Sid: Enable Decrypt access for Shared Signals dev account
               Effect: Allow
@@ -171,7 +171,7 @@ Resources:
                 AWS: '{{resolve:ssm:SharedSignalsAccountRootArn}}'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:SharedSignalsAccountNumber}}:role/shared-signals-${Environment}-create-set-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:SharedSignalsAccountNumber}}:role/shared-signals-create-set-role'
             # Otherwise allow anything in the dev query results account root account
             - Sid: AllowRPEventsQueueReadForSharedSignalsAccount
               Action:
