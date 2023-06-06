@@ -16,6 +16,9 @@ Parameters:
 Conditions:
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
+  IsIntegratedEnvironment: !And
+    - !Not [!Equals [!Ref Environment, dev]]
+    - !Not [!Equals [!Ref Environment, build]]
 
 Resources:
   ####################
@@ -79,6 +82,7 @@ Resources:
 
   RelyingPartyPairwiseMappingTableCrossAccountAccessRole:
     Type: AWS::IAM::Role
+    Condition: IsIntegratedEnvironment
     Properties:
       RoleName: !Sub '${AWS::StackName}-pairwise-table-access-role'
       PermissionsBoundary: !If
@@ -99,8 +103,9 @@ Resources:
 
   RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
+    Condition: IsIntegratedEnvironment
     Properties:
-      ManagedPolicyName: !Sub ${AWS::StakName}-pairwise-table-access-policy
+      ManagedPolicyName: !Sub ${AWS::StackName}-pairwise-table-access-policy
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
