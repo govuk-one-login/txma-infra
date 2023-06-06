@@ -92,11 +92,10 @@ Resources:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Sid: AllowLambdaToAssumeRole
+          - Sid: AllowAssumeRoleAccessToFPAD
             Effect: Allow
             Principal:
-              Service:
-                - lambda.amazonaws.com
+              AWS: '{{resolve:ssm:FpadAwsAccountRootArn}}'
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - !Ref RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy
