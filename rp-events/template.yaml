@@ -50,39 +50,67 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${AWS::StackName}-${Environment}-rp-pairwise-mapping-table
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: commonSubjectId
           AttributeType: S
         - AttributeName: clientId
           AttributeType: S
-        - AttributeName: pairwiseId
+        - AttributeName: clientPairwiseIdLookup
           AttributeType: S
       KeySchema:
         - AttributeName: commonSubjectId
           KeyType: HASH
         - AttributeName: clientId
           KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
       GlobalSecondaryIndexes:
-        - IndexName: ClientIdIndex
+        - IndexName: ClientPairwiseIdIndex
           KeySchema:
-            - AttributeName: clientId
+            - AttributeName: clientPairwiseIdLookup
               KeyType: HASH
-            - AttributeName: pairwiseId
-              KeyType: RANGE
           Projection:
             ProjectionType: KEYS_ONLY
-          ProvisionedThroughput:
-            ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
       SSESpecification:
         SSEEnabled: true
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
+  RelyingPartyPairwiseMappingTableCrossAccountAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-pairwise-table-access-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaToAssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy
+
+  RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StakName}-pairwise-table-access-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DynamoPairwiseTableRead
+            Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:Query
+            Resource:
+              - !GetAtt RelyingPartyPairwiseMappingTable.Arn
 
   ################
   # SQS Resources
