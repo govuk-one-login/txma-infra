@@ -51,12 +51,14 @@ Resources:
     Properties:
       TableName: !Sub ${AWS::StackName}-${Environment}-rp-pairwise-mapping-table
       AttributeDefinitions:
-        - AttributeName: userId
+        - AttributeName: commonSubjectId
           AttributeType: S
         - AttributeName: clientId
           AttributeType: S
+        - AttributeName: pairwiseId
+          AttributeType: S
       KeySchema:
-        - AttributeName: userId
+        - AttributeName: commonSubjectId
           KeyType: HASH
         - AttributeName: clientId
           KeyType: RANGE
@@ -68,10 +70,10 @@ Resources:
           KeySchema:
             - AttributeName: clientId
               KeyType: HASH
-            - AttributeName: userId
+            - AttributeName: pairwiseId
               KeyType: RANGE
           Projection:
-            ProjectionType: ALL
+            ProjectionType: KEYS_ONLY
           ProvisionedThroughput:
             ReadCapacityUnits: 5
             WriteCapacityUnits: 5
