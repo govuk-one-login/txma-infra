@@ -36,6 +36,7 @@ Globals:
     ReservedConcurrentExecutions: 10
     Runtime: nodejs18.x
     Timeout: 30
+    MemorySize: 256
     Architectures:
       - 'arm64'
 
