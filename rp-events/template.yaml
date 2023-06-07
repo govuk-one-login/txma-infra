@@ -120,6 +120,12 @@ Resources:
               - dynamodb:Query
             Resource:
               - !GetAtt RelyingPartyPairwiseMappingTable.Arn
+          - Sid: DynamoItemsDecrypt
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource:
+              - '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
   ################
   # SQS Resources
