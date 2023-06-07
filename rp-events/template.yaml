@@ -12,6 +12,10 @@ Parameters:
       - staging
       - integration
       - production
+  PermissionsBoundary:
+    Description: The ARN of the permissions boundary to apply to any role created by the template
+    Type: String
+    Default: none
 
 Conditions:
   LockCrossAccountPermissionsToLambdaRoles:
@@ -19,6 +23,7 @@ Conditions:
   IsIntegratedEnvironment: !And
     - !Not [!Equals [!Ref Environment, dev]]
     - !Not [!Equals [!Ref Environment, build]]
+  UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
 
 Resources:
   ####################
