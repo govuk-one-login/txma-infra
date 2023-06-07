@@ -16,6 +16,9 @@ Parameters:
 Conditions:
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
+  IsIntegratedEnvironment: !And
+    - !Not [!Equals [!Ref Environment, dev]]
+    - !Not [!Equals [!Ref Environment, build]]
 
 Resources:
   ####################
@@ -50,37 +53,68 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${AWS::StackName}-${Environment}-rp-pairwise-mapping-table
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: userId
+        - AttributeName: commonSubjectId
           AttributeType: S
         - AttributeName: clientId
           AttributeType: S
+        - AttributeName: clientPairwiseIdLookup
+          AttributeType: S
       KeySchema:
-        - AttributeName: userId
+        - AttributeName: commonSubjectId
           KeyType: HASH
         - AttributeName: clientId
           KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
       GlobalSecondaryIndexes:
-        - IndexName: ClientIdIndex
+        - IndexName: ClientPairwiseIdIndex
           KeySchema:
-            - AttributeName: clientId
+            - AttributeName: clientPairwiseIdLookup
               KeyType: HASH
-            - AttributeName: userId
-              KeyType: RANGE
           Projection:
-            ProjectionType: ALL
-          ProvisionedThroughput:
-            ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
+            ProjectionType: KEYS_ONLY
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
       SSESpecification:
         SSEEnabled: true
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
+  RelyingPartyPairwiseMappingTableCrossAccountAccessRole:
+    Type: AWS::IAM::Role
+    Condition: IsIntegratedEnvironment
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-pairwise-table-access-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAssumeRoleAccessToFPAD
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:FpadAwsAccountRootArn}}'
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy
+
+  RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: IsIntegratedEnvironment
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StackName}-pairwise-table-access-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DynamoPairwiseTableRead
+            Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:Query
+            Resource:
+              - !GetAtt RelyingPartyPairwiseMappingTable.Arn
 
   ################
   # SQS Resources
