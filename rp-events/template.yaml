@@ -216,7 +216,7 @@ Resources:
                 AWS: '{{resolve:ssm:SharedSignalsAccountRootArn}}'
               Condition:
                 StringEquals:
-                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:SharedSignalsAccountNumber}}:role/shared-signals-create-set-role'
+                  'aws:principalArn': !Sub 'arn:aws:iam::{{resolve:ssm:SharedSignalsAccountNumber}}:role/shared-signals-create-sets-function-role'
             # Otherwise allow anything in the dev query results account root account
             - Sid: AllowRPEventsQueueReadForSharedSignalsAccount
               Action:
