@@ -1,21 +1,12 @@
-import { DeleteItemCommand } from '@aws-sdk/client-dynamodb'
+import { DeleteCommand } from '@aws-sdk/lib-dynamodb'
 import { OperationParams } from '../../types/dynamoDbOperation'
-import { dynamoDbClient } from './dynamoDbClient'
+import { documentClient } from './dynamoDbClient'
 
 export const dynamoDbDelete = async (operationParams: OperationParams) => {
-  if (!operationParams.keyAttributeValue)
-    throw Error('No keyAttributeValue found in dynamoDbDelete parameters')
-  if (!operationParams.keyAttributeName)
-    throw Error('No keyAttributeName found in dynamoDbDelete parameters')
-
-  const deleteDynamoEntryCommand = {
+  const deleteCommand = {
     TableName: operationParams.tableName,
-    Key: {
-      [operationParams.keyAttributeName]: {
-        S: operationParams.keyAttributeValue
-      }
-    }
+    Key: operationParams.key
   }
 
-  return dynamoDbClient.send(new DeleteItemCommand(deleteDynamoEntryCommand))
+  return documentClient.send(new DeleteCommand(deleteCommand))
 }
