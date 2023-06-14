@@ -2,9 +2,10 @@ import { when } from 'jest-when'
 import { DynamoDbOperation, Operation } from '../../types/dynamoDbOperation'
 import { logger } from '../../utils/logger'
 import {
-  QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-  TEST_ATHENA_QUERY_ID,
-  ZENDESK_TICKET_ID
+  TEST_DYNAMO_TABLE_NAME,
+  TEST_KEY,
+  TEST_ITEM,
+  TEST_DESIRED_ATTRIBUTE_NAME
 } from '../../utils/tests/constants/testConstants'
 import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
 import { dynamoDbDelete } from './dynamoDbDelete'
@@ -30,27 +31,23 @@ describe('dynamo db operations handler', () => {
     return {
       operation,
       params: {
-        tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
+        tableName: TEST_DYNAMO_TABLE_NAME,
         ...(operation === 'GET' && {
-          zendeskId: ZENDESK_TICKET_ID,
-          attributeName: 'athenaQueryId'
+          key: TEST_KEY,
+          desiredAttributeName: TEST_DESIRED_ATTRIBUTE_NAME
         }),
         ...(operation === 'PUT' && {
-          zendeskId: ZENDESK_TICKET_ID,
-          itemToPut: { zendeskId: { S: ZENDESK_TICKET_ID } }
+          itemToPut: TEST_ITEM
         }),
         ...(operation === 'DELETE' && {
-          zendeskId: ZENDESK_TICKET_ID
+          key: TEST_KEY
         })
       }
     }
   }
 
   const dynamoDbGetReturnsEntry = () => {
-    when(dynamoDbGet).mockResolvedValue({
-      zendeskId: { S: ZENDESK_TICKET_ID },
-      athenaQueryId: { S: TEST_ATHENA_QUERY_ID }
-    })
+    when(dynamoDbGet).mockResolvedValue(TEST_ITEM)
   }
 
   it('returns a dynamoDbEntry when handler is called with correct GET params', async () => {
@@ -65,14 +62,11 @@ describe('dynamo db operations handler', () => {
       'GetItemCommand successfully sent to Dynamo'
     )
     expect(dynamoDbGet).toHaveBeenCalledWith({
-      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      zendeskId: ZENDESK_TICKET_ID,
-      attributeName: 'athenaQueryId'
+      tableName: TEST_DYNAMO_TABLE_NAME,
+      key: TEST_KEY,
+      desiredAttributeName: TEST_DESIRED_ATTRIBUTE_NAME
     })
-    expect(dynamoDbEntry).toEqual({
-      zendeskId: { S: ZENDESK_TICKET_ID },
-      athenaQueryId: { S: TEST_ATHENA_QUERY_ID }
-    })
+    expect(dynamoDbEntry).toEqual(TEST_ITEM)
   })
 
   it('calls the dynamoDbPut function when handler is called with PUT operation', async () => {
@@ -82,9 +76,8 @@ describe('dynamo db operations handler', () => {
       'PutItemCommand successfully sent to Dynamo'
     )
     expect(dynamoDbPut).toHaveBeenCalledWith({
-      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      zendeskId: ZENDESK_TICKET_ID,
-      itemToPut: { zendeskId: { S: ZENDESK_TICKET_ID } }
+      tableName: TEST_DYNAMO_TABLE_NAME,
+      itemToPut: TEST_ITEM
     })
   })
 
@@ -95,8 +88,8 @@ describe('dynamo db operations handler', () => {
       'DeleteItemCommand successfully sent to Dynamo'
     )
     expect(dynamoDbDelete).toHaveBeenCalledWith({
-      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      zendeskId: ZENDESK_TICKET_ID
+      tableName: TEST_DYNAMO_TABLE_NAME,
+      key: TEST_KEY
     })
   })
 

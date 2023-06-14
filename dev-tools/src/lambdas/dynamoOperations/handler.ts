@@ -10,35 +10,31 @@ import { dynamoDbGet } from './dynamoDbGet'
 import { dynamoDbPut } from './dynamoDbPut'
 
 export const handler = async (
-  dynamoOperationParams: DynamoDbOperation,
+  dynamoDbOperation: DynamoDbOperation,
   context: Context
 ) => {
   initialiseLogger(context)
-  if (!dynamoOperationParams) {
+
+  if (!dynamoDbOperation) {
     throw Error('Function called with undefined params')
   }
-  if (
-    dynamoOperationParams.params.keyAttributeName &&
-    dynamoOperationParams.params.keyAttributeValue
-  ) {
-    appendKeyAttributeDataToLogger(
-      dynamoOperationParams.params.keyAttributeName,
-      dynamoOperationParams.params.keyAttributeValue
-    )
+
+  if (dynamoDbOperation.params.key) {
+    appendKeyAttributeDataToLogger(dynamoDbOperation.params.key)
   }
 
   let result
-  switch (dynamoOperationParams.operation) {
+  switch (dynamoDbOperation.operation) {
     case 'GET':
-      result = await dynamoDbGet(dynamoOperationParams.params)
+      result = await dynamoDbGet(dynamoDbOperation.params)
       logger.info('GetItemCommand successfully sent to Dynamo')
       break
     case 'PUT':
-      result = await dynamoDbPut(dynamoOperationParams.params)
+      result = await dynamoDbPut(dynamoDbOperation.params)
       logger.info('PutItemCommand successfully sent to Dynamo')
       break
     case 'DELETE':
-      result = await dynamoDbDelete(dynamoOperationParams.params)
+      result = await dynamoDbDelete(dynamoDbOperation.params)
       logger.info('DeleteItemCommand successfully sent to Dynamo')
       break
     default:

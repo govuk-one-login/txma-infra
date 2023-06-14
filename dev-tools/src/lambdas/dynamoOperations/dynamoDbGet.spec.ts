@@ -1,5 +1,6 @@
 import { mockClient } from 'aws-sdk-client-mock'
 import {
+  TEST_DESIRED_ATTRIBUTE_NAME,
   TEST_DYNAMO_TABLE_NAME,
   TEST_ITEM,
   TEST_KEY
@@ -45,15 +46,15 @@ describe('dynamoDbGet', () => {
   })
 
   it('dynamo client is called with the correct params (with attributeName)', async () => {
-    const desiredAttributeName = 'aKeyForAValueIWant'
-    const getDynamoEntryCommandWithAttName =
-      generateGetDynamoEntryCommand(desiredAttributeName)
+    const getDynamoEntryCommandWithAttName = generateGetDynamoEntryCommand(
+      TEST_DESIRED_ATTRIBUTE_NAME
+    )
     givenDatabaseReturnsData()
 
     const dynamoItem = await dynamoDbGet({
       tableName: TEST_DYNAMO_TABLE_NAME,
       key: TEST_KEY,
-      desiredAttributeName: desiredAttributeName
+      desiredAttributeName: TEST_DESIRED_ATTRIBUTE_NAME
     })
 
     expect(dynamoMock).toHaveReceivedCommandWith(
