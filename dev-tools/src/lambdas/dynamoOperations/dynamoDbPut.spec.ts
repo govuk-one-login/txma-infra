@@ -1,35 +1,26 @@
-import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb'
 import { mockClient } from 'aws-sdk-client-mock'
 import {
-  QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-  ZENDESK_TICKET_ID
+  TEST_DYNAMO_TABLE_NAME,
+  TEST_ITEM
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbPut } from './dynamoDbPut'
 import 'aws-sdk-client-mock-jest'
-import { OperationParams } from '../../types/dynamoDbOperation'
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 
-const dynamoMock = mockClient(DynamoDBClient)
+const dynamoMock = mockClient(DynamoDBDocumentClient)
 
 describe('dynamoDbPut', () => {
   it('dynamo client is called with the correct params', async () => {
-    const item = { zendeskId: { S: ZENDESK_TICKET_ID } }
     const putItemCommand = {
-      TableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      ReturnValues: 'ALL_OLD',
-      Item: item
+      TableName: TEST_DYNAMO_TABLE_NAME,
+      Item: TEST_ITEM
     }
 
     await dynamoDbPut({
-      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      itemToPut: item
+      tableName: TEST_DYNAMO_TABLE_NAME,
+      itemToPut: TEST_ITEM
     })
 
-    expect(dynamoMock).toHaveReceivedCommandWith(PutItemCommand, putItemCommand)
-  })
-
-  it('throws an error if function is called without an itemToPut', async () => {
-    expect(dynamoDbPut({} as OperationParams)).rejects.toThrow(
-      'No item found to put to db in dynamoDbPut parameters'
-    )
+    expect(dynamoMock).toHaveReceivedCommandWith(PutCommand, putItemCommand)
   })
 })
