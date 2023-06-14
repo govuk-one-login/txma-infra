@@ -3,7 +3,7 @@ import {
   TEST_DESIRED_ATTRIBUTE_NAME,
   TEST_DYNAMO_TABLE_NAME,
   TEST_ITEM,
-  TEST_KEY
+  TEST_DYNAMO_KEY
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbGet } from './dynamoDbGet'
 import 'aws-sdk-client-mock-jest'
@@ -22,7 +22,7 @@ describe('dynamoDbGet', () => {
   const generateGetDynamoEntryCommand = (desiredAttributeName?: string) => {
     return {
       TableName: TEST_DYNAMO_TABLE_NAME,
-      Key: TEST_KEY,
+      Key: TEST_DYNAMO_KEY,
       ...(desiredAttributeName && {
         ProjectionExpression: desiredAttributeName
       })
@@ -35,7 +35,7 @@ describe('dynamoDbGet', () => {
 
     const dynamoItem = await dynamoDbGet({
       tableName: TEST_DYNAMO_TABLE_NAME,
-      key: TEST_KEY
+      key: TEST_DYNAMO_KEY
     })
 
     expect(dynamoMock).toHaveReceivedCommandWith(
@@ -53,7 +53,7 @@ describe('dynamoDbGet', () => {
 
     const dynamoItem = await dynamoDbGet({
       tableName: TEST_DYNAMO_TABLE_NAME,
-      key: TEST_KEY,
+      key: TEST_DYNAMO_KEY,
       desiredAttributeName: TEST_DESIRED_ATTRIBUTE_NAME
     })
 

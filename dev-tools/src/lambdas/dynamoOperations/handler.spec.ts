@@ -3,7 +3,7 @@ import { DynamoDbOperation, Operation } from '../../types/dynamoDbOperation'
 import { logger } from '../../utils/logger'
 import {
   TEST_DYNAMO_TABLE_NAME,
-  TEST_KEY,
+  TEST_DYNAMO_KEY,
   TEST_ITEM,
   TEST_DESIRED_ATTRIBUTE_NAME
 } from '../../utils/tests/constants/testConstants'
@@ -33,14 +33,14 @@ describe('dynamo db operations handler', () => {
       params: {
         tableName: TEST_DYNAMO_TABLE_NAME,
         ...(operation === 'GET' && {
-          key: TEST_KEY,
+          key: TEST_DYNAMO_KEY,
           desiredAttributeName: TEST_DESIRED_ATTRIBUTE_NAME
         }),
         ...(operation === 'PUT' && {
           itemToPut: TEST_ITEM
         }),
         ...(operation === 'DELETE' && {
-          key: TEST_KEY
+          key: TEST_DYNAMO_KEY
         })
       }
     }
@@ -63,7 +63,7 @@ describe('dynamo db operations handler', () => {
     )
     expect(dynamoDbGet).toHaveBeenCalledWith({
       tableName: TEST_DYNAMO_TABLE_NAME,
-      key: TEST_KEY,
+      key: TEST_DYNAMO_KEY,
       desiredAttributeName: TEST_DESIRED_ATTRIBUTE_NAME
     })
     expect(dynamoDbEntry).toEqual(TEST_ITEM)
@@ -89,7 +89,7 @@ describe('dynamo db operations handler', () => {
     )
     expect(dynamoDbDelete).toHaveBeenCalledWith({
       tableName: TEST_DYNAMO_TABLE_NAME,
-      key: TEST_KEY
+      key: TEST_DYNAMO_KEY
     })
   })
 
