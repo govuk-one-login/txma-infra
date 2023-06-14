@@ -3,13 +3,17 @@ import { OperationParams } from '../../types/dynamoDbOperation'
 import { dynamoDbClient } from './dynamoDbClient'
 
 export const dynamoDbDelete = async (operationParams: OperationParams) => {
-  if (!operationParams.zendeskId)
-    throw Error('No Zendesk ID found in dynamoDbDelete parameters')
+  if (!operationParams.keyAttributeValue)
+    throw Error('No keyAttributeValue found in dynamoDbDelete parameters')
+  if (!operationParams.keyAttributeName)
+    throw Error('No keyAttributeName found in dynamoDbDelete parameters')
 
   const deleteDynamoEntryCommand = {
     TableName: operationParams.tableName,
     Key: {
-      zendeskId: { S: operationParams.zendeskId }
+      [operationParams.keyAttributeName]: {
+        S: operationParams.keyAttributeValue
+      }
     }
   }
 

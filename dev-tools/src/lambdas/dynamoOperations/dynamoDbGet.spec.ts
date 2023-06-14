@@ -27,7 +27,7 @@ describe('dynamoDbGet', () => {
     return {
       TableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
       Key: {
-        zendeskId: { S: ZENDESK_TICKET_ID }
+        myKeyAttributeName: { S: ZENDESK_TICKET_ID }
       },
       ...(attributeName && { ProjectionExpression: attributeName })
     }
@@ -39,7 +39,8 @@ describe('dynamoDbGet', () => {
 
     const dynamoItem = await dynamoDbGet({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      zendeskId: ZENDESK_TICKET_ID
+      keyAttributeName: 'myKeyAttributeName',
+      keyAttributeValue: ZENDESK_TICKET_ID
     })
 
     expect(dynamoMock).toHaveReceivedCommandWith(
@@ -56,7 +57,8 @@ describe('dynamoDbGet', () => {
 
     const dynamoItem = await dynamoDbGet({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      zendeskId: ZENDESK_TICKET_ID,
+      keyAttributeName: 'myKeyAttributeName',
+      keyAttributeValue: ZENDESK_TICKET_ID,
       attributeName: 'athenaQueryId'
     })
 
@@ -67,9 +69,15 @@ describe('dynamoDbGet', () => {
     expect(dynamoItem).toEqual(MOCK_ITEM)
   })
 
-  it('throws an error when function is called without a zendeskId', async () => {
-    expect(dynamoDbGet({} as OperationParams)).rejects.toThrow(
-      'No Zendesk ID found in dynamoDbGet parameters'
-    )
+  it('throws an error when function is called without a keyAttributeValue', async () => {
+    expect(
+      dynamoDbGet({ keyAttributeName: 'myKeyName ' } as OperationParams)
+    ).rejects.toThrow('No keyAttributeValue found in dynamoDbGet parameters')
+  })
+
+  it('throws an error when function is called without a keyAttributeName', async () => {
+    expect(
+      dynamoDbGet({ keyAttributeValue: 'myKeyValue ' } as OperationParams)
+    ).rejects.toThrow('No keyAttributeName found in dynamoDbGet parameters')
   })
 })

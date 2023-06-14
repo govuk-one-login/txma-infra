@@ -7,7 +7,8 @@ export interface DynamoDbOperation {
 
 export interface OperationParams {
   tableName: string
-  zendeskId?: string
+  keyAttributeName?: string
+  keyAttributeValue?: string
   attributeName?: string
   itemToPut?: Record<string, AttributeValue>
 }

@@ -3,7 +3,7 @@ import { DynamoDbOperation } from '../../types/dynamoDbOperation'
 import {
   initialiseLogger,
   logger,
-  appendZendeskIdToLogger
+  appendKeyAttributeDataToLogger
 } from '../../utils/logger'
 import { dynamoDbDelete } from './dynamoDbDelete'
 import { dynamoDbGet } from './dynamoDbGet'
@@ -17,8 +17,14 @@ export const handler = async (
   if (!dynamoOperationParams) {
     throw Error('Function called with undefined params')
   }
-  if (dynamoOperationParams.params.zendeskId) {
-    appendZendeskIdToLogger(dynamoOperationParams.params.zendeskId)
+  if (
+    dynamoOperationParams.params.keyAttributeName &&
+    dynamoOperationParams.params.keyAttributeValue
+  ) {
+    appendKeyAttributeDataToLogger(
+      dynamoOperationParams.params.keyAttributeName,
+      dynamoOperationParams.params.keyAttributeValue
+    )
   }
 
   let result

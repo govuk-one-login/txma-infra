@@ -14,14 +14,15 @@ describe('dynamoDbDelete', () => {
   const deleteDynamoEntryCommand = {
     TableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
     Key: {
-      zendeskId: { S: ZENDESK_TICKET_ID }
+      myKeyAttributeName: { S: ZENDESK_TICKET_ID }
     }
   }
 
   it('dynamo client is called with the correct params', async () => {
     await dynamoDbDelete({
       tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      zendeskId: ZENDESK_TICKET_ID
+      keyAttributeName: 'myKeyAttributeName',
+      keyAttributeValue: ZENDESK_TICKET_ID
     })
 
     expect(dynamoMock).toHaveReceivedCommandWith(
@@ -30,9 +31,15 @@ describe('dynamoDbDelete', () => {
     )
   })
 
-  it('throws an error when function is called without a zendeskId', async () => {
-    expect(dynamoDbDelete({} as OperationParams)).rejects.toThrow(
-      'No Zendesk ID found in dynamoDbDelete parameters'
-    )
+  it('throws an error when function is called without a keyAttributeValue', async () => {
+    expect(
+      dynamoDbDelete({ keyAttributeName: 'myKeyName ' } as OperationParams)
+    ).rejects.toThrow('No keyAttributeValue found in dynamoDbDelete parameters')
+  })
+
+  it('throws an error when function is called without a keyAttributeName', async () => {
+    expect(
+      dynamoDbDelete({ keyAttributeValue: 'myKeyValue ' } as OperationParams)
+    ).rejects.toThrow('No keyAttributeName found in dynamoDbDelete parameters')
   })
 })
