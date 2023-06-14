@@ -16,7 +16,7 @@ export const initialiseLogger = (context: Context) => {
 export const appendKeyAttributeDataToLogger = (
   key: Record<string, unknown>
 ) => {
-  loggerInstance.appendKeys({ ...key })
+  loggerInstance.appendKeys(key)
 }
 
 export const logger = loggerInstance
