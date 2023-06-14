@@ -13,8 +13,11 @@ export const initialiseLogger = (context: Context) => {
   loggerInstance.removeKeys(['zendeskId'])
 }
 
-export const appendZendeskIdToLogger = (zendeskId: string) => {
-  loggerInstance.appendKeys({ zendeskId })
+export const appendKeyAttributeDataToLogger = (
+  keyAttributeName: string,
+  keyAttributeValue: string
+) => {
+  loggerInstance.appendKeys({ [keyAttributeName]: keyAttributeValue })
 }
 
 export const logger = loggerInstance

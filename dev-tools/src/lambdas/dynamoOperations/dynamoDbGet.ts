@@ -3,13 +3,17 @@ import { OperationParams } from '../../types/dynamoDbOperation'
 import { dynamoDbClient } from './dynamoDbClient'
 
 export const dynamoDbGet = async (operationParams: OperationParams) => {
-  if (!operationParams.zendeskId)
-    throw Error('No Zendesk ID found in dynamoDbGet parameters')
+  if (!operationParams.keyAttributeValue)
+    throw Error('No keyAttributeValue found in dynamoDbGet parameters')
+  if (!operationParams.keyAttributeName)
+    throw Error('No keyAttributeName found in dynamoDbGet parameters')
 
   const getDynamoEntryCommand = {
     TableName: operationParams.tableName,
     Key: {
-      zendeskId: { S: `${operationParams.zendeskId}` }
+      [operationParams.keyAttributeName]: {
+        S: `${operationParams.keyAttributeValue}`
+      }
     },
     ...(operationParams.attributeName && {
       ProjectionExpression: operationParams.attributeName
