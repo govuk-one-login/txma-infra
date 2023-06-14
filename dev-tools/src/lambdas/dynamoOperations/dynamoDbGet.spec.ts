@@ -1,35 +1,30 @@
-import {
-  DynamoDBClient,
-  GetItemCommand,
-  GetItemOutput
-} from '@aws-sdk/client-dynamodb'
 import { mockClient } from 'aws-sdk-client-mock'
 import {
-  QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-  MOCK_ITEM,
-  ZENDESK_TICKET_ID
+  TEST_DYNAMO_TABLE_NAME,
+  TEST_ITEM,
+  TEST_KEY
 } from '../../utils/tests/constants/testConstants'
 import { dynamoDbGet } from './dynamoDbGet'
 import 'aws-sdk-client-mock-jest'
-import { OperationParams } from '../../types/dynamoDbOperation'
+import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb'
 
-const dynamoMock = mockClient(DynamoDBClient)
+const dynamoMock = mockClient(DynamoDBDocumentClient)
 
 describe('dynamoDbGet', () => {
   const givenDatabaseReturnsData = () => {
     const mockDbGetContents = {
-      Item: MOCK_ITEM
+      Item: TEST_ITEM
     }
-    dynamoMock.on(GetItemCommand).resolves(mockDbGetContents as GetItemOutput)
+    dynamoMock.on(GetCommand).resolves(mockDbGetContents)
   }
 
-  const generateGetDynamoEntryCommand = (attributeName?: string) => {
+  const generateGetDynamoEntryCommand = (desiredAttributeName?: string) => {
     return {
-      TableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      Key: {
-        myKeyAttributeName: { S: ZENDESK_TICKET_ID }
-      },
-      ...(attributeName && { ProjectionExpression: attributeName })
+      TableName: TEST_DYNAMO_TABLE_NAME,
+      Key: TEST_KEY,
+      ...(desiredAttributeName && {
+        ProjectionExpression: desiredAttributeName
+      })
     }
   }
 
@@ -38,46 +33,33 @@ describe('dynamoDbGet', () => {
     givenDatabaseReturnsData()
 
     const dynamoItem = await dynamoDbGet({
-      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      keyAttributeName: 'myKeyAttributeName',
-      keyAttributeValue: ZENDESK_TICKET_ID
+      tableName: TEST_DYNAMO_TABLE_NAME,
+      key: TEST_KEY
     })
 
     expect(dynamoMock).toHaveReceivedCommandWith(
-      GetItemCommand,
+      GetCommand,
       getDynamoEntryCommandWithoutAttName
     )
-    expect(dynamoItem).toEqual(MOCK_ITEM)
+    expect(dynamoItem).toEqual(TEST_ITEM)
   })
 
   it('dynamo client is called with the correct params (with attributeName)', async () => {
+    const desiredAttributeName = 'aKeyForAValueIWant'
     const getDynamoEntryCommandWithAttName =
-      generateGetDynamoEntryCommand('athenaQueryId')
+      generateGetDynamoEntryCommand(desiredAttributeName)
     givenDatabaseReturnsData()
 
     const dynamoItem = await dynamoDbGet({
-      tableName: QUERY_REQUEST_DYNAMODB_TABLE_NAME,
-      keyAttributeName: 'myKeyAttributeName',
-      keyAttributeValue: ZENDESK_TICKET_ID,
-      attributeName: 'athenaQueryId'
+      tableName: TEST_DYNAMO_TABLE_NAME,
+      key: TEST_KEY,
+      desiredAttributeName: desiredAttributeName
     })
 
     expect(dynamoMock).toHaveReceivedCommandWith(
-      GetItemCommand,
+      GetCommand,
       getDynamoEntryCommandWithAttName
     )
-    expect(dynamoItem).toEqual(MOCK_ITEM)
-  })
-
-  it('throws an error when function is called without a keyAttributeValue', async () => {
-    expect(
-      dynamoDbGet({ keyAttributeName: 'myKeyName ' } as OperationParams)
-    ).rejects.toThrow('No keyAttributeValue found in dynamoDbGet parameters')
-  })
-
-  it('throws an error when function is called without a keyAttributeName', async () => {
-    expect(
-      dynamoDbGet({ keyAttributeValue: 'myKeyValue ' } as OperationParams)
-    ).rejects.toThrow('No keyAttributeName found in dynamoDbGet parameters')
+    expect(dynamoItem).toEqual(TEST_ITEM)
   })
 })

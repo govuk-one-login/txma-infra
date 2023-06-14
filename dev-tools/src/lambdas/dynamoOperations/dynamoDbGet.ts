@@ -1,27 +1,17 @@
-import { GetItemCommand } from '@aws-sdk/client-dynamodb'
+import { GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb'
 import { OperationParams } from '../../types/dynamoDbOperation'
-import { dynamoDbClient } from './dynamoDbClient'
+import { documentClient } from './dynamoDbClient'
 
 export const dynamoDbGet = async (operationParams: OperationParams) => {
-  if (!operationParams.keyAttributeValue)
-    throw Error('No keyAttributeValue found in dynamoDbGet parameters')
-  if (!operationParams.keyAttributeName)
-    throw Error('No keyAttributeName found in dynamoDbGet parameters')
-
-  const getDynamoEntryCommand = {
-    TableName: operationParams.tableName,
-    Key: {
-      [operationParams.keyAttributeName]: {
-        S: `${operationParams.keyAttributeValue}`
-      }
-    },
-    ...(operationParams.attributeName && {
-      ProjectionExpression: operationParams.attributeName
+  const res = (await documentClient.send(
+    new GetCommand({
+      TableName: operationParams.tableName,
+      Key: operationParams.key,
+      ...(operationParams.desiredAttributeName && {
+        ProjectionExpression: operationParams.desiredAttributeName
+      })
     })
-  }
+  )) as GetCommandOutput
 
-  const item = await dynamoDbClient.send(
-    new GetItemCommand(getDynamoEntryCommand)
-  )
-  return item?.Item
+  return res.Item
 }

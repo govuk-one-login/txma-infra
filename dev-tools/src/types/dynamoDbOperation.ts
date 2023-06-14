@@ -7,9 +7,8 @@ export interface DynamoDbOperation {
 
 export interface OperationParams {
   tableName: string
-  keyAttributeName?: string
-  keyAttributeValue?: string
-  attributeName?: string
+  key?: Record<string, unknown>
+  desiredAttributeName?: string
   itemToPut?: Record<string, AttributeValue>
 }
 
