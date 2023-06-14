@@ -758,6 +758,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aws-sdk/lib-dynamodb@npm:3.350.0":
+  version: 3.350.0
+  resolution: "@aws-sdk/lib-dynamodb@npm:3.350.0"
+  dependencies:
+    "@aws-sdk/util-dynamodb": 3.350.0
+    tslib: ^2.5.0
+  peerDependencies:
+    "@aws-sdk/client-dynamodb": ^3.0.0
+    "@aws-sdk/smithy-client": ^3.0.0
+    "@aws-sdk/types": ^3.0.0
+  checksum: f5619ecc4c20be4aed27c91677836e82d09c5821d454d2d4f08d659802330b2b433db6d1202787c5b3d8e4afbc5b7f063c5774ae259c7d42739708fa864b8401
+  languageName: node
+  linkType: hard
+
 "@aws-sdk/md5-js@npm:3.347.0":
   version: 3.347.0
   resolution: "@aws-sdk/md5-js@npm:3.347.0"
@@ -1230,6 +1244,15 @@ __metadata:
     "@aws-sdk/types": 3.347.0
     tslib: ^2.5.0
   checksum: 22cba2f20b12810a915b36a24e116af3c0d33027792c65f862e04783908ac295486dd1989dcf9b4e4779bde88df6b8503170f0a305419924c669f6b7bd1d5e46
+  languageName: node
+  linkType: hard
+
+"@aws-sdk/util-dynamodb@npm:3.350.0":
+  version: 3.350.0
+  resolution: "@aws-sdk/util-dynamodb@npm:3.350.0"
+  dependencies:
+    tslib: ^2.5.0
+  checksum: 304fcf1a156b4ed85b006082f8cf34006ae19241f20123272bfff99717ac1bf275d173aa2bd31d29ad20666ef3b66304755c76f5d9a8c0a3ae03e594a456ada8
   languageName: node
   linkType: hard
 
@@ -3645,6 +3668,8 @@ __metadata:
     "@aws-sdk/client-firehose": 3.350.0
     "@aws-sdk/client-s3": 3.350.0
     "@aws-sdk/client-sqs": 3.350.0
+    "@aws-sdk/lib-dynamodb": 3.350.0
+    "@aws-sdk/smithy-client": 3.347.0
     "@types/aws-lambda": 8.10.114
     "@types/jest": 29.5.1
     "@types/jest-when": 3.5.2

@@ -846,6 +846,38 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@aws-sdk/lib-dynamodb", [\
+        ["npm:3.350.0", {\
+          "packageLocation": "./.yarn/cache/@aws-sdk-lib-dynamodb-npm-3.350.0-3ae94cfe0d-f5619ecc4c.zip/node_modules/@aws-sdk/lib-dynamodb/",\
+          "packageDependencies": [\
+            ["@aws-sdk/lib-dynamodb", "npm:3.350.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:377b828a23a6077cae1ab2af9e9b9141fa3c41aeb7b7156cd82cbd89b2b5334eebf7afe3926ccb316b54c44ab68108bcd0426e1253d734efb05bfa0a91728cae#npm:3.350.0", {\
+          "packageLocation": "./.yarn/__virtual__/@aws-sdk-lib-dynamodb-virtual-a4f9a191de/0/cache/@aws-sdk-lib-dynamodb-npm-3.350.0-3ae94cfe0d-f5619ecc4c.zip/node_modules/@aws-sdk/lib-dynamodb/",\
+          "packageDependencies": [\
+            ["@aws-sdk/lib-dynamodb", "virtual:377b828a23a6077cae1ab2af9e9b9141fa3c41aeb7b7156cd82cbd89b2b5334eebf7afe3926ccb316b54c44ab68108bcd0426e1253d734efb05bfa0a91728cae#npm:3.350.0"],\
+            ["@aws-sdk/client-dynamodb", "npm:3.350.0"],\
+            ["@aws-sdk/smithy-client", "npm:3.347.0"],\
+            ["@aws-sdk/types", null],\
+            ["@aws-sdk/util-dynamodb", "npm:3.350.0"],\
+            ["@types/aws-sdk__client-dynamodb", null],\
+            ["@types/aws-sdk__smithy-client", null],\
+            ["@types/aws-sdk__types", null],\
+            ["tslib", "npm:2.5.3"]\
+          ],\
+          "packagePeers": [\
+            "@aws-sdk/client-dynamodb",\
+            "@aws-sdk/smithy-client",\
+            "@aws-sdk/types",\
+            "@types/aws-sdk__client-dynamodb",\
+            "@types/aws-sdk__smithy-client",\
+            "@types/aws-sdk__types"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@aws-sdk/md5-js", [\
         ["npm:3.347.0", {\
           "packageLocation": "./.yarn/cache/@aws-sdk-md5-js-npm-3.347.0-62e167e9f7-ee1d07546d.zip/node_modules/@aws-sdk/md5-js/",\
@@ -1367,6 +1399,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/node-config-provider", "npm:3.347.0"],\
             ["@aws-sdk/property-provider", "npm:3.347.0"],\
             ["@aws-sdk/types", "npm:3.347.0"],\
+            ["tslib", "npm:2.5.3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@aws-sdk/util-dynamodb", [\
+        ["npm:3.350.0", {\
+          "packageLocation": "./.yarn/cache/@aws-sdk-util-dynamodb-npm-3.350.0-3401484a10-304fcf1a15.zip/node_modules/@aws-sdk/util-dynamodb/",\
+          "packageDependencies": [\
+            ["@aws-sdk/util-dynamodb", "npm:3.350.0"],\
             ["tslib", "npm:2.5.3"]\
           ],\
           "linkType": "HARD"\
@@ -4625,6 +4667,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-firehose", "npm:3.350.0"],\
             ["@aws-sdk/client-s3", "npm:3.350.0"],\
             ["@aws-sdk/client-sqs", "npm:3.350.0"],\
+            ["@aws-sdk/lib-dynamodb", "virtual:377b828a23a6077cae1ab2af9e9b9141fa3c41aeb7b7156cd82cbd89b2b5334eebf7afe3926ccb316b54c44ab68108bcd0426e1253d734efb05bfa0a91728cae#npm:3.350.0"],\
+            ["@aws-sdk/smithy-client", "npm:3.347.0"],\
             ["@types/aws-lambda", "npm:8.10.114"],\
             ["@types/jest", "npm:29.5.1"],\
             ["@types/jest-when", "npm:3.5.2"],\

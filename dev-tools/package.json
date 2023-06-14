@@ -17,6 +17,8 @@
     "@aws-sdk/client-firehose": "3.350.0",
     "@aws-sdk/client-s3": "3.350.0",
     "@aws-sdk/client-sqs": "3.350.0",
+    "@aws-sdk/lib-dynamodb": "3.350.0",
+    "@aws-sdk/smithy-client": "3.347.0",
     "axios": "0.27.2"
   },
   "devDependencies": {
