@@ -3237,10 +3237,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@types/aws-lambda", [\
-        ["npm:8.10.114", {\
-          "packageLocation": "./.yarn/cache/@types-aws-lambda-npm-8.10.114-952a890edf-9657d06ac8.zip/node_modules/@types/aws-lambda/",\
+        ["npm:8.10.119", {\
+          "packageLocation": "./.yarn/cache/@types-aws-lambda-npm-8.10.119-a048853c12-56328bd147.zip/node_modules/@types/aws-lambda/",\
           "packageDependencies": [\
-            ["@types/aws-lambda", "npm:8.10.114"]\
+            ["@types/aws-lambda", "npm:8.10.119"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -3959,7 +3959,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-cloudformation", "npm:3.350.0"],\
             ["@aws-sdk/client-s3", "npm:3.350.0"],\
             ["@aws-sdk/client-sqs", "npm:3.350.0"],\
-            ["@types/aws-lambda", "npm:8.10.114"],\
+            ["@types/aws-lambda", "npm:8.10.119"],\
             ["@types/jest", "npm:29.5.0"],\
             ["@types/jest-when", "npm:3.5.2"],\
             ["@types/node", "npm:18.15.11"],\
@@ -4669,7 +4669,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-sqs", "npm:3.350.0"],\
             ["@aws-sdk/lib-dynamodb", "virtual:377b828a23a6077cae1ab2af9e9b9141fa3c41aeb7b7156cd82cbd89b2b5334eebf7afe3926ccb316b54c44ab68108bcd0426e1253d734efb05bfa0a91728cae#npm:3.350.0"],\
             ["@aws-sdk/smithy-client", "npm:3.347.0"],\
-            ["@types/aws-lambda", "npm:8.10.114"],\
+            ["@types/aws-lambda", "npm:8.10.119"],\
             ["@types/jest", "npm:29.5.1"],\
             ["@types/jest-when", "npm:3.5.2"],\
             ["@types/node", "npm:18.15.11"],\
