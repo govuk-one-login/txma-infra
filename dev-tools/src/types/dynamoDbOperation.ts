@@ -1,5 +1,3 @@
-import { AttributeValue } from '@aws-sdk/client-dynamodb'
-
 export interface DynamoDbOperation {
   operation: Operation
   params: OperationParams
@@ -7,10 +5,9 @@ export interface DynamoDbOperation {
 
 export interface OperationParams {
   tableName: string
-  keyAttributeName?: string
-  keyAttributeValue?: string
-  attributeName?: string
-  itemToPut?: Record<string, AttributeValue>
+  key?: Record<string, unknown>
+  desiredAttributeName?: string
+  itemToPut?: Record<string, unknown>
 }
 
 export type Operation = 'GET' | 'PUT' | 'DELETE'
