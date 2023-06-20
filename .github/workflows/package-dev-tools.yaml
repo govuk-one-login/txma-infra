@@ -32,7 +32,7 @@ jobs:
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Assume AWS Validate role
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DEV_TOOLS }}
@@ -127,7 +127,7 @@ jobs:
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Assume AWS role
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}

@@ -2,13 +2,21 @@ import { CloudFormationCustomResourceEvent, Context } from 'aws-lambda'
 import { emptyS3Bucket } from './emptyS3Bucket'
 import { listS3Buckets } from './listS3Buckets'
 import axios from 'axios'
-import { initialiseLogger, logger } from '../../utils/logger'
+import {
+  appendKeyAttributeDataToLogger,
+  initialiseLogger,
+  logger
+} from '../../utils/logger'
 
 export const handler = async (
   event: CloudFormationCustomResourceEvent,
   context: Context
 ): Promise<void> => {
   initialiseLogger(context)
+
+  const stackId = event.StackId
+  appendKeyAttributeDataToLogger({ stackId })
+
   try {
     if (event.RequestType !== 'Delete') {
       logger.info('RequestType is not Delete')
@@ -19,13 +27,13 @@ export const handler = async (
       'CloudFormationCustomResourceEvent is Delete. Attempting to empty S3 Buckets'
     )
 
-    const stackId = event.StackId
     const s3Buckets = await listS3Buckets(stackId)
 
     if (s3Buckets.length === 0) {
       logger.info('No S3 buckets found')
       return await sendResponse(event, 'SUCCESS')
     }
+    logger.info(`Found ${s3Buckets.length} S3 bucket(s)`, { s3Buckets })
 
     await Promise.all(s3Buckets.map((bucket) => emptyS3Bucket(bucket)))
 
@@ -34,7 +42,7 @@ export const handler = async (
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendResponse(event, 'FAILED', error.message)
-      logger.info(`Lambda error occurred with '${error.message}'`)
+      logger.info('Lambda error occurred', { error })
     } else {
       await sendResponse(event, 'FAILED', 'Unknown error')
       logger.info(`Lambda error occurred with 'Unknown error'`)
