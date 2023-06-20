@@ -1,11 +1,6 @@
 import { Context } from 'aws-lambda'
 import { DynamoDbOperation } from '../../types/dynamoDbOperation'
-import {
-  initialiseLogger,
-  logger,
-  appendKeyAttributeDataToLogger,
-  removeLoggerKeys
-} from '../../utils/logger'
+import { initialiseLogger, logger } from '../../utils/logger'
 import { dynamoDbDelete } from './dynamoDbDelete'
 import { dynamoDbGet } from './dynamoDbGet'
 import { dynamoDbPut } from './dynamoDbPut'
@@ -18,11 +13,6 @@ export const handler = async (
 
   if (!dynamoDbOperation) {
     throw Error('Function called with undefined params')
-  }
-
-  if (dynamoDbOperation.params.key) {
-    removeLoggerKeys(Object.keys(dynamoDbOperation.params.key))
-    appendKeyAttributeDataToLogger(dynamoDbOperation.params.key)
   }
 
   let result
