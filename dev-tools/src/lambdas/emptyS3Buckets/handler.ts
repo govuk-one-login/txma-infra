@@ -33,7 +33,7 @@ export const handler = async (
       logger.info('No S3 buckets found')
       return await sendResponse(event, 'SUCCESS')
     }
-    logger.info(`Found ${s3Buckets.length} S3 buckets`, { s3Buckets })
+    logger.info(`Found ${s3Buckets.length} S3 bucket(s)`, { s3Buckets })
 
     await Promise.all(s3Buckets.map((bucket) => emptyS3Bucket(bucket)))
 
