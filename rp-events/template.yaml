@@ -287,3 +287,10 @@ Resources:
       Name: RPEventsQueueUrl
       Type: String
       Value: !Ref RPEventsQueue
+
+  RPEventsDeadLetterQueueNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RPEventsDeadLetterQueueName
+      Type: String
+      Value: !Ref RPEventsDeadLetterQueue.QueueName
