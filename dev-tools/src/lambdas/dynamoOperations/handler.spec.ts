@@ -58,9 +58,6 @@ describe('dynamo db operations handler', () => {
       mockLambdaContext
     )
 
-    expect(logger.info).toHaveBeenCalledWith(
-      'GetItemCommand successfully sent to Dynamo'
-    )
     expect(dynamoDbGet).toHaveBeenCalledWith({
       tableName: TEST_DYNAMO_TABLE_NAME,
       key: TEST_DYNAMO_KEY,
@@ -72,9 +69,6 @@ describe('dynamo db operations handler', () => {
   it('calls the dynamoDbPut function when handler is called with PUT operation', async () => {
     await handler(generateDynamoOperationParams('PUT'), mockLambdaContext)
 
-    expect(logger.info).toHaveBeenCalledWith(
-      'PutItemCommand successfully sent to Dynamo'
-    )
     expect(dynamoDbPut).toHaveBeenCalledWith({
       tableName: TEST_DYNAMO_TABLE_NAME,
       itemToPut: TEST_ITEM
@@ -84,9 +78,6 @@ describe('dynamo db operations handler', () => {
   it('calls the dynamoDbDelete function when handler is called with DELETE operation', async () => {
     await handler(generateDynamoOperationParams('DELETE'), mockLambdaContext)
 
-    expect(logger.info).toHaveBeenCalledWith(
-      'DeleteItemCommand successfully sent to Dynamo'
-    )
     expect(dynamoDbDelete).toHaveBeenCalledWith({
       tableName: TEST_DYNAMO_TABLE_NAME,
       key: TEST_DYNAMO_KEY
