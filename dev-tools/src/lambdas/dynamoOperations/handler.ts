@@ -3,7 +3,8 @@ import { DynamoDbOperation } from '../../types/dynamoDbOperation'
 import {
   initialiseLogger,
   logger,
-  appendKeyAttributeDataToLogger
+  appendKeyAttributeDataToLogger,
+  removeLoggerKeys
 } from '../../utils/logger'
 import { dynamoDbDelete } from './dynamoDbDelete'
 import { dynamoDbGet } from './dynamoDbGet'
@@ -20,6 +21,7 @@ export const handler = async (
   }
 
   if (dynamoDbOperation.params.key) {
+    removeLoggerKeys(Object.keys(dynamoDbOperation.params.key))
     appendKeyAttributeDataToLogger(dynamoDbOperation.params.key)
   }
 

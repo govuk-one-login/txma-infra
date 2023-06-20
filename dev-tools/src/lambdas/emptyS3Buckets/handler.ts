@@ -5,7 +5,8 @@ import axios from 'axios'
 import {
   appendKeyAttributeDataToLogger,
   initialiseLogger,
-  logger
+  logger,
+  removeLoggerKeys
 } from '../../utils/logger'
 
 export const handler = async (
@@ -13,6 +14,7 @@ export const handler = async (
   context: Context
 ): Promise<void> => {
   initialiseLogger(context)
+  removeLoggerKeys(['stackId'])
 
   const stackId = event.StackId
   appendKeyAttributeDataToLogger({ stackId })

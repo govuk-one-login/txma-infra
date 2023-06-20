@@ -10,7 +10,10 @@ const loggerInstance = new Logger({
 
 export const initialiseLogger = (context: Context) => {
   loggerInstance.addContext(context)
-  loggerInstance.removeKeys(['zendeskId'])
+}
+
+export const removeLoggerKeys = (keys: string[]) => {
+  loggerInstance.removeKeys(keys)
 }
 
 export const appendKeyAttributeDataToLogger = (
