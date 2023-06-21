@@ -235,6 +235,14 @@ Resources:
       QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-dead-letter-queue
       KmsMasterKeyId: !GetAtt RPEventsQueueKmsKey.Arn
 
+  InvalidPairwiseInfoQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-invalid-pairwise-info-queue
+      KmsMasterKeyId: '{{resolve:ssm:SqsKmsKeyArn}}'
+      VisibilityTimeout: 60
+      MessageRetentionPeriod: 604800 # 7 Days
+
   ################
   # SSM Parameters
   ################
@@ -294,3 +302,10 @@ Resources:
       Name: RPEventsDeadLetterQueueName
       Type: String
       Value: !Ref RPEventsDeadLetterQueue.QueueName
+
+  InvalidPairwiseInfoQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: InvalidPairwiseInfoQueueUrl
+      Type: String
+      Value: !Ref InvalidPairwiseInfoQueue
