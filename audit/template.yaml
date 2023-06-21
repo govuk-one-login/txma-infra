@@ -87,6 +87,13 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/encryption-generator-kms-key
       TargetKeyId: !Ref EncryptionGeneratorKmsKey
 
+  AuditFileReadyToEncryptQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditFileReadyToEncryptQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt AuditFileReadyToEncryptQueueKmsKey.Arn
+
   S3EncryptionGeneratorKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
