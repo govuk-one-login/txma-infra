@@ -339,6 +339,13 @@ Resources:
             ExpirationInDays: 30
             NoncurrentVersionExpiration:
               NoncurrentDays: 7
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            # Queue: !GetAtt AuditFileReadyToEncryptQueue.Arn
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -367,6 +374,16 @@ Resources:
                 aws:SourceAccount: !Ref AWS::AccountId
               Bool:
                 aws:SecureTransport: true
+          - Sid: S3LogShipping
+            Effect: Allow
+            Resource:
+              - !Sub ${S3LogsBucket.Arn}
+              - !Sub ${S3LogsBucket.Arn}/*
+            Principal:
+              # AWS: // lambdaRole
+            Action:
+              - s3:List*
+              - s3:Put*
 
   ##########################
   # End: S3 Logs resources #
