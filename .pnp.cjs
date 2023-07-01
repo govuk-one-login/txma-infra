@@ -3902,7 +3902,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/jest", "npm:29.5.2"],\
             ["@types/jest-when", "npm:3.5.2"],\
             ["@types/node", "npm:18.16.18"],\
-            ["aws-sdk-client-mock", "npm:2.1.1"],\
+            ["aws-sdk-client-mock", "npm:2.2.0"],\
             ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.1.1"],\
             ["axios", "npm:1.4.0"],\
             ["esbuild", "npm:0.18.3"],\
@@ -3917,10 +3917,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["aws-sdk-client-mock", [\
-        ["npm:2.1.1", {\
-          "packageLocation": "./.yarn/cache/aws-sdk-client-mock-npm-2.1.1-ae2be51797-8330b88cda.zip/node_modules/aws-sdk-client-mock/",\
+        ["npm:2.2.0", {\
+          "packageLocation": "./.yarn/cache/aws-sdk-client-mock-npm-2.2.0-d33403f973-25232d56cd.zip/node_modules/aws-sdk-client-mock/",\
           "packageDependencies": [\
-            ["aws-sdk-client-mock", "npm:2.1.1"],\
+            ["aws-sdk-client-mock", "npm:2.2.0"],\
             ["@types/sinon", "npm:10.0.13"],\
             ["sinon", "npm:14.0.2"],\
             ["tslib", "npm:2.5.3"]\
@@ -3942,7 +3942,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.1.1"],\
             ["@types/aws-sdk-client-mock", null],\
             ["@types/jest", "npm:28.1.8"],\
-            ["aws-sdk-client-mock", "npm:2.1.1"],\
+            ["aws-sdk-client-mock", "npm:2.2.0"],\
             ["tslib", "npm:2.5.3"]\
           ],\
           "packagePeers": [\
@@ -4614,7 +4614,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/jest", "npm:29.5.2"],\
             ["@types/jest-when", "npm:3.5.2"],\
             ["@types/node", "npm:18.16.18"],\
-            ["aws-sdk-client-mock", "npm:2.1.1"],\
+            ["aws-sdk-client-mock", "npm:2.2.0"],\
             ["aws-sdk-client-mock-jest", "virtual:936f5314842938908333ba10fafd56a22d6bdd036344948d140afaf9e0e80fca82b9c403786577afa25c3d2bff2c7dbe598f0a40e92bae3075f285eb4094e3fc#npm:2.1.1"],\
             ["axios", "npm:1.4.0"],\
             ["esbuild", "npm:0.18.3"],\
