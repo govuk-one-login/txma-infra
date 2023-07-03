@@ -301,6 +301,43 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/queue-kms-key
       TargetKeyId: !Ref SqsKmsKey
 
+  CslsKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
+          - Sid: CSLS Access
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
+            Action:
+              - kms:Decrypt*
+            Resource: '*'
+
+  CslsKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/csls-kms-key
+      TargetKeyId: !Ref CslsKmsKey
+
   #################
   # End: KMS Keys #
   #################
@@ -342,7 +379,7 @@ Resources:
       NotificationConfiguration:
         QueueConfigurations:
           - Event: 's3:ObjectCreated:*'
-            # Queue: !GetAtt AuditFileReadyToEncryptQueue.Arn
+            Queue: !GetAtt S3CslsQueue.Arn
       OwnershipControls:
         Rules:
           - ObjectOwnership: BucketOwnerEnforced
@@ -380,14 +417,51 @@ Resources:
               - !Sub ${S3LogsBucket.Arn}
               - !Sub ${S3LogsBucket.Arn}/*
             Principal:
-              # AWS: // lambdaRole
+              AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
             Action:
               - s3:List*
-              - s3:Put*
+              - s3:Get*
 
   ##########################
   # End: S3 Logs resources #
   ##########################
+
+  ######################
+  # CSLS SQS resources #   
+  ######################
+
+  S3CslsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-s3-csls-queue
+      KmsMasterKeyId: !GetAtt CslsKmsKey.Arn
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt S3CslsDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  QueryCompletedQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref S3CslsQueue
+      PolicyDocument:
+        Statement:
+          - Sid: SQSLogshipping
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
+              - 'sqs:ReceiveMessage'
+            Effect: 'Allow'
+            Resource: !GetAtt S3CslsQueue.Arn
+            Principal:
+              AWS: '{{resolve:ssm:CSLSS3LambdaArn}}'
+
+  S3CslsDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-s3-csls-dead-letter-queue
+      KmsMasterKeyId: !GetAtt CslsKmsKey.Arn
 
   #########################
   # Start: SSM Parameters #
