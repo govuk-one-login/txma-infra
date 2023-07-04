@@ -464,6 +464,27 @@ Resources:
       KmsMasterKeyId: !GetAtt CslsKmsKey.Arn
       MessageRetentionPeriod: 1209600 # 14 days
 
+  FailureToProcessS3CslsMessageAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm that monitors the S3Csls DLQ for any new objects
+      AlarmName: !Sub ${AWS::StackName}-failure-to-process-s3-csls-message
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      Statistic: Sum
+      Period: 60
+      Threshold: 1
+      TreatMissingData: notBreaching
+      MetricName: ApproximateNumberOfMessagesVisible
+      Namespace: AWS/SQS
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      OKActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt S3CslsDeadLetterQueue.QueueName
+
   #########################
   # Start: SSM Parameters #
   #########################
