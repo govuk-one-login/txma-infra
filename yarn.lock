@@ -2679,13 +2679,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:18.16.18":
-  version: 18.16.18
-  resolution: "@types/node@npm:18.16.18"
-  checksum: d32d8a0a04cd3f5ecb361bcb42f3a07623881ac90d680e06bf626defb3c663a94860d11690babe607cfe67265eceeb8a59ba5fe40c0e49f5a1b01e0088640469
-  languageName: node
-  linkType: hard
-
 "@types/prettier@npm:^2.1.5":
   version: 2.7.1
   resolution: "@types/prettier@npm:2.7.1"
@@ -3634,7 +3627,7 @@ __metadata:
     "@types/aws-lambda": 8.10.119
     "@types/jest": 29.5.2
     "@types/jest-when": 3.5.2
-    "@types/node": 18.16.18
+    "@types/node": 18.16.19
     aws-sdk-client-mock: 3.0.0
     aws-sdk-client-mock-jest: 3.0.0
     axios: 1.4.0
