@@ -427,7 +427,7 @@ Resources:
   ##########################
 
   ######################
-  # CSLS SQS resources #   
+  # CSLS SQS resources #
   ######################
 
   S3CslsQueue:
@@ -462,6 +462,7 @@ Resources:
     Properties:
       QueueName: !Sub ${AWS::StackName}-${Environment}-s3-csls-dead-letter-queue
       KmsMasterKeyId: !GetAtt CslsKmsKey.Arn
+      MessageRetentionPeriod: 1209600 # 14 days
 
   #########################
   # Start: SSM Parameters #
