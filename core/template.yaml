@@ -423,11 +423,16 @@ Resources:
               AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
           - Sid: S3Notification
             Action:
-              - 'sqs:SendMessage'
+              - 'sqs:*'
             Effect: 'Allow'
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
-              AWS: !GetAtt S3LogsBucket.Arn
+              Service: s3.amazonaws.com
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:s3:::${AWS::StackName}-${Environment}-s3-logs-*
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
 
   S3CslsDeadLetterQueue:
     Type: AWS::SQS::Queue
