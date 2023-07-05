@@ -519,8 +519,8 @@ Resources:
         RestrictPublicBuckets: true
       Tags: !If
         - CslsS3Logs
-        - - Key: SQSPolicyName
-          - Value: !Ref S3CslsQueuePolicy
+        - Key: SQSPolicyName
+          Value: !Ref S3CslsQueuePolicy
         - !Ref AWS::NoValue
       VersioningConfiguration:
         Status: Enabled
