@@ -475,8 +475,6 @@ Resources:
 
   S3LogsBucket:
     #checkov:skip=CKV_AWS_18:This is the logs bucket
-    DependsOn:
-      - S3CslsQueuePolicy
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -519,6 +517,11 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      Tags: !If
+        - CslsS3Logs
+        - - Key: SQSPolicyName
+          - Value: !Ref S3CslsQueuePolicy
+        - !Ref AWS::NoValue
       VersioningConfiguration:
         Status: Enabled
 
