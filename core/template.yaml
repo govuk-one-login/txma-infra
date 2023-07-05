@@ -510,9 +510,9 @@ Resources:
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
               AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
-          - Sid:
+          - Sid: S3Notification
             Action:
-            - 'sqs:SendMessage'
+              - 'sqs:SendMessage'
             Effect: 'Allow'
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
