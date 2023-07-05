@@ -19,6 +19,12 @@ Parameters:
 
 Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
+  CslsS3Logs:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration],
+      !Equals [!Ref Environment, staging]
+    ]
 
 Resources:
   #################################
@@ -333,6 +339,7 @@ Resources:
 
   CslsKmsKey:
     Type: AWS::KMS::Key
+    Condition: CslsS3Logs
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
@@ -364,6 +371,7 @@ Resources:
 
   CslsKmsKeyAlias:
     Type: AWS::KMS::Alias
+    Condition: CslsS3Logs
     Properties:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/csls-kms-key
       TargetKeyId: !Ref CslsKmsKey
@@ -407,9 +415,11 @@ Resources:
             NoncurrentVersionExpiration:
               NoncurrentDays: 7
       NotificationConfiguration:
-        QueueConfigurations:
-          - Event: 's3:ObjectCreated:*'
-            Queue: !GetAtt S3CslsQueue.Arn
+        QueueConfigurations: !If
+          - CslsS3Logs
+          - - Event: 's3:ObjectCreated:*'
+              Queue: !GetAtt S3CslsQueue.Arn
+          - !Ref AWS::NoValue
       OwnershipControls:
         Rules:
           - ObjectOwnership: BucketOwnerEnforced
@@ -441,16 +451,19 @@ Resources:
                 aws:SourceAccount: !Ref AWS::AccountId
               Bool:
                 aws:SecureTransport: true
-          - Sid: S3LogShipping
-            Effect: Allow
-            Resource:
-              - !Sub ${S3LogsBucket.Arn}
-              - !Sub ${S3LogsBucket.Arn}/*
-            Principal:
-              AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
-            Action:
-              - s3:List*
-              - s3:Get*
+          - !If
+            - CslsS3Logs
+            - Sid: S3LogShipping
+              Effect: Allow
+              Resource:
+                - !Sub ${S3LogsBucket.Arn}
+                - !Sub ${S3LogsBucket.Arn}/*
+              Principal:
+                AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
+              Action:
+                - s3:List*
+                - s3:Get*
+            - !Ref AWS::NoValue
 
   ##########################
   # End: S3 Logs resources #
@@ -462,6 +475,7 @@ Resources:
 
   S3CslsQueue:
     Type: AWS::SQS::Queue
+    Condition: CslsS3Logs
     Properties:
       QueueName: !Sub ${AWS::StackName}-${Environment}-s3-csls-queue
       KmsMasterKeyId: !GetAtt CslsKmsKey.Arn
@@ -471,6 +485,7 @@ Resources:
 
   QueryCompletedQueuePolicy:
     Type: AWS::SQS::QueuePolicy
+    Condition: CslsS3Logs
     Properties:
       Queues:
         - !Ref S3CslsQueue
@@ -485,10 +500,11 @@ Resources:
             Effect: 'Allow'
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
-              AWS: '{{resolve:ssm:CSLSS3LambdaArn}}'
+              AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
 
   S3CslsDeadLetterQueue:
     Type: AWS::SQS::Queue
+    Condition: CslsS3Logs
     Properties:
       QueueName: !Sub ${AWS::StackName}-${Environment}-s3-csls-dead-letter-queue
       KmsMasterKeyId: !GetAtt CslsKmsKey.Arn
@@ -496,6 +512,7 @@ Resources:
 
   FailureToProcessS3CslsMessageAlarm:
     Type: AWS::CloudWatch::Alarm
+    Condition: CslsS3Logs
     Properties:
       AlarmActions:
         - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
