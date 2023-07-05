@@ -198,6 +198,36 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/logs-kms-key
       TargetKeyId: !Ref LogsKmsKey
 
+  S3QueueNotificationsKmsKey:
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource:
+              - '*'
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:GenerateDataKey
+            Resource: '*'
+
+  S3QueueNotificationsKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/s3-queue-notifications-kms-key
+      TargetKeyId: !Ref S3QueueNotificationsKmsKey
+
   SecretsKmsKey:
     Type: AWS::KMS::Key
     Properties:
@@ -538,6 +568,13 @@ Resources:
       Name: S3LogsBucketName
       Type: String
       Value: !Ref S3LogsBucket
+
+  S3QueueNotificationsKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: S3QueueNotificationsKmsKeyArn
+      Type: String
+      Value: !GetAtt S3QueueNotificationsKmsKey.Arn
 
   SecretsKmsKeyArnParameter:
     Type: AWS::SSM::Parameter

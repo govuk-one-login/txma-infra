@@ -14,6 +14,10 @@ Parameters:
       - production
 
 Resources:
+  ###################
+  # Start: KMS Keys #
+  ###################
+
   AuditFileReadyToEncryptQueueKmsKey:
     Type: AWS::KMS::Key
     DeletionPolicy: Retain
@@ -87,6 +91,14 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/encryption-generator-kms-key
       TargetKeyId: !Ref EncryptionGeneratorKmsKey
 
+  #################
+  # End: KMS Keys #
+  #################
+
+  #########################
+  # Start: SSM Parameters #
+  #########################
+
   AuditFileReadyToEncryptQueueKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -100,3 +112,7 @@ Resources:
       Name: S3EncryptionGeneratorKmsKeyArn
       Type: String
       Value: !GetAtt EncryptionGeneratorKmsKey.Arn
+
+  #######################
+  # End: SSM Parameters #
+  #######################
