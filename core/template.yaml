@@ -485,7 +485,7 @@ Resources:
             Effect: 'Allow'
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
-              AWS: '{{resolve:ssm:CSLSS3LambdaArn}}'
+              AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
 
   S3CslsDeadLetterQueue:
     Type: AWS::SQS::Queue
