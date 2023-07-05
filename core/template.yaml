@@ -368,6 +368,15 @@ Resources:
             Action:
               - kms:Decrypt*
             Resource: '*'
+          - Sid: Allow s3 access
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
 
   CslsKmsKeyAlias:
     Type: AWS::KMS::Alias
@@ -483,7 +492,7 @@ Resources:
         deadLetterTargetArn: !GetAtt S3CslsDeadLetterQueue.Arn
         maxReceiveCount: 5
 
-  QueryCompletedQueuePolicy:
+  S3CslsQueuePolicy:
     Type: AWS::SQS::QueuePolicy
     Condition: CslsS3Logs
     Properties:
@@ -501,6 +510,13 @@ Resources:
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
               AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
+          - Sid:
+            Action:
+            - 'sqs:SendMessage'
+            Effect: 'Allow'
+            Resource: !GetAtt S3CslsQueue.Arn
+            Principal:
+              AWS: !GetAtt S3LogsBucket.Arn
 
   S3CslsDeadLetterQueue:
     Type: AWS::SQS::Queue
