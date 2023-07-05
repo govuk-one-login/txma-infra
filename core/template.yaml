@@ -423,7 +423,7 @@ Resources:
               AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
           - Sid: S3Notification
             Action:
-              - 'sqs:*'
+              - 'sqs:SendMessage'
             Effect: 'Allow'
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
@@ -475,6 +475,8 @@ Resources:
 
   S3LogsBucket:
     #checkov:skip=CKV_AWS_18:This is the logs bucket
+    DependsOn: 
+      - S3CslsQueuePolicy
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
