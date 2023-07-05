@@ -475,7 +475,7 @@ Resources:
 
   S3LogsBucket:
     #checkov:skip=CKV_AWS_18:This is the logs bucket
-    DependsOn: 
+    DependsOn:
       - S3CslsQueuePolicy
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
