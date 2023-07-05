@@ -415,7 +415,7 @@ Resources:
             NoncurrentVersionExpiration:
               NoncurrentDays: 7
       NotificationConfiguration:
-        QueueConfigurations: !If 
+        QueueConfigurations: !If
           - CslsS3Logs
           - - Event: 's3:ObjectCreated:*'
               Queue: !GetAtt S3CslsQueue.Arn
