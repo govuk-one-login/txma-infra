@@ -520,7 +520,7 @@ Resources:
       Tags: !If
         - CslsS3Logs
         - - Key: SQSPolicyName
-          - Value: !Ref S3CslsQueuePolicy
+            Value: !Ref S3CslsQueuePolicy
         - !Ref AWS::NoValue
       VersioningConfiguration:
         Status: Enabled
