@@ -517,6 +517,7 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      # This Tag is required in order to prevent a circular dependency for the notification to the S3CslsQueue. It should not be deleted
       Tags: !If
         - CslsS3Logs
         - - Key: SQSPolicyName
