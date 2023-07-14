@@ -237,6 +237,7 @@ Resources:
 
   IntegrationTestProducerQueueArnParameter:
     Type: AWS::SSM::Parameter
+    Condition: IsStaging
     Properties:
       Name: IntegrationTestProducerQueueArn
       Type: String
@@ -244,6 +245,7 @@ Resources:
 
   IntegrationTestProducerQueueKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
+    Condition: IsStaging
     Properties:
       Name: IntegrationTestProducerQueueKmsKeyArn
       Type: String
@@ -251,6 +253,7 @@ Resources:
 
   IntegrationTestProducerQueueUrlParameter:
     Type: AWS::SSM::Parameter
+    Condition: IsStaging
     Properties:
       Name: IntegrationTestProducerQueueUrl
       Type: String
