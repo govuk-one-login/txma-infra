@@ -3,7 +3,7 @@ name: Package DNS records for Audit account
 on:
   push:
     paths:
-      - dns-records-audit/**
+      - infrastructure/dns-records-audit/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dns-records-audit
+        working-directory: infrastructure/dns-records-audit
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DNS_RECORDS_AUDIT }}
       - name: Validate SAM template
         if: always()
-        run: sam validate
+        run: sam validate --lint
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master

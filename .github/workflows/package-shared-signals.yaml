@@ -3,7 +3,7 @@ name: Package Shared Signals infrastructure
 on:
   push:
     paths:
-      - shared-signals/**
+      - infrastructure/shared-signals/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: shared-signals
+        working-directory: infrastructure/shared-signals
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -33,10 +33,9 @@ jobs:
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_SHARED_SIGNALS}}
-
       - name: Validate SAM template
         if: always()
-        run: sam validate
+        run: sam validate --lint
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
