@@ -143,7 +143,7 @@ Resources:
     Type: AWS::SQS::Queue
     Condition: IsStaging
     Properties:
-      QueueName: ${AWS::StackName}-${Environment}-test-producer-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-test-producer-queue
       KmsMasterKeyId: !GetAtt IntegrationTestProducerQueueKmsKey.Arn
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt IntegrationTestProducerDeadLetterQueue.Arn
