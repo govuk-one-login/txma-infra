@@ -40,7 +40,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: dns-records-query-results/template.yaml
+          file: infrastructure/dns-records-query-results/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: dns-records-query-results-sam-template
           path: |
-            dns-records-query-results/template.yaml
+            infrastructure/dns-records-query-results/template.yaml
 
   package:
     strategy:

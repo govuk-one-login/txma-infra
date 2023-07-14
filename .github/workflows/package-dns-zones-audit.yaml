@@ -40,7 +40,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: dns-zones-audit/template.yaml
+          file: infrastructure/dns-zones-audit/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: dns-zones-audit-sam-template
           path: |
-            dns-zones-audit/template.yaml
+            infrastructure/dns-zones-audit/template.yaml
 
   package:
     strategy:

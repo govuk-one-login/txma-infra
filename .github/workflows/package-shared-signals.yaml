@@ -40,7 +40,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: shared-signals/template.yaml
+          file: infrastructure/shared-signals/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: shared-signals-sam-template
           path: |
-            shared-signals/template.yaml
+            infrastructure/shared-signals/template.yaml
 
   package:
     strategy:

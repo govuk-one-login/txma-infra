@@ -40,7 +40,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: core/template.yaml
+          file: infrastructure/core/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload build artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: core-sam-template
           path: |
-            core/template.yaml
+            infrastructure/core/template.yaml
 
   package:
     strategy:

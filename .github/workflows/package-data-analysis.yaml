@@ -40,7 +40,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: data-analysis/template.yaml
+          file: infrastructure/data-analysis/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: data-analysis-sam-template
           path: |
-            data-analysis/template.yaml
+            infrastructure/data-analysis/template.yaml
 
   package:
     strategy:

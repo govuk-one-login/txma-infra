@@ -40,7 +40,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: rp-events/template.yaml
+          file: infrastructure/rp-events/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: rp-events-sam-template
           path: |
-            rp-events/template.yaml
+            infrastructure/rp-events/template.yaml
 
   package:
     strategy:

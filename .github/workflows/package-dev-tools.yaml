@@ -54,7 +54,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: dev-tools/template.yaml
+          file: infrastructure/dev-tools/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload build artifact
@@ -62,8 +62,8 @@ jobs:
         with:
           name: dev-tools-sam-template
           path: |
-            dev-tools/dist/
-            dev-tools/template.yaml
+            infrastructure/dev-tools/dist/
+            infrastructure/dev-tools/template.yaml
 
   package:
     strategy:
