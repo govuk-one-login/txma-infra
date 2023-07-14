@@ -25,6 +25,7 @@ Conditions:
       !Equals [!Ref Environment, integration]
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
+  IsStaging: !Equals [!Ref Environment, 'staging']
 
 Resources:
   ####################
@@ -135,6 +136,89 @@ Resources:
   # Integration test Resources
   ############################
 
+  ######################################
+  # Test producer queue resources START
+  ######################################
+  IntegrationTestProducerQueue:
+    Type: AWS::SQS::Queue
+    Condition: IsStaging
+    Properties:
+      QueueName: ${AWS::StackName}-${Environment}-test-producer-queue
+      KmsMasterKeyId: !GetAtt IntegrationTestProducerQueueKmsKey.Arn
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt IntegrationTestProducerDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  IntegrationTestProducerQueueQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Condition: IsStaging
+    Properties:
+      Queues:
+        - !Ref IntegrationTestProducerQueue
+      PolicyDocument:
+        Statement:
+          - Sid: AllowEventProcessingAccountQueueRead
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
+              - 'sqs:ReceiveMessage'
+            Effect: 'Allow'
+            Resource: !GetAtt IntegrationTestProducerQueue.Arn
+            Principal:
+              AWS:
+                - '{{resolve:ssm:EventProcessingAccountRootArn}}'
+
+  IntegrationTestProducerDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Condition: IsStaging
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-test-producer-dlq
+      KmsMasterKeyId: !GetAtt IntegrationTestProducerQueueKmsKey.Arn
+
+  IntegrationTestProducerQueueKmsKey:
+    Type: AWS::KMS::Key
+    Condition: IsStaging
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Enable Decrypt access for Event Processing
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:EventProcessingAccountRootArn}}'
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
+
+  IntegrationTestProducerQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Condition: IsStaging
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/integration-test-producer-queue-kms-key
+      TargetKeyId: !Ref IntegrationTestProducerQueueKmsKey
+
+  ######################################
+  # Test producer queue resources END
+  ######################################
+
   CognitoTestUsers:
     #checkov:skip=CKV_AWS_149:We will use aws managed kms key
     Type: AWS::SecretsManager::Secret
@@ -150,6 +234,28 @@ Resources:
       Name: CognitoTestUsersArn
       Type: String
       Value: !Ref CognitoTestUsers
+
+  IntegrationTestProducerQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: IntegrationTestProducerQueueArn
+      Type: String
+      Value: !GetAtt IntegrationTestProducerQueue.Arn
+
+  IntegrationTestProducerQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: IntegrationTestProducerQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt IntegrationTestProducerQueueKmsKey.Arn
+
+  IntegrationTestProducerQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: IntegrationTestProducerQueueUrl
+      Type: String
+      Value: !Ref IntegrationTestProducerQueue
+
 Outputs:
   SSFUserPoolId:
     Description: 'user pool id for cognito'
