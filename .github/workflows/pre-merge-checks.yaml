@@ -1,4 +1,4 @@
-name: Run linting and check Yarn cache
+name: Validate templates, linting and tests
 
 on:
   pull_request:
