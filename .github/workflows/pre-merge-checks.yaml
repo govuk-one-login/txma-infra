@@ -46,7 +46,7 @@ jobs:
         run: yarn workspace audit-test-tools test
 
   validate-templates:
-    name: Validate SAM template
+    name: Validate SAM templates
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -57,7 +57,7 @@ jobs:
           python-version: '3.8'
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
-      - name: Validate SAM template
+      - name: Validate SAM templates
         run: ./scripts/validate-templates.sh
       - name: Run Checkov on SAM templates
         uses: bridgecrewio/checkov-action@master
