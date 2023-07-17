@@ -51,6 +51,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Validate SAM template
