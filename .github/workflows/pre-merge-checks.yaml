@@ -21,6 +21,8 @@ jobs:
           node-version: 18
       - name: Node - Enable Corepack
         run: corepack enable
+      - name: Install ESBuild binaries
+        run: yarn unplug
       - name: Check Yarn cache
         run: yarn install --immutable --immutable-cache --check-cache
 
