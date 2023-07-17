@@ -3,7 +3,8 @@ name: Package audit test tools infrastructure
 on:
   push:
     paths:
-      - audit-test-tools/**
+      - infrastructure/audit-test-tools/**
+      - .yarn/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: audit-test-tools
+        working-directory: infrastructure/audit-test-tools
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -48,12 +49,12 @@ jobs:
         run: yarn build
       - name: Validate SAM template
         if: always()
-        run: sam validate
+        run: sam validate --lint
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: audit-test-tools/template.yaml
+          file: infrastructure/audit-test-tools/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload build artifact
@@ -61,8 +62,8 @@ jobs:
         with:
           name: audit-test-tools-sam-template
           path: |
-            audit-test-tools/dist/
-            audit-test-tools/template.yaml
+            infrastructure/audit-test-tools/dist/
+            infrastructure/audit-test-tools/template.yaml
 
   package:
     strategy:

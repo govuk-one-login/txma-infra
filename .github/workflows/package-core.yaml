@@ -3,7 +3,7 @@ name: Package core infrastructure
 on:
   push:
     paths:
-      - core/**
+      - infrastructure/core/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: core
+        working-directory: infrastructure/core
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -40,7 +40,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: core/template.yaml
+          file: infrastructure/core/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload build artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: core-sam-template
           path: |
-            core/template.yaml
+            infrastructure/core/template.yaml
 
   package:
     strategy:

@@ -3,7 +3,7 @@ name: Package query results infrastructure
 on:
   push:
     paths:
-      - query-results/**
+      - infrastructure/query-results/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: query-results
+        working-directory: infrastructure/query-results
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -35,12 +35,12 @@ jobs:
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_QUERY_RESULTS }}
       - name: Validate SAM template
         if: always()
-        run: sam validate
+        run: sam validate --lint
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: query-results/template.yaml
+          file: infrastructure/query-results/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: query-results-sam-template
           path: |
-            query-results/template.yaml
+            infrastructure/query-results/template.yaml
 
   package:
     strategy:

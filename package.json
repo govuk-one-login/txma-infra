@@ -5,8 +5,8 @@
   "private": true,
   "packageManager": "yarn@3.4.1",
   "workspaces": [
-    "dev-tools",
-    "audit-test-tools"
+    "infrastructure/dev-tools",
+    "infrastructure/audit-test-tools"
   ],
   "scripts": {
     "lint": "prettier . --check || exit 1 ; eslint . --max-warnings=0",

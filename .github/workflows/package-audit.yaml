@@ -3,7 +3,7 @@ name: Package audit infrastructure
 on:
   push:
     paths:
-      - audit/**
+      - infrastructure/audit/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: audit
+        working-directory: infrastructure/audit
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -40,7 +40,7 @@ jobs:
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: audit/template.yaml
+          file: infrastructure/audit/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload build artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: audit-sam-template
           path: |
-            audit/template.yaml
+            infrastructure/audit/template.yaml
 
   package:
     strategy:

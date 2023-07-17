@@ -3,7 +3,7 @@ name: Package DNS delegation infrastructure
 on:
   push:
     paths:
-      - dns-delegation/**
+      - infrastructure/dns-delegation/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dns-delegation
+        working-directory: infrastructure/dns-delegation
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -35,12 +35,12 @@ jobs:
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DNS_DELEGATION_AUDIT }}
       - name: Validate SAM template
         if: always()
-        run: sam validate
+        run: sam validate --lint
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: dns-delegation/template.yaml
+          file: infrastructure/dns-delegation/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -48,7 +48,7 @@ jobs:
         with:
           name: dns-delegation-sam-template
           path: |
-            dns-delegation/template.yaml
+            infrastructure/dns-delegation/template.yaml
 
   package:
     strategy:

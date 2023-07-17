@@ -3,7 +3,7 @@ name: Package Relying Parties Event Processing infrastructure
 on:
   push:
     paths:
-      - rp-events/**
+      - infrastructure/rp-events/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: rp-events
+        working-directory: infrastructure/rp-events
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -33,15 +33,14 @@ jobs:
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_RP_EVENTS}}
-
       - name: Validate SAM template
         if: always()
-        run: sam validate
+        run: sam validate --lint
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: rp-events/template.yaml
+          file: infrastructure/rp-events/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload template artifact
@@ -49,7 +48,7 @@ jobs:
         with:
           name: rp-events-sam-template
           path: |
-            rp-events/template.yaml
+            infrastructure/rp-events/template.yaml
 
   package:
     strategy:

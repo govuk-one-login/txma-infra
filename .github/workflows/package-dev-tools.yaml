@@ -3,7 +3,8 @@ name: Package dev tools infrastructure
 on:
   push:
     paths:
-      - dev-tools/**
+      - infrastructure/dev-tools/**
+      - .yarn/**
   workflow_dispatch: {}
 
 env:
@@ -18,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dev-tools
+        working-directory: infrastructure/dev-tools
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -48,12 +49,12 @@ jobs:
         run: yarn build
       - name: Validate SAM template
         if: always()
-        run: sam validate
+        run: sam validate --lint
       - name: Run Checkov on SAM template
         if: always()
         uses: bridgecrewio/checkov-action@master
         with:
-          file: dev-tools/template.yaml
+          file: infrastructure/dev-tools/template.yaml
           quiet: true
           framework: cloudformation
       - name: Upload build artifact
@@ -61,8 +62,8 @@ jobs:
         with:
           name: dev-tools-sam-template
           path: |
-            dev-tools/dist/
-            dev-tools/template.yaml
+            infrastructure/dev-tools/dist/
+            infrastructure/dev-tools/template.yaml
 
   package:
     strategy:
