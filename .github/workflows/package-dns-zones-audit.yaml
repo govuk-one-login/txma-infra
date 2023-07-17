@@ -10,46 +10,6 @@ env:
   AWS_REGION: eu-west-2
 
 jobs:
-  validate:
-    name: Validate template
-    permissions:
-      id-token: write
-      contents: read
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: infrastructure/dns-zones-audit
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - name: Setup SAM CLI
-        uses: aws-actions/setup-sam@v2
-      - name: Assume AWS Validate role
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DNS_ZONES_AUDIT }}
-      - name: Validate SAM template
-        if: always()
-        run: sam validate --lint
-      - name: Run Checkov on SAM template
-        if: always()
-        uses: bridgecrewio/checkov-action@master
-        with:
-          file: infrastructure/dns-zones-audit/template.yaml
-          quiet: true
-          framework: cloudformation
-      - name: Upload template artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: dns-zones-audit-sam-template
-          path: |
-            infrastructure/dns-zones-audit/template.yaml
-
   package:
     strategy:
       matrix:
@@ -61,16 +21,13 @@ jobs:
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_AUDIT_BUILD
     name: Package template
     if: github.ref == 'refs/heads/main'
-    needs: [validate]
     permissions:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: dns-zones-audit-sam-template
+      - name: Checkout repository code
+        uses: actions/checkout@v3
       - name: Setup Python 3.8
         uses: actions/setup-python@v4
         with:
@@ -87,4 +44,5 @@ jobs:
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET] }}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
+          template-file: infrastructure/dns-zones-audit/template.yaml
           working-directory: '.'

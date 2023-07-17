@@ -10,46 +10,6 @@ env:
   AWS_REGION: eu-west-2
 
 jobs:
-  validate:
-    name: Validate template
-    permissions:
-      id-token: write
-      contents: read
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: infrastructure/query-results
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - name: Setup SAM CLI
-        uses: aws-actions/setup-sam@v2
-      - name: Assume AWS Validate role
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_QUERY_RESULTS }}
-      - name: Validate SAM template
-        if: always()
-        run: sam validate --lint
-      - name: Run Checkov on SAM template
-        if: always()
-        uses: bridgecrewio/checkov-action@master
-        with:
-          file: infrastructure/query-results/template.yaml
-          quiet: true
-          framework: cloudformation
-      - name: Upload template artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: query-results-sam-template
-          path: |
-            infrastructure/query-results/template.yaml
-
   package:
     strategy:
       matrix:
@@ -65,16 +25,13 @@ jobs:
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_QUERY_RESULTS_BUILD
     name: Package template
     if: github.ref == 'refs/heads/main'
-    needs: [validate]
     permissions:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - name: Download template artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: query-results-sam-template
+      - name: Checkout repository code
+        uses: actions/checkout@v3
       - name: Setup Python 3.8
         uses: actions/setup-python@v4
         with:
@@ -91,4 +48,5 @@ jobs:
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET] }}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
+          template-file: infrastructure/query-results/template.yaml
           working-directory: '.'
