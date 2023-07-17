@@ -2,6 +2,8 @@ name: Package core infrastructure
 
 on:
   push:
+    branches:
+      - main
     paths:
       - infrastructure/core/**
   workflow_dispatch: {}
@@ -55,7 +57,6 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_CORE_RP_EVENTS_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_RP_EVENTS_BUILD
     name: Package template
-    if: github.ref == 'refs/heads/main'
     permissions:
       id-token: write
       contents: read

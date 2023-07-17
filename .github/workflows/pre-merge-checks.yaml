@@ -10,7 +10,7 @@ env:
 
 jobs:
   validate:
-    name: Run linting and check Yarn cache
+    name: Run linting and tests
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -22,16 +22,10 @@ jobs:
       - name: Node - Enable Corepack
         run: corepack enable
       - name: Run linting
-        if: always()
         run: yarn lint
-      - name: Install ESBuild binaries
-        run: yarn unplug
-      - name: Check Yarn cache
-        run: yarn install --immutable --immutable-cache --check-cache
       - name: Validate SAM templates
         run: yarn validate:templates
       - name: Run Checkov on SAM templates
-        if: always()
         uses: bridgecrewio/checkov-action@master
         with:
           directory: infrastructure/
@@ -41,3 +35,18 @@ jobs:
         run: yarn workspace dev-tools test
       - name: Run tests (audit-test-tools)
         run: yarn workspace audit-test-tools test
+
+  check-yarn-cache:
+    name: Check Yarn cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Setup Node 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Node - Enable Corepack
+        run: corepack enable
+      - name: Check Yarn cache
+        run: yarn install --immutable --immutable-cache --check-cache

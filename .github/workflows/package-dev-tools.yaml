@@ -2,6 +2,8 @@ name: Package dev tools infrastructure
 
 on:
   push:
+    branches:
+      - main
     paths:
       - infrastructure/dev-tools/**
       - .yarn/**
@@ -87,7 +89,6 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DEV_TOOLS_RP_EVENTS_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_RP_EVENTS_BUILD
     name: Package template
-    if: github.ref == 'refs/heads/main'
     needs: [build]
     permissions:
       id-token: write

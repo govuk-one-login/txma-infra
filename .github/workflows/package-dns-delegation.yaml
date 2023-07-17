@@ -2,6 +2,8 @@ name: Package DNS delegation infrastructure
 
 on:
   push:
+    branches:
+      - main
     paths:
       - infrastructure/dns-delegation/**
   workflow_dispatch: {}
@@ -20,7 +22,6 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DNS_DELEGATION_AUDIT_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_AUDIT_BUILD
     name: Package template
-    if: github.ref == 'refs/heads/main'
     permissions:
       id-token: write
       contents: read
