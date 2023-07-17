@@ -15,7 +15,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup Node 18
+        uses: actions/setup-node@v3
         with:
           node-version: 18
       - name: Node - Enable Corepack
@@ -27,6 +28,15 @@ jobs:
         run: yarn unplug
       - name: Check Yarn cache
         run: yarn install --immutable --immutable-cache --check-cache
+      - name: Validate SAM templates
+        run: yarn validate:templates
+      - name: Run Checkov on SAM templates
+        if: always()
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infrastructure/
+          quiet: true
+          framework: cloudformation
       - name: Run tests (dev-tools)
         run: yarn workspace dev-tools test
       - name: Run tests (audit-test-tools)
