@@ -58,7 +58,7 @@ jobs:
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Validate SAM template
-        run: yarn validate:templates
+        run: ./scripts/validate-templates.sh
       - name: Run Checkov on SAM templates
         uses: bridgecrewio/checkov-action@master
         with:
