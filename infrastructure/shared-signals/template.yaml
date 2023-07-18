@@ -121,14 +121,6 @@ Resources:
       LogGroupName: aws-waf-logs-SharedSignalsApiWafAcl
       RetentionInDays: 30
 
-  SharedSignalsApiWafCslsSubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: CslsEgress
-    Properties:
-      LogGroupName: !Ref SharedSignalsApiWafLogs
-      FilterPattern: ''
-      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
-
   SharedSignalsApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
     Properties:
