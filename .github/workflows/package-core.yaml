@@ -2,6 +2,8 @@ name: Package core infrastructure
 
 on:
   push:
+    branches:
+      - main
     paths:
       - infrastructure/core/**
   workflow_dispatch: {}
@@ -10,46 +12,6 @@ env:
   AWS_REGION: eu-west-2
 
 jobs:
-  validate:
-    name: Validate template
-    permissions:
-      id-token: write
-      contents: read
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: infrastructure/core
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - name: Setup SAM CLI
-        uses: aws-actions/setup-sam@v2
-      - name: Assume AWS Validate role
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_CORE }}
-      - name: Validate SAM template
-        if: always()
-        run: sam validate --lint
-      - name: Run Checkov on SAM template
-        if: always()
-        uses: bridgecrewio/checkov-action@master
-        with:
-          file: infrastructure/core/template.yaml
-          quiet: true
-          framework: cloudformation
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: core-sam-template
-          path: |
-            infrastructure/core/template.yaml
-
   package:
     strategy:
       matrix:
@@ -95,17 +57,13 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_CORE_RP_EVENTS_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_RP_EVENTS_BUILD
     name: Package template
-    if: github.ref == 'refs/heads/main'
-    needs: [validate]
     permissions:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: core-sam-template
+      - name: Checkout repository code
+        uses: actions/checkout@v3
       - name: Setup Python 3.8
         uses: actions/setup-python@v4
         with:
@@ -113,7 +71,7 @@ jobs:
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Assume AWS role
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
@@ -122,4 +80,5 @@ jobs:
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
+          template-file: infrastructure/core/${{ matrix.target }}/template.yaml
           working-directory: '.'
