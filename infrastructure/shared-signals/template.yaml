@@ -36,13 +36,12 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub ${AWS::StackName}-user-config
-      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: client_id
           AttributeType: S
         - AttributeName: aud
           AttributeType: S
+      BillingMode: PAY_PER_REQUEST
       GlobalSecondaryIndexes:
         - IndexName: !Ref AudienceGSI
           KeySchema:
@@ -59,6 +58,9 @@ Resources:
         SSEEnabled: true
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      TableName: !Sub ${AWS::StackName}-user-config
 
   ###############
   # WAF Resources
