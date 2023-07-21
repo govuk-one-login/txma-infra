@@ -182,6 +182,13 @@ Resources:
       Type: String
       Value: !Ref AudienceGSI
 
+  UserConfigTableStreamArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableStreamArn
+      Type: String
+      Value: !GetAtt UserConfigTable.StreamArn
+
   SSFUserPoolIdParameter:
     Type: AWS::SSM::Parameter
     Properties:
