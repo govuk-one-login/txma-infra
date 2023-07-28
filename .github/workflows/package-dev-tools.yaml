@@ -2,40 +2,30 @@ name: Package dev tools infrastructure
 
 on:
   push:
+    branches:
+      - main
     paths:
-      - dev-tools/**
+      - infrastructure/dev-tools/**
+      - .yarn/**
   workflow_dispatch: {}
 
 env:
   AWS_REGION: eu-west-2
 
 jobs:
-  validate-build:
-    name: Run tests and validation
-    permissions:
-      id-token: write
-      contents: read
+  build:
+    name: Build Lambda functions
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dev-tools
+        working-directory: infrastructure/dev-tools
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - uses: actions/setup-node@v3
+      - name: Setup Node 18
+        uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Setup SAM CLI
-        uses: aws-actions/setup-sam@v2
-      - name: Assume AWS Validate role
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.GH_ACTIONS_VALIDATE_ROLE_ARN_DEV_TOOLS }}
       - name: Node - Enable Corepack
         run: corepack enable
       - name: Install ESBuild binaries
@@ -46,23 +36,13 @@ jobs:
       - name: Build Lambda functions
         if: always()
         run: yarn build
-      - name: Validate SAM template
-        if: always()
-        run: sam validate
-      - name: Run Checkov on SAM template
-        if: always()
-        uses: bridgecrewio/checkov-action@master
-        with:
-          file: dev-tools/template.yaml
-          quiet: true
-          framework: cloudformation
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: dev-tools-sam-template
           path: |
-            dev-tools/dist/
-            dev-tools/template.yaml
+            infrastructure/dev-tools/dist/
+            infrastructure/dev-tools/template.yaml
 
   package:
     strategy:
@@ -109,8 +89,7 @@ jobs:
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_DEV_TOOLS_RP_EVENTS_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_RP_EVENTS_BUILD
     name: Package template
-    if: github.ref == 'refs/heads/main'
-    needs: [validate-build]
+    needs: [build]
     permissions:
       id-token: write
       contents: read
@@ -132,7 +111,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
       - name: Package SAM app
-        uses: alphagov/di-devplatform-upload-action@v3
+        uses: alphagov/di-devplatform-upload-action@v3.3
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}

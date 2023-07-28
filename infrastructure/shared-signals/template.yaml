@@ -1,0 +1,353 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static infrastructure for Shared Signal Framework
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+  AudienceGSI:
+    Description: Name of the audience GSI
+    Type: String
+    Default: audGSI
+
+Conditions:
+  NotTestEnvironment:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration]
+    ]
+  TestEnvironment: !Not [Condition: NotTestEnvironment]
+  IsStaging: !Equals [!Ref Environment, 'staging']
+
+Resources:
+  ####################
+  # DynamoDB Resources
+  ####################
+
+  UserConfigTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: client_id
+          AttributeType: S
+        - AttributeName: aud
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: !Ref AudienceGSI
+          KeySchema:
+            - AttributeName: aud
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      KeySchema:
+        - AttributeName: client_id
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      TableName: !Sub ${AWS::StackName}-user-config
+
+  ###############
+  # WAF Resources
+  ###############
+
+  SharedSignalsApiWafAcl:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      DefaultAction:
+        Allow: {}
+      Name: SharedSignalsApiWafAcl
+      Scope: REGIONAL
+      VisibilityConfig:
+        CloudWatchMetricsEnabled: true
+        MetricName: SharedSignalsApiWafMetric
+        SampledRequestsEnabled: true
+      Rules:
+        - Name: AWSManagedRulesCommonRuleSet
+          Priority: 0
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+              ExcludedRules: []
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: SharedSignalsApiWafCommonRuleSetMetric
+        - Name: AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: SharedSignalsApiWafKnownBadInputsRuleSetMetric
+            SampledRequestsEnabled: true
+        - Name: AWSManagedRulesAmazonIpReputationList
+          Priority: 2
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAmazonIpReputationList
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: SharedSignalsApiWafIpReputationListMetric
+            SampledRequestsEnabled: true
+
+  SharedSignalsApiWafLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: aws-waf-logs-SharedSignalsApiWafAcl
+      RetentionInDays: 30
+
+  SharedSignalsApiWafLoggingConfiguration:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      LogDestinationConfigs:
+        # Cannot use Fn::GetAtt here since the ARN of a log group includes ':*' at the end, which is not accepted by the WAF service.
+        # The ARN must not include the ':*'.
+        - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${SharedSignalsApiWafLogs}
+      ResourceArn: !GetAtt SharedSignalsApiWafAcl.Arn
+
+  ####################
+  # Cognito Resources
+  ####################
+
+  SSFUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AWS::StackName}-ssf-user-pool
+
+  SSFUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref SSFUserPool
+      Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
+
+  SharedSignalsStreamResourceServer:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties:
+      UserPoolId: !Ref SSFUserPool
+      Identifier: 'stream'
+      Name: !Sub '${AWS::StackName}-stream-resource-server'
+      Scopes:
+        - ScopeDescription: 'Allows read access to the SSF stream config'
+          ScopeName: 'read'
+
+  ################
+  # SSM Parameters
+  ################
+
+  UserConfigTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableArn
+      Type: String
+      Value: !GetAtt UserConfigTable.Arn
+
+  UserConfigTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableName
+      Type: String
+      Value: !Ref UserConfigTable
+
+  UserConfigTableAudienceGSIParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableAudienceGSI
+      Type: String
+      Value: !Ref AudienceGSI
+
+  UserConfigTableStreamArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserConfigTableStreamArn
+      Type: String
+      Value: !GetAtt UserConfigTable.StreamArn
+
+  SSFUserPoolIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SSFUserPoolId
+      Type: String
+      Value: !Ref SSFUserPool
+
+  SSFUserPoolArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SSFUserPoolArn
+      Type: String
+      Value: !GetAtt SSFUserPool.Arn
+
+  CognitoDomainURLParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: CognitoDomainUrl
+      Type: String
+      Value: !Sub https://${SSFUserPoolDomain}.auth.eu-west-2.amazoncognito.com
+
+  #############################
+  # Integration test Resources
+  ############################
+
+  ######################################
+  # Test producer queue resources START
+  ######################################
+  IntegrationTestProducerQueue:
+    Type: AWS::SQS::Queue
+    Condition: IsStaging
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-test-producer-queue
+      KmsMasterKeyId: !GetAtt IntegrationTestProducerQueueKmsKey.Arn
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt IntegrationTestProducerDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  IntegrationTestProducerQueueQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Condition: IsStaging
+    Properties:
+      Queues:
+        - !Ref IntegrationTestProducerQueue
+      PolicyDocument:
+        Statement:
+          - Sid: AllowEventProcessingAccountQueueRead
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
+              - 'sqs:ReceiveMessage'
+            Effect: 'Allow'
+            Resource: !GetAtt IntegrationTestProducerQueue.Arn
+            Principal:
+              AWS:
+                - '{{resolve:ssm:EventProcessingAccountRootArn}}'
+
+  IntegrationTestProducerDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Condition: IsStaging
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-test-producer-dlq
+      KmsMasterKeyId: !GetAtt IntegrationTestProducerQueueKmsKey.Arn
+
+  IntegrationTestProducerQueueKmsKey:
+    Type: AWS::KMS::Key
+    Condition: IsStaging
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Enable Decrypt access for Event Processing
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:EventProcessingAccountRootArn}}'
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:GenerateDataKey
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: '*'
+
+  IntegrationTestProducerQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Condition: IsStaging
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/integration-test-producer-queue-kms-key
+      TargetKeyId: !Ref IntegrationTestProducerQueueKmsKey
+
+  ######################################
+  # Test producer queue resources END
+  ######################################
+
+  CognitoTestUsers:
+    #checkov:skip=CKV_AWS_149:We will use aws managed kms key
+    Type: AWS::SecretsManager::Secret
+    Condition: TestEnvironment
+    Properties:
+      Description: 'A set of TEST cognito users that can be used to authenticate against shared signals API Gateway. Used for testing only'
+      Name: APIGatewayTestUserCredentials
+
+  CognitoTestUsersSecretArnParameter:
+    Type: AWS::SSM::Parameter
+    Condition: TestEnvironment
+    Properties:
+      Name: CognitoTestUsersArn
+      Type: String
+      Value: !Ref CognitoTestUsers
+
+  IntegrationTestProducerQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Condition: IsStaging
+    Properties:
+      Name: IntegrationTestProducerQueueArn
+      Type: String
+      Value: !GetAtt IntegrationTestProducerQueue.Arn
+
+  IntegrationTestProducerQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Condition: IsStaging
+    Properties:
+      Name: IntegrationTestProducerQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt IntegrationTestProducerQueueKmsKey.Arn
+
+  IntegrationTestProducerQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Condition: IsStaging
+    Properties:
+      Name: IntegrationTestProducerQueueUrl
+      Type: String
+      Value: !Ref IntegrationTestProducerQueue
+
+  SharedSignalsApiWafAclArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SharedSignalsApiWafAclArn
+      Type: String
+      Value: !GetAtt SharedSignalsApiWafAcl.Arn
+
+Outputs:
+  SSFUserPoolId:
+    Description: 'user pool id for cognito'
+    Value: !Ref SSFUserPool
+  UserConfigTableName:
+    Description: 'table name for user config table'
+    Value: !Ref UserConfigTable

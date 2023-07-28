@@ -5,14 +5,15 @@
   "private": true,
   "packageManager": "yarn@3.4.1",
   "workspaces": [
-    "dev-tools",
-    "audit-test-tools"
+    "infrastructure/dev-tools",
+    "infrastructure/audit-test-tools"
   ],
   "scripts": {
     "lint": "prettier . --check || exit 1 ; eslint . --max-warnings=0",
     "lint:fix": "prettier . --write ; eslint . --fix",
     "postinstall": "husky install",
-    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
+    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
+    "validate:templates": "bash ./scripts/validate-templates.sh"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "5.61.0",
