@@ -18,14 +18,15 @@ Parameters:
     Default: audGSI
 
 Conditions:
+  IsDev: !Equals [!Ref Environment, dev]
+  IsProduction: !Equals [!Ref Environment, production]
+  IsStaging: !Equals [!Ref Environment, staging]
   NotTestEnvironment:
     !Or [
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration]
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
-  IsStaging: !Equals [!Ref Environment, 'staging']
-  IsDev: !Equals [!Ref Environment, 'dev']
 
 Resources:
   ####################
