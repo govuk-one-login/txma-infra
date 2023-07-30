@@ -25,6 +25,7 @@ Conditions:
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
   IsStaging: !Equals [!Ref Environment, 'staging']
+  IsDev: !Equals [!Ref Environment, 'dev']
 
 Resources:
   ####################
@@ -144,6 +145,10 @@ Resources:
   SSFUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
+      CustomDomainConfig: !If
+        - IsDev
+        - !Ref AWS::NoValue
+        - CertificateArn: '{{resolve:ssm:CognitoCustomDomainCertificateArn}}'
       UserPoolId: !Ref SSFUserPool
       Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
 
