@@ -18,14 +18,21 @@ Parameters:
     Default: audGSI
 
 Conditions:
+  IsDev: !Equals [!Ref Environment, dev]
+  IsProduction: !Equals [!Ref Environment, production]
+  IsStaging: !Equals [!Ref Environment, staging]
   NotTestEnvironment:
     !Or [
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration]
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
-  IsStaging: !Equals [!Ref Environment, 'staging']
-  IsDev: !Equals [!Ref Environment, 'dev']
+  CslsEgress:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration],
+      !Equals [!Ref Environment, staging]
+    ]
 
 Resources:
   ####################
@@ -124,6 +131,14 @@ Resources:
       LogGroupName: aws-waf-logs-SharedSignalsApiWafAcl
       RetentionInDays: 30
 
+  SharedSignalsApiWafCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsEgress
+    Properties:
+      LogGroupName: !Ref SharedSignalsApiWafLogs
+      FilterPattern: ''
+      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
+
   SharedSignalsApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
     Properties:
@@ -149,8 +164,14 @@ Resources:
         - IsDev
         - !Ref AWS::NoValue
         - CertificateArn: '{{resolve:ssm:CognitoCustomDomainCertificateArn}}'
+      Domain: !If
+        - IsDev
+        - !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
+        - !If
+          - IsProduction
+          - shared-signals-transmitter.transaction.account.gov.uk
+          - !Sub ssf-transmitter.transaction.${Environment}.account.gov.uk
       UserPoolId: !Ref SSFUserPool
-      Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
 
   SharedSignalsStreamResourceServer:
     Type: AWS::Cognito::UserPoolResourceServer
