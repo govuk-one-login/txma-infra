@@ -26,6 +26,12 @@ Conditions:
   TestEnvironment: !Not [Condition: NotTestEnvironment]
   IsStaging: !Equals [!Ref Environment, 'staging']
   IsDev: !Equals [!Ref Environment, 'dev']
+  CslsEgress:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration],
+      !Equals [!Ref Environment, staging]
+    ]
 
 Resources:
   ####################
@@ -123,6 +129,14 @@ Resources:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
       LogGroupName: aws-waf-logs-SharedSignalsApiWafAcl
       RetentionInDays: 30
+
+  SharedSignalsApiWafCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsEgress
+    Properties:
+      LogGroupName: !Ref SharedSignalsApiWafLogs
+      FilterPattern: ''
+      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
 
   SharedSignalsApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
