@@ -173,20 +173,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@aws-lambda-powertools/commons", [\
-        ["npm:1.11.1", {\
-          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-commons-npm-1.11.1-cdc3695405-62d1a55270.zip/node_modules/@aws-lambda-powertools/commons/",\
+        ["npm:1.12.1", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-commons-npm-1.12.1-5857cfd794-1d6032bb26.zip/node_modules/@aws-lambda-powertools/commons/",\
           "packageDependencies": [\
-            ["@aws-lambda-powertools/commons", "npm:1.11.1"]\
+            ["@aws-lambda-powertools/commons", "npm:1.12.1"]\
           ],\
           "linkType": "HARD"\
         }]\
       ]],\
       ["@aws-lambda-powertools/logger", [\
-        ["npm:1.11.0", {\
-          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.11.0-26439ce742-d85d2e491a.zip/node_modules/@aws-lambda-powertools/logger/",\
+        ["npm:1.12.1", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.12.1-7bb4b17117-87fa705ee6.zip/node_modules/@aws-lambda-powertools/logger/",\
           "packageDependencies": [\
-            ["@aws-lambda-powertools/logger", "npm:1.11.0"],\
-            ["@aws-lambda-powertools/commons", "npm:1.11.1"],\
+            ["@aws-lambda-powertools/logger", "npm:1.12.1"],\
+            ["@aws-lambda-powertools/commons", "npm:1.12.1"],\
             ["lodash.merge", "npm:4.6.2"]\
           ],\
           "linkType": "HARD"\
@@ -3965,7 +3965,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./infrastructure/audit-test-tools/",\
           "packageDependencies": [\
             ["audit-test-tools", "workspace:infrastructure/audit-test-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.11.0"],\
+            ["@aws-lambda-powertools/logger", "npm:1.12.1"],\
             ["@aws-sdk/client-cloudformation", "npm:3.352.0"],\
             ["@aws-sdk/client-s3", "npm:3.352.0"],\
             ["@aws-sdk/client-sqs", "npm:3.352.0"],\
@@ -4666,7 +4666,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./infrastructure/dev-tools/",\
           "packageDependencies": [\
             ["dev-tools", "workspace:infrastructure/dev-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.11.0"],\
+            ["@aws-lambda-powertools/logger", "npm:1.12.1"],\
             ["@aws-sdk/client-cloudformation", "npm:3.352.0"],\
             ["@aws-sdk/client-dynamodb", "npm:3.352.0"],\
             ["@aws-sdk/client-firehose", "npm:3.352.0"],\
