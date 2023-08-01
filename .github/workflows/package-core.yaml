@@ -56,7 +56,7 @@ jobs:
             ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_CORE_RP_EVENTS_BUILD
             GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_CORE_RP_EVENTS_BUILD
             SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_RP_EVENTS_BUILD
-    name: Package template
+    name: Package template - ${{ matrix.target }}
     permissions:
       id-token: write
       contents: read
