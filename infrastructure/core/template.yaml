@@ -341,6 +341,14 @@ Resources:
               - kms:GenerateDataKey*
               - kms:Describe*
             Resource: '*'
+          - Sid: Allow AWS S3 access
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - kms:Decrypt*
+              - kms:GenerateDataKey*
+            Resource: '*'
 
   SqsKmsKeyAlias:
     Type: AWS::KMS::Alias
