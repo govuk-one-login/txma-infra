@@ -19,7 +19,6 @@ Parameters:
 
 Conditions:
   IsDev: !Equals [!Ref Environment, dev]
-  IsProduction: !Equals [!Ref Environment, production]
   IsStaging: !Equals [!Ref Environment, staging]
   NotTestEnvironment:
     !Or [
@@ -158,19 +157,10 @@ Resources:
       UserPoolName: !Sub ${AWS::StackName}-ssf-user-pool
 
   SSFUserPoolDomain:
+    Condition: IsDev # Custom domain name for higher envs defined in DNS repo
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      CustomDomainConfig: !If
-        - IsDev
-        - !Ref AWS::NoValue
-        - CertificateArn: '{{resolve:ssm:CognitoCustomDomainCertificateArn}}'
-      Domain: !If
-        - IsDev
-        - !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
-        - !If
-          - IsProduction
-          - shared-signals-transmitter.transaction.account.gov.uk
-          - !Sub ssf-transmitter.transaction.${Environment}.account.gov.uk
+      Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
       UserPoolId: !Ref SSFUserPool
 
   SharedSignalsStreamResourceServer:
@@ -230,6 +220,7 @@ Resources:
       Value: !GetAtt SSFUserPool.Arn
 
   CognitoDomainURLParameter:
+    Condition: IsDev # Custom domain name for higher envs defined in DNS repo
     Type: AWS::SSM::Parameter
     Properties:
       Name: CognitoDomainUrl
