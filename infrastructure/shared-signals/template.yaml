@@ -19,7 +19,6 @@ Parameters:
 
 Conditions:
   IsDev: !Equals [!Ref Environment, dev]
-  IsProduction: !Equals [!Ref Environment, production]
   IsStaging: !Equals [!Ref Environment, staging]
   NotTestEnvironment:
     !Or [
