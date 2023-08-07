@@ -18,13 +18,20 @@ Parameters:
     Default: audGSI
 
 Conditions:
+  IsDev: !Equals [!Ref Environment, dev]
+  IsStaging: !Equals [!Ref Environment, staging]
   NotTestEnvironment:
     !Or [
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration]
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
-  IsStaging: !Equals [!Ref Environment, 'staging']
+  CslsEgress:
+    !Or [
+      !Equals [!Ref Environment, production],
+      !Equals [!Ref Environment, integration],
+      !Equals [!Ref Environment, staging]
+    ]
 
 Resources:
   ####################
@@ -123,6 +130,14 @@ Resources:
       LogGroupName: aws-waf-logs-SharedSignalsApiWafAcl
       RetentionInDays: 30
 
+  SharedSignalsApiWafCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsEgress
+    Properties:
+      LogGroupName: !Ref SharedSignalsApiWafLogs
+      FilterPattern: ''
+      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
+
   SharedSignalsApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
     Properties:
@@ -142,10 +157,11 @@ Resources:
       UserPoolName: !Sub ${AWS::StackName}-ssf-user-pool
 
   SSFUserPoolDomain:
+    Condition: IsDev # Custom domain name for higher envs defined in DNS repo
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      UserPoolId: !Ref SSFUserPool
       Domain: !Sub di-txma-${AWS::StackName}-${Environment}-ssf-auth
+      UserPoolId: !Ref SSFUserPool
 
   SharedSignalsStreamResourceServer:
     Type: AWS::Cognito::UserPoolResourceServer
@@ -204,6 +220,7 @@ Resources:
       Value: !GetAtt SSFUserPool.Arn
 
   CognitoDomainURLParameter:
+    Condition: IsDev # Custom domain name for higher envs defined in DNS repo
     Type: AWS::SSM::Parameter
     Properties:
       Name: CognitoDomainUrl

@@ -330,6 +330,17 @@ Resources:
               - kms:Encrypt
               - kms:Decrypt
             Resource: '*'
+          - Sid: Allow AWS SNS access
+            Effect: Allow
+            Principal:
+              Service: sns.amazonaws.com
+            Action:
+              - kms:Encrypt*
+              - kms:Decrypt*
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:Describe*
+            Resource: '*'
 
   SqsKmsKeyAlias:
     Type: AWS::KMS::Alias
