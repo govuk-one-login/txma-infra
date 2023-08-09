@@ -118,6 +118,7 @@ Resources:
               - dynamodb:Query
             Resource:
               - !GetAtt RelyingPartyPairwiseMappingTable.Arn
+              - !Sub ${RelyingPartyPairwiseMappingTable.Arn}/index/*
           - Sid: DynamoItemsDecrypt
             Effect: Allow
             Action:
