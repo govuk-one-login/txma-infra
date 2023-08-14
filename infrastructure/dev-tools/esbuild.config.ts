@@ -25,13 +25,16 @@ const lambdas = awsResources.filter(
   (resource) => resource.Type === 'AWS::Serverless::Function'
 ) as ILambdaFunction[]
 
-const entries = lambdas.reduce((entries, lambda) => {
-  const handlerName = lambda.Properties.Handler.split('.')[0]
-  const filepath = `./${handlerPath}/${handlerName}/handler.ts`
+const entries = lambdas.reduce(
+  (entries, lambda) => {
+    const handlerName = lambda.Properties.Handler.split('.')[0]
+    const filepath = `./${handlerPath}/${handlerName}/handler.ts`
 
-  entries[handlerName] = filepath
-  return entries
-}, {} as { [key: string]: string })
+    entries[handlerName] = filepath
+    return entries
+  },
+  {} as { [key: string]: string }
+)
 
 esbuild
   .build({
