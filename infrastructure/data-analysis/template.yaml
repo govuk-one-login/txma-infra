@@ -114,6 +114,8 @@ Resources:
       Name: ticf-automated-audit-data-queries
       RecursiveDeleteOption: true
       WorkGroupConfiguration:
+        EngineVersion:
+          SelectedEngineVersion: 'Athena engine version 3'
         EnforceWorkGroupConfiguration: true
         PublishCloudWatchMetricsEnabled: false
         ResultConfiguration:
