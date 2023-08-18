@@ -234,6 +234,28 @@ Resources:
       QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-dead-letter-queue
       KmsMasterKeyId: !GetAtt RPEventsQueueKmsKey.Arn
 
+  AgeOfOldestMessageOnRPEventsQueueAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      AlarmDescription: >-
+        Alarm that monitors the age of the oldest message on the RPEvents Queue.
+        If messages remain on the queue for more than one hour it suggests that our
+        system isn't processing data.
+      AlarmName: !Sub ${AWS::StackName}-rp-events-queue-oldest-message-age
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt RPEventsQueue.QueueName
+      EvaluationPeriods: 1
+      MetricName: ApproximateAgeOfOldestMessage
+      Namespace: AWS/SQS
+      Statistic: Maximum
+      Period: 60
+      Threshold: 3600
+
   ################
   # SSM Parameters
   ################
