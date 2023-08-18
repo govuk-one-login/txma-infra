@@ -41,6 +41,7 @@ jobs:
         with:
           name: dev-tools-sam-template
           path: |
+            .git/
             infrastructure/dev-tools/dist/
             infrastructure/dev-tools/template.yaml
 
@@ -115,4 +116,5 @@ jobs:
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
+          template-file: infrastructure/dev-tools/template.yaml
           working-directory: '.'
