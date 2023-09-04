@@ -35,6 +35,8 @@ jobs:
           node-version: 18
       - name: Node - Enable Corepack
         run: corepack enable
+      - name: Install ESBuild binaries
+        run: yarn unplug
       - name: Run linting
         run: yarn lint
       - name: Run tests (dev-tools)
