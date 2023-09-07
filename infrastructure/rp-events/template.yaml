@@ -255,6 +255,7 @@ Resources:
       Statistic: Maximum
       Period: 60
       Threshold: 3600
+      TreatMissingData: ignore
 
   ################
   # SSM Parameters
