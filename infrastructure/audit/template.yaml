@@ -95,6 +95,34 @@ Resources:
   # End: KMS Keys #
   #################
 
+  #####################
+  # Batch Job Resources
+  #####################
+
+  AuditBatchJobManifestBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-batch-job-manifest-bucket
+      LifecycleConfiguration:
+        Rules:
+          - Id: BatchJobManifestCleanupRule
+            Status: Enabled
+            ExpirationInDays: 5
+      LoggingConfiguration:
+        DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-batch-job-manifest-bucket/
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
   #########################
   # Start: SSM Parameters #
   #########################
@@ -112,6 +140,20 @@ Resources:
       Name: S3EncryptionGeneratorKmsKeyArn
       Type: String
       Value: !GetAtt EncryptionGeneratorKmsKey.Arn
+
+  AuditBatchJobManifestBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditBatchJobManifestBucketArn
+      Type: String
+      Value: !GetAtt AuditBatchJobManifestBucket.Arn
+
+  AuditBatchJobManifestBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditBatchJobManifestBucketName
+      Type: String
+      Value: !Ref AuditBatchJobManifestBucket
 
   #######################
   # End: SSM Parameters #
