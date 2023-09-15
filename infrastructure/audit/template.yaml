@@ -212,6 +212,20 @@ Resources:
       Type: String
       Value: !Ref AuditBatchJobManifestBucket
 
+  EventReplaySnsTopicNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySnsTopicName
+      Type: String
+      Value: !Ref EventReplaySnsTopic
+
+  EventReplaySnsTopicArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySnsTopicArn
+      Type: String
+      Value: !GetAtt EventReplaySnsTopic.TopicArn
+
   #######################
   # End: SSM Parameters #
   #######################
