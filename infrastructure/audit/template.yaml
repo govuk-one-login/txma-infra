@@ -91,6 +91,45 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/encryption-generator-kms-key
       TargetKeyId: !Ref EncryptionGeneratorKmsKey
 
+  EventReplaySnsKmsKey:
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource:
+              - '*'
+          - Effect: Allow
+            Principal:
+              Service: sqs.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+          - Sid: Enable Decrypt access for Event Processing
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:EventProcessingAccountRootArn}}'
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+
+  EventReplaySnsKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/event-replay-sns-kms-key
+      TargetKeyId: !Ref EventReplaySnsKmsKey
+
   #################
   # End: KMS Keys #
   #################
@@ -123,6 +162,24 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  ############################
+  # End: Batch Job Resources #
+  ############################
+
+  ############################
+  # End: SNS topics #
+  ############################
+
+  EventReplaySnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub ${AWS::StackName}-event-replay-topic
+      KmsMasterKeyId: !Ref EventReplaySnsKmsKey
+
+  ############################
+  # End: SNS topics #
+  ############################
+
   #########################
   # Start: SSM Parameters #
   #########################
@@ -154,6 +211,27 @@ Resources:
       Name: AuditBatchJobManifestBucketName
       Type: String
       Value: !Ref AuditBatchJobManifestBucket
+
+  EventReplaySnsTopicNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySnsTopicName
+      Type: String
+      Value: !Ref EventReplaySnsTopic
+
+  EventReplaySnsTopicArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySnsTopicArn
+      Type: String
+      Value: !GetAtt EventReplaySnsTopic.TopicArn
+
+  EventReplaySnsKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySnsKmsKeyArn
+      Type: String
+      Value: !GetAtt EventReplaySnsKmsKey.Arn
 
   #######################
   # End: SSM Parameters #
