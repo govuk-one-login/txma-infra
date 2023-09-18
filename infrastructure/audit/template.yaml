@@ -162,6 +162,26 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  EventReplayFileMappingTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: s3FileKey
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: s3FileKey
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      TableName: !Sub ${AWS::StackName}-event-replay-file-mapping
+
   ############################
   # End: Batch Job Resources #
   ############################
