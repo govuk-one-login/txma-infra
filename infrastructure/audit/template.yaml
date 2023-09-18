@@ -162,6 +162,24 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  EventReplayFileMappingTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: s3FileKey
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: s3FileKey
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+        SSEEnabled: true
+        SSEType: KMS
+      TableName: !Sub ${AWS::StackName}-event-replay-file-mapping
+
   ############################
   # End: Batch Job Resources #
   ############################
@@ -209,13 +227,6 @@ Resources:
       Type: String
       Value: !GetAtt AuditFileReadyToEncryptQueueKmsKey.Arn
 
-  S3EncryptionGeneratorKmsKeyArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: S3EncryptionGeneratorKmsKeyArn
-      Type: String
-      Value: !GetAtt EncryptionGeneratorKmsKey.Arn
-
   AuditBatchJobManifestBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -229,6 +240,20 @@ Resources:
       Name: AuditBatchJobManifestBucketName
       Type: String
       Value: !Ref AuditBatchJobManifestBucket
+
+  EventReplayFileMappingTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplayFileMappingTableArn
+      Type: String
+      Value: !GetAtt EventReplayFileMappingTable.Arn
+
+  EventReplayFileMappingTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplayFileMappingTableName
+      Type: String
+      Value: !Ref EventReplayFileMappingTable
 
   EventReplaySnsTopicNameParameter:
     Type: AWS::SSM::Parameter
@@ -250,6 +275,13 @@ Resources:
       Name: EventReplaySnsKmsKeyArn
       Type: String
       Value: !GetAtt EventReplaySnsKmsKey.Arn
+
+  S3EncryptionGeneratorKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: S3EncryptionGeneratorKmsKeyArn
+      Type: String
+      Value: !GetAtt EncryptionGeneratorKmsKey.Arn
 
   #######################
   # End: SSM Parameters #
