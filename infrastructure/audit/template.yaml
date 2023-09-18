@@ -178,8 +178,6 @@ Resources:
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
         SSEEnabled: true
         SSEType: KMS
-      StreamSpecification:
-        StreamViewType: NEW_IMAGE
       TableName: !Sub ${AWS::StackName}-event-replay-file-mapping
 
   ############################
