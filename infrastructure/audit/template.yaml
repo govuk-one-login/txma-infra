@@ -175,9 +175,9 @@ Resources:
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
       SSESpecification:
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
         SSEEnabled: true
         SSEType: KMS
-        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
       StreamSpecification:
         StreamViewType: NEW_IMAGE
       TableName: !Sub ${AWS::StackName}-event-replay-file-mapping
@@ -229,13 +229,6 @@ Resources:
       Type: String
       Value: !GetAtt AuditFileReadyToEncryptQueueKmsKey.Arn
 
-  S3EncryptionGeneratorKmsKeyArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: S3EncryptionGeneratorKmsKeyArn
-      Type: String
-      Value: !GetAtt EncryptionGeneratorKmsKey.Arn
-
   AuditBatchJobManifestBucketArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -249,6 +242,20 @@ Resources:
       Name: AuditBatchJobManifestBucketName
       Type: String
       Value: !Ref AuditBatchJobManifestBucket
+
+  EventReplayFileMappingTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplayFileMappingTableArn
+      Type: String
+      Value: !GetAtt EventReplayFileMappingTable.Arn
+
+  EventReplayFileMappingTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplayFileMappingTableName
+      Type: String
+      Value: !Ref EventReplayFileMappingTable
 
   EventReplaySnsTopicNameParameter:
     Type: AWS::SSM::Parameter
@@ -270,6 +277,13 @@ Resources:
       Name: EventReplaySnsKmsKeyArn
       Type: String
       Value: !GetAtt EventReplaySnsKmsKey.Arn
+
+  S3EncryptionGeneratorKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: S3EncryptionGeneratorKmsKeyArn
+      Type: String
+      Value: !GetAtt EncryptionGeneratorKmsKey.Arn
 
   #######################
   # End: SSM Parameters #
