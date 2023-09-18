@@ -168,10 +168,14 @@ Resources:
       AttributeDefinitions:
         - AttributeName: s3FileKey
           AttributeType: S
+        - AttributeName: requesterId
+          AttributeType: S
       BillingMode: PAY_PER_REQUEST
       KeySchema:
         - AttributeName: s3FileKey
           KeyType: HASH
+        - AttributeName: requesterId
+          KeyType: RANGE
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
       SSESpecification:
