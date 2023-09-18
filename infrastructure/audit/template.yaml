@@ -176,6 +176,24 @@ Resources:
       TopicName: !Sub ${AWS::StackName}-event-replay-topic
       KmsMasterKeyId: !Ref EventReplaySnsKmsKey
 
+  EventReplaySnsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Id: AllowSnsSubscribe
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowEventProcessingAccountToSubscribe
+            Effect: Allow
+            Action:
+              - sns:Subscribe
+            Principal:
+              AWS:
+                - '{{resolve:ssm:EventProcessingAccountRootArn}}'
+            Resource: !Ref EventReplaySnsTopic
+      Topics:
+        - !Ref EventReplaySnsTopic
+
   ############################
   # End: SNS topics #
   ############################
