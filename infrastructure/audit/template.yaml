@@ -182,7 +182,7 @@ Resources:
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
         SSEEnabled: true
         SSEType: KMS
-      TableName: !Sub ${AWS::StackName}-event-replay-file-mapping
+      TableName: !Sub ${AWS::StackName}-event-replay-file-mapping-table
 
   ############################
   # End: Batch Job Resources #
