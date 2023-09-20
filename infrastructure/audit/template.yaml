@@ -265,7 +265,7 @@ Resources:
                 - s3.amazonaws.com
             Condition:
               ArnLike:
-                aws:SourceArn: !Sub arn:aws:s3:::audit-${Environment}-permanent-message-batch
+                aws:SourceArn: !Sub arn:aws:s3:::*-permanent-message-batch
               StringEquals:
                 aws:SourceAccount: !Ref AWS::AccountId
 
