@@ -59,6 +59,47 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/audit-file-ready-to-encrypt-queue-kms-key
       TargetKeyId: !Ref AuditFileReadyToEncryptQueueKmsKey
 
+  S3OperationQueueKmsKey:
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource:
+              - '*'
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+          - Effect: Allow
+            Principal:
+              Service: sqs.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+
+  S3OperationQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/s3-operation-queue-kms-key
+      TargetKeyId: !Ref S3OperationQueueKmsKey
+
   EncryptionGeneratorKmsKey:
     Type: AWS::KMS::Key
     DeletionPolicy: Retain
@@ -189,6 +230,50 @@ Resources:
   ############################
 
   ############################
+  # Start: SQS queues        #
+  ############################
+  AuditFileGlacierRestoreQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-file-glacier-restore-queue
+      KmsMasterKeyId: !GetAtt S3OperationQueueKmsKey.Arn
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt AuditFileGlacierRestoreDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  AuditFileGlacierRestoreDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-file-glacier-restore-dlq
+      KmsMasterKeyId: !GetAtt S3OperationQueueKmsKey.Arn
+
+  AuditFileGlacierRestoreQueueQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref AuditFileGlacierRestoreQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - sqs:*
+            Resource:
+              - !GetAtt AuditFileGlacierRestoreQueue.Arn
+            Principal:
+              Service:
+                - s3.amazonaws.com
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:s3:::audit-${Environment}-permanent-message-batch
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+
+  ############################
+  # End: SQS queues        #
+  ############################
+
+  ############################
   # End: SNS topics #
   ############################
 
@@ -230,6 +315,13 @@ Resources:
       Name: AuditFileReadyToEncryptQueueKmsKeyArn
       Type: String
       Value: !GetAtt AuditFileReadyToEncryptQueueKmsKey.Arn
+
+  S3OperationQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: S3OperationQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt S3OperationQueueKmsKey.Arn
 
   AuditBatchJobManifestBucketArnParameter:
     Type: AWS::SSM::Parameter
@@ -286,6 +378,13 @@ Resources:
       Name: S3EncryptionGeneratorKmsKeyArn
       Type: String
       Value: !GetAtt EncryptionGeneratorKmsKey.Arn
+
+  AuditFileGlacierRestoreQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditFileGlacierRestoreQueueArn
+      Type: String
+      Value: !GetAtt AuditFileGlacierRestoreQueue.Arn
 
   #######################
   # End: SSM Parameters #
