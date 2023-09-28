@@ -212,6 +212,13 @@ Resources:
         - AttributeName: requesterId
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: requesterIdGSI
+          KeySchema:
+            - AttributeName: requesterId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
       KeySchema:
         - AttributeName: s3FileKey
           KeyType: HASH
@@ -223,6 +230,8 @@ Resources:
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
         SSEEnabled: true
         SSEType: KMS
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
       TableName: !Sub ${AWS::StackName}-event-replay-file-mapping-table
 
   ############################
