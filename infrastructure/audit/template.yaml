@@ -351,6 +351,13 @@ Resources:
       Type: String
       Value: !Ref EventReplayFileMappingTable
 
+  EventReplayFileMappingTableStreamArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplayFileMappingTableStreamArn
+      Type: String
+      Value: !GetAtt EventReplayFileMappingTable.StreamArn
+
   EventReplaySnsTopicNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
