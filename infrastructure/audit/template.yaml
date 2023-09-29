@@ -59,6 +59,47 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/audit-file-ready-to-encrypt-queue-kms-key
       TargetKeyId: !Ref AuditFileReadyToEncryptQueueKmsKey
 
+  S3OperationQueueKmsKey:
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource:
+              - '*'
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+          - Effect: Allow
+            Principal:
+              Service: sqs.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+
+  S3OperationQueueKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/s3-operation-queue-kms-key
+      TargetKeyId: !Ref S3OperationQueueKmsKey
+
   EncryptionGeneratorKmsKey:
     Type: AWS::KMS::Key
     DeletionPolicy: Retain
@@ -91,9 +132,187 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/encryption-generator-kms-key
       TargetKeyId: !Ref EncryptionGeneratorKmsKey
 
+  EventReplaySnsKmsKey:
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource:
+              - '*'
+          - Effect: Allow
+            Principal:
+              Service: sqs.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+          - Sid: Enable Decrypt access for Event Processing
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:EventProcessingAccountRootArn}}'
+            Action:
+              - kms:Decrypt
+            Resource: '*'
+
+  EventReplaySnsKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/event-replay-sns-kms-key
+      TargetKeyId: !Ref EventReplaySnsKmsKey
+
   #################
   # End: KMS Keys #
   #################
+
+  #####################
+  # Batch Job Resources
+  #####################
+
+  AuditBatchJobManifestBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-batch-job-manifest-bucket
+      LifecycleConfiguration:
+        Rules:
+          - Id: BatchJobManifestCleanupRule
+            Status: Enabled
+            ExpirationInDays: 5
+      LoggingConfiguration:
+        DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-batch-job-manifest-bucket/
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  EventReplayFileMappingTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: s3FileKey
+          AttributeType: S
+        - AttributeName: requesterId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: requesterIdGSI
+          KeySchema:
+            - AttributeName: requesterId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      KeySchema:
+        - AttributeName: s3FileKey
+          KeyType: HASH
+        - AttributeName: requesterId
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+        SSEEnabled: true
+        SSEType: KMS
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      TableName: !Sub ${AWS::StackName}-event-replay-file-mapping-table
+
+  ############################
+  # End: Batch Job Resources #
+  ############################
+
+  ############################
+  # Start: SQS queues        #
+  ############################
+  AuditFileGlacierRestoreQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-file-glacier-restore-queue
+      KmsMasterKeyId: !GetAtt S3OperationQueueKmsKey.Arn
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt AuditFileGlacierRestoreDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  AuditFileGlacierRestoreDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-file-glacier-restore-dlq
+      KmsMasterKeyId: !GetAtt S3OperationQueueKmsKey.Arn
+
+  AuditFileGlacierRestoreQueueQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref AuditFileGlacierRestoreQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - sqs:*
+            Resource:
+              - !GetAtt AuditFileGlacierRestoreQueue.Arn
+            Principal:
+              Service:
+                - s3.amazonaws.com
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:s3:::*-permanent-message-batch
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+
+  ############################
+  # End: SQS queues        #
+  ############################
+
+  ############################
+  # End: SNS topics #
+  ############################
+
+  EventReplaySnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub ${AWS::StackName}-event-replay-topic
+      KmsMasterKeyId: !Ref EventReplaySnsKmsKey
+
+  EventReplaySnsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Id: AllowSnsSubscribe
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowEventProcessingAccountToSubscribe
+            Effect: Allow
+            Action:
+              - sns:Subscribe
+            Principal:
+              AWS:
+                - '{{resolve:ssm:EventProcessingAccountRootArn}}'
+            Resource: !Ref EventReplaySnsTopic
+      Topics:
+        - !Ref EventReplaySnsTopic
+
+  ############################
+  # End: SNS topics #
+  ############################
 
   #########################
   # Start: SSM Parameters #
@@ -106,12 +325,82 @@ Resources:
       Type: String
       Value: !GetAtt AuditFileReadyToEncryptQueueKmsKey.Arn
 
+  S3OperationQueueKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: S3OperationQueueKmsKeyArn
+      Type: String
+      Value: !GetAtt S3OperationQueueKmsKey.Arn
+
+  AuditBatchJobManifestBucketArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditBatchJobManifestBucketArn
+      Type: String
+      Value: !GetAtt AuditBatchJobManifestBucket.Arn
+
+  AuditBatchJobManifestBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditBatchJobManifestBucketName
+      Type: String
+      Value: !Ref AuditBatchJobManifestBucket
+
+  EventReplayFileMappingTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplayFileMappingTableArn
+      Type: String
+      Value: !GetAtt EventReplayFileMappingTable.Arn
+
+  EventReplayFileMappingTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplayFileMappingTableName
+      Type: String
+      Value: !Ref EventReplayFileMappingTable
+
+  EventReplayFileMappingTableStreamArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplayFileMappingTableStreamArn
+      Type: String
+      Value: !GetAtt EventReplayFileMappingTable.StreamArn
+
+  EventReplaySnsTopicNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySnsTopicName
+      Type: String
+      Value: !Ref EventReplaySnsTopic
+
+  EventReplaySnsTopicArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySnsTopicArn
+      Type: String
+      Value: !GetAtt EventReplaySnsTopic.TopicArn
+
+  EventReplaySnsKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySnsKmsKeyArn
+      Type: String
+      Value: !GetAtt EventReplaySnsKmsKey.Arn
+
   S3EncryptionGeneratorKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: S3EncryptionGeneratorKmsKeyArn
       Type: String
       Value: !GetAtt EncryptionGeneratorKmsKey.Arn
+
+  AuditFileGlacierRestoreQueueArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AuditFileGlacierRestoreQueueArn
+      Type: String
+      Value: !GetAtt AuditFileGlacierRestoreQueue.Arn
 
   #######################
   # End: SSM Parameters #
