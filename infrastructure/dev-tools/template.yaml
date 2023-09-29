@@ -194,6 +194,136 @@ Resources:
       LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-sqs-operations'
       RetentionInDays: 30
 
+  ##############################
+  # CopyS3FileFunction START   #
+  ##############################
+
+  CopyS3FileFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
+    #checkov:skip=CKV_AWS_116:DLQ not required
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: copyS3File.handler
+      FunctionName: !Sub ${AWS::StackName}-copy-s3-file
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      MemorySize: 512
+      Role: !GetAtt CopyS3FileRole.Arn
+
+  CopyS3FileRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-copy-s3-file-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaToAssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaExecute
+        - !Ref CopyS3FilePolicy
+
+  CopyS3FilePolicy:
+    #checkov:skip=CKV_AWS_111 this test Lambda is used across the account, so we can't specify
+    # which buckets it will specifically be used with upfront.
+    # The code is not deployed to production
+    #checkov:skip=CKV_AWS_108 We need to be able to copy from one bucket to another
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StackName}-copy-s3-file-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3Copy
+            Effect: 'Allow'
+            Action:
+              - s3:GetObject*
+              - s3:PutObject
+              - s3:PutObjectTagging
+            Resource: '*'
+
+  CopyS3FileLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-copy-s3-file'
+      RetentionInDays: 30
+
+  ############################
+  # CopyS3FileFunction END   #
+  ############################
+
+  ###################################
+  # CheckS3FileExistsFunction START #
+  ###################################
+
+  CheckS3FileExistsFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
+    #checkov:skip=CKV_AWS_116:DLQ not required
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: checkS3FileExists.handler
+      FunctionName: !Sub ${AWS::StackName}-check-s3-file-exists
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      MemorySize: 512
+      Role: !GetAtt CheckS3FileExistsRole.Arn
+
+  CheckS3FileExistsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-check-s3-file-exists-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaToAssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaExecute
+        - !Ref CheckS3FileExistsPolicy
+
+  CheckS3FileExistsPolicy:
+    #checkov:skip=CKV_AWS_108: this function is only used in test environments, where
+    # we need to be able to check if files exists or not
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StackName}-check-s3-file-exists-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3Read
+            Effect: 'Allow'
+            Action:
+              - s3:GetObject*
+            Resource: '*'
+
+  CheckS3FileExistsLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-check-s3-file-exists'
+      RetentionInDays: 30
+
+  ###################################
+  # CheckS3FileExistsFunction END   #
+  ###################################
+
   IntegrationTestDataBucket:
     Type: AWS::S3::Bucket
     Properties:
