@@ -174,21 +174,34 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@aws-lambda-powertools/commons", [\
-        ["npm:1.12.1", {\
-          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-commons-npm-1.12.1-5857cfd794-1d6032bb26.zip/node_modules/@aws-lambda-powertools/commons/",\
+        ["npm:1.14.0", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-commons-npm-1.14.0-aefae9d9f3-7025ff5d7d.zip/node_modules/@aws-lambda-powertools/commons/",\
           "packageDependencies": [\
-            ["@aws-lambda-powertools/commons", "npm:1.12.1"]\
+            ["@aws-lambda-powertools/commons", "npm:1.14.0"]\
           ],\
           "linkType": "HARD"\
         }]\
       ]],\
       ["@aws-lambda-powertools/logger", [\
-        ["npm:1.12.1", {\
-          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.12.1-7bb4b17117-87fa705ee6.zip/node_modules/@aws-lambda-powertools/logger/",\
+        ["npm:1.14.0", {\
+          "packageLocation": "./.yarn/cache/@aws-lambda-powertools-logger-npm-1.14.0-a3311b99e9-acb59fd46c.zip/node_modules/@aws-lambda-powertools/logger/",\
           "packageDependencies": [\
-            ["@aws-lambda-powertools/logger", "npm:1.12.1"],\
-            ["@aws-lambda-powertools/commons", "npm:1.12.1"],\
+            ["@aws-lambda-powertools/logger", "npm:1.14.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:1.14.0", {\
+          "packageLocation": "./.yarn/__virtual__/@aws-lambda-powertools-logger-virtual-694274fe58/0/cache/@aws-lambda-powertools-logger-npm-1.14.0-a3311b99e9-acb59fd46c.zip/node_modules/@aws-lambda-powertools/logger/",\
+          "packageDependencies": [\
+            ["@aws-lambda-powertools/logger", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:1.14.0"],\
+            ["@aws-lambda-powertools/commons", "npm:1.14.0"],\
+            ["@middy/core", null],\
+            ["@types/middy__core", null],\
             ["lodash.merge", "npm:4.6.2"]\
+          ],\
+          "packagePeers": [\
+            "@middy/core",\
+            "@types/middy__core"\
           ],\
           "linkType": "HARD"\
         }]\
@@ -5100,7 +5113,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./infrastructure/audit-test-tools/",\
           "packageDependencies": [\
             ["audit-test-tools", "workspace:infrastructure/audit-test-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.12.1"],\
+            ["@aws-lambda-powertools/logger", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:1.14.0"],\
             ["@aws-sdk/client-cloudformation", "npm:3.352.0"],\
             ["@aws-sdk/client-s3", "npm:3.352.0"],\
             ["@aws-sdk/client-sqs", "npm:3.352.0"],\
@@ -5805,7 +5818,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./infrastructure/dev-tools/",\
           "packageDependencies": [\
             ["dev-tools", "workspace:infrastructure/dev-tools"],\
-            ["@aws-lambda-powertools/logger", "npm:1.12.1"],\
+            ["@aws-lambda-powertools/logger", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:1.14.0"],\
             ["@aws-sdk/client-cloudformation", "npm:3.405.0"],\
             ["@aws-sdk/client-dynamodb", "npm:3.405.0"],\
             ["@aws-sdk/client-firehose", "npm:3.405.0"],\
