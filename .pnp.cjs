@@ -4225,6 +4225,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tslib", "npm:2.6.0"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:2.3.4", {\
+          "packageLocation": "./.yarn/cache/@smithy-types-npm-2.3.4-7d0b3a2a2f-12a500a02a.zip/node_modules/@smithy/types/",\
+          "packageDependencies": [\
+            ["@smithy/types", "npm:2.3.4"],\
+            ["tslib", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["@smithy/url-parser", [\
@@ -5814,7 +5822,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/lib-dynamodb", "virtual:76754fb9e14934e6ac41a4d7d9b67fc21dc49c963cdfa915e977592128b41bc3702292586e4f16dac3064a53bbc355ae9dceef50ba4f8b442ee55bfac3b20bf2#npm:3.405.0"],\
             ["@aws-sdk/types", "npm:3.398.0"],\
             ["@smithy/smithy-client", "npm:2.0.5"],\
-            ["@smithy/types", "npm:2.2.2"],\
+            ["@smithy/types", "npm:2.3.4"],\
             ["@types/aws-lambda", "npm:8.10.119"],\
             ["@types/jest", "npm:29.5.4"],\
             ["@types/jest-when", "npm:3.5.2"],\
