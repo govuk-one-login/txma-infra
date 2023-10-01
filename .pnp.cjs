@@ -4559,10 +4559,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@types/jest-when", [\
-        ["npm:3.5.2", {\
-          "packageLocation": "./.yarn/cache/@types-jest-when-npm-3.5.2-8b6f3f4c13-106230dd71.zip/node_modules/@types/jest-when/",\
+        ["npm:3.5.3", {\
+          "packageLocation": "./.yarn/cache/@types-jest-when-npm-3.5.3-0e9eb05086-5dc2661ad5.zip/node_modules/@types/jest-when/",\
           "packageDependencies": [\
-            ["@types/jest-when", "npm:3.5.2"],\
+            ["@types/jest-when", "npm:3.5.3"],\
             ["@types/jest", "npm:29.5.4"]\
           ],\
           "linkType": "HARD"\
@@ -5106,7 +5106,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-sqs", "npm:3.352.0"],\
             ["@types/aws-lambda", "npm:8.10.119"],\
             ["@types/jest", "npm:29.5.4"],\
-            ["@types/jest-when", "npm:3.5.2"],\
+            ["@types/jest-when", "npm:3.5.3"],\
             ["@types/node", "npm:18.17.14"],\
             ["aws-sdk-client-mock", "npm:3.0.0"],\
             ["aws-sdk-client-mock-jest", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:3.0.0"],\
@@ -5817,7 +5817,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@smithy/types", "npm:2.2.2"],\
             ["@types/aws-lambda", "npm:8.10.119"],\
             ["@types/jest", "npm:29.5.4"],\
-            ["@types/jest-when", "npm:3.5.2"],\
+            ["@types/jest-when", "npm:3.5.3"],\
             ["@types/node", "npm:18.17.14"],\
             ["aws-sdk-client-mock", "npm:3.0.0"],\
             ["aws-sdk-client-mock-jest", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:3.0.0"],\
