@@ -43,7 +43,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@typescript-eslint/parser", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:5.62.0"],\
             ["eslint", "npm:8.48.0"],\
             ["eslint-config-prettier", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:9.0.0"],\
-            ["eslint-plugin-jest", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:27.2.3"],\
+            ["eslint-plugin-jest", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:27.4.2"],\
             ["husky", "npm:8.0.3"],\
             ["lint-staged", "npm:13.3.0"],\
             ["prettier", "npm:3.0.3"],\
@@ -5843,7 +5843,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@typescript-eslint/parser", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:5.62.0"],\
             ["eslint", "npm:8.48.0"],\
             ["eslint-config-prettier", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:9.0.0"],\
-            ["eslint-plugin-jest", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:27.2.3"],\
+            ["eslint-plugin-jest", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:27.4.2"],\
             ["husky", "npm:8.0.3"],\
             ["lint-staged", "npm:13.3.0"],\
             ["prettier", "npm:3.0.3"],\
@@ -6117,17 +6117,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["eslint-plugin-jest", [\
-        ["npm:27.2.3", {\
-          "packageLocation": "./.yarn/cache/eslint-plugin-jest-npm-27.2.3-eeb5f3c7e9-4c7e07f52f.zip/node_modules/eslint-plugin-jest/",\
+        ["npm:27.4.2", {\
+          "packageLocation": "./.yarn/cache/eslint-plugin-jest-npm-27.4.2-7cad4fd5b2-99a8301ae0.zip/node_modules/eslint-plugin-jest/",\
           "packageDependencies": [\
-            ["eslint-plugin-jest", "npm:27.2.3"]\
+            ["eslint-plugin-jest", "npm:27.4.2"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:27.2.3", {\
-          "packageLocation": "./.yarn/__virtual__/eslint-plugin-jest-virtual-f8f44ebbd5/0/cache/eslint-plugin-jest-npm-27.2.3-eeb5f3c7e9-4c7e07f52f.zip/node_modules/eslint-plugin-jest/",\
+        ["virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:27.4.2", {\
+          "packageLocation": "./.yarn/__virtual__/eslint-plugin-jest-virtual-f4e31138b3/0/cache/eslint-plugin-jest-npm-27.4.2-7cad4fd5b2-99a8301ae0.zip/node_modules/eslint-plugin-jest/",\
           "packageDependencies": [\
-            ["eslint-plugin-jest", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:27.2.3"],\
+            ["eslint-plugin-jest", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:27.4.2"],\
             ["@types/eslint", null],\
             ["@types/jest", null],\
             ["@types/typescript-eslint__eslint-plugin", null],\
