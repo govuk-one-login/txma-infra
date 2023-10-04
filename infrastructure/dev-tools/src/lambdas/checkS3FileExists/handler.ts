@@ -12,7 +12,9 @@ export const handler = async (
   logger.info('Received request to check if file exists', { s3FileDetails })
   const doesFileExist = await s3FileExists(s3FileDetails)
   logger.info('File existence result', { doesFileExist })
-  return doesFileExist
+  return {
+    fileExists: doesFileExist
+  }
 }
 
 const s3FileExists = async (s3FileDetails: S3FileDetails): Promise<boolean> => {
@@ -29,7 +31,6 @@ const s3FileExists = async (s3FileDetails: S3FileDetails): Promise<boolean> => {
     const notFoundError = err as { name: string }
     if (
       notFoundError &&
-      // Depending on the permissions, we can either get AccessDenied or NotFound when a file doesn't
       ['AccessDenied', 'NotFound'].includes(notFoundError.name)
     ) {
       return false

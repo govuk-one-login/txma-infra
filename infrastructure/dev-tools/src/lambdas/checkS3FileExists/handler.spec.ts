@@ -28,7 +28,7 @@ describe('checkS3FileExists handler', () => {
       { bucketName: testBucket, key: testKey },
       mockLambdaContext
     )
-    expect(result).toEqual(true)
+    expect(result).toStrictEqual({ fileExists: true })
     expect(s3Mock).toHaveReceivedCommandWith(HeadObjectCommand, {
       Bucket: testBucket,
       Key: testKey
@@ -44,7 +44,7 @@ describe('checkS3FileExists handler', () => {
         { bucketName: testBucket, key: testKey },
         mockLambdaContext
       )
-      expect(result).toEqual(false)
+      expect(result).toStrictEqual({ fileExists: false })
     }
   )
 })
