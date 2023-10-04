@@ -392,3 +392,17 @@ Resources:
       Name: /tests/ReadS3FileToStringFunctionName
       Type: String
       Value: !Ref ReadS3FileToStringFunction
+
+  CopyS3FileFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/CopyS3FileFunctionName
+      Type: String
+      Value: !Ref CopyS3FileFunction
+
+  CheckS3FileExistsFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/CheckS3FileExistsFunctionName
+      Type: String
+      Value: !Ref CheckS3FileExistsFunction
