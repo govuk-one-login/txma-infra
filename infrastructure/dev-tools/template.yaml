@@ -261,6 +261,75 @@ Resources:
   # CopyS3FileFunction END   #
   ############################
 
+  ##############################
+  # S3OperationsFunction START   #
+  ##############################
+
+  S3OperationsFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
+    #checkov:skip=CKV_AWS_116:DLQ not required
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: S3Operations.handler
+      FunctionName: !Sub ${AWS::StackName}-s3-operations
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      MemorySize: 512
+      Role: !GetAtt S3OperationsRole.Arn
+
+  S3OperationsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-s3-operations-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaToAssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Ref S3OperationsPolicy
+
+  S3OperationsPolicy:
+    #checkov:skip=CKV_AWS_111 this test Lambda is used across the account, so we can't specify
+    # which buckets it will specifically be used with upfront.
+    # The code is not deployed to production
+    #checkov:skip=CKV_AWS_108 We need to be able to copy from one bucket to another
+    #checkov:skip=CKV_AWS_109 This is a generic S3 Function and requires broad permissions
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StackName}-s3-operations-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3Operations
+            Effect: 'Allow'
+            Action:
+              - s3:GetObject*
+              - s3:ListBucket
+              - s3:PutObject*
+              - s3:DeleteObject*
+            Resource: '*'
+
+  S3OperationsLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-s3-operations'
+      RetentionInDays: 30
+
+  ############################
+  # S3OperationsFunction END   #
+  ############################
+
   ###################################
   # CheckS3FileExistsFunction START #
   ###################################
