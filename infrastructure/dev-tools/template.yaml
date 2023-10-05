@@ -477,3 +477,10 @@ Resources:
       Name: /tests/CheckS3FileExistsFunctionName
       Type: String
       Value: !Ref CheckS3FileExistsFunction
+
+  S3OperationsFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/S3OperationsFunctionName
+      Type: String
+      Value: !Ref S3OperationsFunction
