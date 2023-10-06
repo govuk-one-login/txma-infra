@@ -3249,6 +3249,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@smithy/fetch-http-handler@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "@smithy/fetch-http-handler@npm:2.2.1"
+  dependencies:
+    "@smithy/protocol-http": ^3.0.6
+    "@smithy/querystring-builder": ^2.0.10
+    "@smithy/types": ^2.3.4
+    "@smithy/util-base64": ^2.0.0
+    tslib: ^2.5.0
+  checksum: f4c59138e0b274778a827872633794ddcaec8022d341789fd8ff50075d24c3ab077bff0b1ad7a562bdd183a67826e3619731468e4e30c688c1db9e411ddbe046
+  languageName: node
+  linkType: hard
+
 "@smithy/hash-blob-browser@npm:^2.0.5":
   version: 2.0.5
   resolution: "@smithy/hash-blob-browser@npm:2.0.5"
@@ -3492,7 +3505,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/smithy-client@npm:2.1.8, @smithy/smithy-client@npm:^2.0.5":
+"@smithy/smithy-client@npm:2.1.9":
+  version: 2.1.9
+  resolution: "@smithy/smithy-client@npm:2.1.9"
+  dependencies:
+    "@smithy/middleware-stack": ^2.0.4
+    "@smithy/types": ^2.3.4
+    "@smithy/util-stream": ^2.0.14
+    tslib: ^2.5.0
+  checksum: f1cbf40c5473b17cd79d4e454d34c4a805bf69d95bba026082b5ad3d4030e5dacf98e9a8a818af38ebe9f489d6f1ffa33328a53e0f65b24c2f1e2523716c1356
+  languageName: node
+  linkType: hard
+
+"@smithy/smithy-client@npm:^2.0.5":
   version: 2.1.8
   resolution: "@smithy/smithy-client@npm:2.1.8"
   dependencies:
@@ -3647,6 +3672,22 @@ __metadata:
     "@smithy/util-utf8": ^2.0.0
     tslib: ^2.5.0
   checksum: 4487e43bc27269539a1f9486c407747529e7337688b0908f924c5ad4d2f73ae77b095e1a6c1acc7f3ed715a0aabbf97c5a71da1789eecf7588061fffdccc131b
+  languageName: node
+  linkType: hard
+
+"@smithy/util-stream@npm:^2.0.14":
+  version: 2.0.14
+  resolution: "@smithy/util-stream@npm:2.0.14"
+  dependencies:
+    "@smithy/fetch-http-handler": ^2.2.1
+    "@smithy/node-http-handler": ^2.1.6
+    "@smithy/types": ^2.3.4
+    "@smithy/util-base64": ^2.0.0
+    "@smithy/util-buffer-from": ^2.0.0
+    "@smithy/util-hex-encoding": ^2.0.0
+    "@smithy/util-utf8": ^2.0.0
+    tslib: ^2.5.0
+  checksum: 1b7c4e838406b644740778d84e8ea3c3ac692d6a6a7a479ba6192ee36e069462adc58dce06880713daada19090c3b80d0b794d13798eaa5915f15ca07a8ce666
   languageName: node
   linkType: hard
 
@@ -4792,7 +4833,7 @@ __metadata:
     "@aws-sdk/client-sqs": 3.405.0
     "@aws-sdk/lib-dynamodb": 3.405.0
     "@aws-sdk/types": 3.398.0
-    "@smithy/smithy-client": 2.1.8
+    "@smithy/smithy-client": 2.1.9
     "@smithy/types": 2.3.4
     "@types/aws-lambda": 8.10.122
     "@types/jest": 29.5.5
@@ -4815,7 +4856,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "di-txma-infra@workspace:."
   dependencies:
-    "@smithy/smithy-client": 2.1.8
+    "@smithy/smithy-client": 2.1.9
     "@typescript-eslint/eslint-plugin": 5.62.0
     "@typescript-eslint/parser": 5.62.0
     eslint: 8.50.0

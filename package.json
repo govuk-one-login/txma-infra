@@ -16,7 +16,7 @@
     "validate:templates": "bash ./scripts/validate-templates.sh"
   },
   "devDependencies": {
-    "@smithy/smithy-client": "2.1.8",
+    "@smithy/smithy-client": "2.1.9",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
     "eslint": "8.50.0",

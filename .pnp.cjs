@@ -38,7 +38,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
-            ["@smithy/smithy-client", "npm:2.1.8"],\
+            ["@smithy/smithy-client", "npm:2.1.9"],\
             ["@typescript-eslint/eslint-plugin", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:5.62.0"],\
             ["@typescript-eslint/parser", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:5.62.0"],\
             ["eslint", "npm:8.50.0"],\
@@ -3946,6 +3946,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tslib", "npm:2.6.0"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:2.2.1", {\
+          "packageLocation": "./.yarn/cache/@smithy-fetch-http-handler-npm-2.2.1-9e2e3c3f4a-f4c59138e0.zip/node_modules/@smithy/fetch-http-handler/",\
+          "packageDependencies": [\
+            ["@smithy/fetch-http-handler", "npm:2.2.1"],\
+            ["@smithy/protocol-http", "npm:3.0.6"],\
+            ["@smithy/querystring-builder", "npm:2.0.10"],\
+            ["@smithy/types", "npm:2.3.4"],\
+            ["@smithy/util-base64", "npm:2.0.0"],\
+            ["tslib", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["@smithy/hash-blob-browser", [\
@@ -4221,6 +4233,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tslib", "npm:2.6.0"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:2.1.9", {\
+          "packageLocation": "./.yarn/cache/@smithy-smithy-client-npm-2.1.9-a42539b079-f1cbf40c54.zip/node_modules/@smithy/smithy-client/",\
+          "packageDependencies": [\
+            ["@smithy/smithy-client", "npm:2.1.9"],\
+            ["@smithy/middleware-stack", "npm:2.0.4"],\
+            ["@smithy/types", "npm:2.3.4"],\
+            ["@smithy/util-stream", "npm:2.0.14"],\
+            ["tslib", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["@smithy/types", [\
@@ -4370,6 +4393,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@smithy/util-stream", "npm:2.0.13"],\
             ["@smithy/fetch-http-handler", "npm:2.2.0"],\
+            ["@smithy/node-http-handler", "npm:2.1.6"],\
+            ["@smithy/types", "npm:2.3.4"],\
+            ["@smithy/util-base64", "npm:2.0.0"],\
+            ["@smithy/util-buffer-from", "npm:2.0.0"],\
+            ["@smithy/util-hex-encoding", "npm:2.0.0"],\
+            ["@smithy/util-utf8", "npm:2.0.0"],\
+            ["tslib", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:2.0.14", {\
+          "packageLocation": "./.yarn/cache/@smithy-util-stream-npm-2.0.14-f349797a45-1b7c4e8384.zip/node_modules/@smithy/util-stream/",\
+          "packageDependencies": [\
+            ["@smithy/util-stream", "npm:2.0.14"],\
+            ["@smithy/fetch-http-handler", "npm:2.2.1"],\
             ["@smithy/node-http-handler", "npm:2.1.6"],\
             ["@smithy/types", "npm:2.3.4"],\
             ["@smithy/util-base64", "npm:2.0.0"],\
@@ -5843,7 +5881,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-sqs", "npm:3.405.0"],\
             ["@aws-sdk/lib-dynamodb", "virtual:76754fb9e14934e6ac41a4d7d9b67fc21dc49c963cdfa915e977592128b41bc3702292586e4f16dac3064a53bbc355ae9dceef50ba4f8b442ee55bfac3b20bf2#npm:3.405.0"],\
             ["@aws-sdk/types", "npm:3.398.0"],\
-            ["@smithy/smithy-client", "npm:2.1.8"],\
+            ["@smithy/smithy-client", "npm:2.1.9"],\
             ["@smithy/types", "npm:2.3.4"],\
             ["@types/aws-lambda", "npm:8.10.122"],\
             ["@types/jest", "npm:29.5.5"],\
@@ -5868,7 +5906,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["di-txma-infra", "workspace:."],\
-            ["@smithy/smithy-client", "npm:2.1.8"],\
+            ["@smithy/smithy-client", "npm:2.1.9"],\
             ["@typescript-eslint/eslint-plugin", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:5.62.0"],\
             ["@typescript-eslint/parser", "virtual:95420a2ca75e9756173d693443c01784b7429bb3485cde4f0b5309e95f632a622710a011847e70e025778a1bd7a5cdc8929e05fed2117b5034bc2fe6ce56796b#npm:5.62.0"],\
             ["eslint", "npm:8.50.0"],\
