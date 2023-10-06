@@ -4460,10 +4460,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@types/aws-lambda", [\
-        ["npm:8.10.122", {\
-          "packageLocation": "./.yarn/cache/@types-aws-lambda-npm-8.10.122-05da57bf10-5c2e02ae8f.zip/node_modules/@types/aws-lambda/",\
+        ["npm:8.10.123", {\
+          "packageLocation": "./.yarn/cache/@types-aws-lambda-npm-8.10.123-673992442a-cb2dfb83e2.zip/node_modules/@types/aws-lambda/",\
           "packageDependencies": [\
-            ["@types/aws-lambda", "npm:8.10.122"]\
+            ["@types/aws-lambda", "npm:8.10.123"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -5118,7 +5118,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-cloudformation", "npm:3.352.0"],\
             ["@aws-sdk/client-s3", "npm:3.352.0"],\
             ["@aws-sdk/client-sqs", "npm:3.352.0"],\
-            ["@types/aws-lambda", "npm:8.10.122"],\
+            ["@types/aws-lambda", "npm:8.10.123"],\
             ["@types/jest", "npm:29.5.5"],\
             ["@types/jest-when", "npm:3.5.3"],\
             ["@types/node", "npm:18.18.1"],\
@@ -5845,7 +5845,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/types", "npm:3.398.0"],\
             ["@smithy/smithy-client", "npm:2.1.8"],\
             ["@smithy/types", "npm:2.3.4"],\
-            ["@types/aws-lambda", "npm:8.10.122"],\
+            ["@types/aws-lambda", "npm:8.10.123"],\
             ["@types/jest", "npm:29.5.5"],\
             ["@types/jest-when", "npm:3.5.3"],\
             ["@types/node", "npm:18.18.1"],\

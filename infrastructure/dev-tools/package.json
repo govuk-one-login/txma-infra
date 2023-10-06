@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@smithy/types": "2.3.4",
-    "@types/aws-lambda": "8.10.122",
+    "@types/aws-lambda": "8.10.123",
     "@types/jest": "29.5.5",
     "@types/jest-when": "3.5.3",
     "@types/node": "18.18.1",
