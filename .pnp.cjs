@@ -5124,7 +5124,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:18.18.1"],\
             ["aws-sdk-client-mock", "npm:3.0.0"],\
             ["aws-sdk-client-mock-jest", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:3.0.0"],\
-            ["axios", "npm:1.5.0"],\
+            ["axios", "npm:1.5.1"],\
             ["esbuild", "npm:0.19.4"],\
             ["jest", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:29.7.0"],\
             ["jest-when", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:3.6.0"],\
@@ -5173,11 +5173,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["axios", [\
-        ["npm:1.5.0", {\
-          "packageLocation": "./.yarn/cache/axios-npm-1.5.0-35a845e191-e7405a5dbb.zip/node_modules/axios/",\
+        ["npm:1.5.1", {\
+          "packageLocation": "./.yarn/cache/axios-npm-1.5.1-6bc68e7d25-4444f06601.zip/node_modules/axios/",\
           "packageDependencies": [\
-            ["axios", "npm:1.5.0"],\
-            ["follow-redirects", "virtual:35a845e191d5a8a7376e256c81e9e855732385142c5dc9e26f0b8393c2fb4673b81fed201d5f2c5ab96fb727142683ac03329eab760f2c4870779d4bda6abe8f#npm:1.15.2"],\
+            ["axios", "npm:1.5.1"],\
+            ["follow-redirects", "virtual:6bc68e7d25b7055a51c269c1fa5648c8246286db1b7949168396e2ffbde7ed58cf742783c99b4e376ba9a3e96fcc4d029f96bd1b532b606b5055545461060ec6#npm:1.15.2"],\
             ["form-data", "npm:4.0.0"],\
             ["proxy-from-env", "npm:1.1.0"]\
           ],\
@@ -5851,7 +5851,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:18.18.1"],\
             ["aws-sdk-client-mock", "npm:3.0.0"],\
             ["aws-sdk-client-mock-jest", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:3.0.0"],\
-            ["axios", "npm:1.5.0"],\
+            ["axios", "npm:1.5.1"],\
             ["esbuild", "npm:0.19.4"],\
             ["jest", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:29.7.0"],\
             ["jest-when", "virtual:25df8bfa1c4e98b5f7e707fea0535d6826460e300df443e0cae8eb0a40963c4b6d6d00a0ea6aa0c4577042d4b973a9f95fb21945e1cd1bd7dd963169bb7b745d#npm:3.6.0"],\
@@ -6506,10 +6506,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:35a845e191d5a8a7376e256c81e9e855732385142c5dc9e26f0b8393c2fb4673b81fed201d5f2c5ab96fb727142683ac03329eab760f2c4870779d4bda6abe8f#npm:1.15.2", {\
-          "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-2e83874824/0/cache/follow-redirects-npm-1.15.2-1ec1dd82be-faa66059b6.zip/node_modules/follow-redirects/",\
+        ["virtual:6bc68e7d25b7055a51c269c1fa5648c8246286db1b7949168396e2ffbde7ed58cf742783c99b4e376ba9a3e96fcc4d029f96bd1b532b606b5055545461060ec6#npm:1.15.2", {\
+          "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-ec65af1aae/0/cache/follow-redirects-npm-1.15.2-1ec1dd82be-faa66059b6.zip/node_modules/follow-redirects/",\
           "packageDependencies": [\
-            ["follow-redirects", "virtual:35a845e191d5a8a7376e256c81e9e855732385142c5dc9e26f0b8393c2fb4673b81fed201d5f2c5ab96fb727142683ac03329eab760f2c4870779d4bda6abe8f#npm:1.15.2"],\
+            ["follow-redirects", "virtual:6bc68e7d25b7055a51c269c1fa5648c8246286db1b7949168396e2ffbde7ed58cf742783c99b4e376ba9a3e96fcc4d029f96bd1b532b606b5055545461060ec6#npm:1.15.2"],\
             ["@types/debug", null],\
             ["debug", null]\
           ],\
