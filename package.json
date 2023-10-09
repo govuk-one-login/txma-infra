@@ -1,5 +1,9 @@
 {
-  "name": "di-txma-infra",
+  "name": "txma-infra",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/govuk-one-login/txma-infra"
+  },
   "author": "GDS",
   "license": "MIT",
   "private": true,

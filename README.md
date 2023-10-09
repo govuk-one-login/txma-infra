@@ -1,4 +1,4 @@
-# di-txma-infra
+# TxMA Infrastructure
 
 Infrastructure for querying data in Transaction Monitoring & Audit. There is an additional README for each stack.
 
