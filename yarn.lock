@@ -4811,23 +4811,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"di-txma-infra@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "di-txma-infra@workspace:."
-  dependencies:
-    "@smithy/smithy-client": 2.1.8
-    "@typescript-eslint/eslint-plugin": 5.62.0
-    "@typescript-eslint/parser": 5.62.0
-    eslint: 8.50.0
-    eslint-config-prettier: 9.0.0
-    eslint-plugin-jest: 27.4.2
-    husky: 8.0.3
-    lint-staged: 13.3.0
-    prettier: 3.0.3
-    typescript: 4.9.5
-  languageName: unknown
-  linkType: soft
-
 "diff-sequences@npm:^28.1.1":
   version: 28.1.1
   resolution: "diff-sequences@npm:28.1.1"
@@ -7993,6 +7976,23 @@ __metadata:
   checksum: 1843f4c1b2e0f975e08c4c21caa4af4f7f65a12ac1b81b3b8489366826259323feb3fc7a243123453d2d1a02314205a7634e048d4a8009921da19f99755cdc48
   languageName: node
   linkType: hard
+
+"txma-infra@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "txma-infra@workspace:."
+  dependencies:
+    "@smithy/smithy-client": 2.1.8
+    "@typescript-eslint/eslint-plugin": 5.62.0
+    "@typescript-eslint/parser": 5.62.0
+    eslint: 8.50.0
+    eslint-config-prettier: 9.0.0
+    eslint-plugin-jest: 27.4.2
+    husky: 8.0.3
+    lint-staged: 13.3.0
+    prettier: 3.0.3
+    typescript: 4.9.5
+  languageName: unknown
+  linkType: soft
 
 "type-check@npm:^0.4.0, type-check@npm:~0.4.0":
   version: 0.4.0
