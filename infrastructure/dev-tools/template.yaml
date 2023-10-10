@@ -330,6 +330,75 @@ Resources:
   # S3OperationsFunction END   #
   ############################
 
+  #######################################
+  # PutZippedStringToS3Function START   #
+  #######################################
+
+  PutZippedStringToS3Function:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
+    #checkov:skip=CKV_AWS_116:DLQ not required
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: writeZippedStringToS3.handler
+      FunctionName: !Sub ${AWS::StackName}-write-zipped-string
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      MemorySize: 512
+      Role: !GetAtt WriteZippedStringRole.Arn
+
+  WriteZippedStringRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-write-zipped-string-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaToAssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Ref WriteZippedStringRolePolicy
+
+  WriteZippedStringRolePolicy:
+    #checkov:skip=CKV_AWS_111 this test Lambda is used across the account, so we can't specify
+    # which buckets it will specifically be used with upfront.
+    # The code is not deployed to production
+    #checkov:skip=CKV_AWS_108 We need to be able to copy from one bucket to another
+    #checkov:skip=CKV_AWS_109 This is a generic S3 Function and requires broad permissions
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StackName}-write-zipped-string-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3Operations
+            Effect: 'Allow'
+            Action:
+              - s3:GetObject*
+              - s3:ListBucket
+              - s3:PutObject*
+              - s3:DeleteObject*
+            Resource: '*'
+
+  WriteZippedStringFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-write-zipped-string'
+      RetentionInDays: 30
+
+  ############################
+  # PutZippedStringToS3Function END   #
+  ############################
+
   ###################################
   # CheckS3FileExistsFunction START #
   ###################################
@@ -484,3 +553,10 @@ Resources:
       Name: /tests/S3OperationsFunctionName
       Type: String
       Value: !Ref S3OperationsFunction
+
+  PutZippedStringToS3FunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/PutZippedStringToS3FunctionName
+      Type: String
+      Value: !Ref PutZippedStringToS3Function
