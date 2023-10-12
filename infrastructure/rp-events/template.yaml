@@ -189,6 +189,7 @@ Resources:
       QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-queue
       KmsMasterKeyId: !GetAtt RPEventsQueueKmsKey.Arn
       VisibilityTimeout: 60
+      MessageRetentionPeriod: 1209600 #14 Days in seconds
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt RPEventsDeadLetterQueue.Arn
         maxReceiveCount: 5
@@ -233,6 +234,7 @@ Resources:
     Properties:
       QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-dead-letter-queue
       KmsMasterKeyId: !GetAtt RPEventsQueueKmsKey.Arn
+      MessageRetentionPeriod: 1209600 #14 Days in seconds
 
   AgeOfOldestMessageOnRPEventsQueueAlarm:
     Type: AWS::CloudWatch::Alarm
