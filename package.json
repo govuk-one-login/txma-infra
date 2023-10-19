@@ -20,10 +20,10 @@
     "validate:templates": "bash ./scripts/validate-templates.sh"
   },
   "devDependencies": {
-    "@smithy/smithy-client": "2.1.8",
+    "@smithy/smithy-client": "2.1.11",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
-    "eslint": "8.50.0",
+    "eslint": "8.51.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-jest": "27.4.2",
     "husky": "8.0.3",
