@@ -9,6 +9,7 @@ jobs:
   check-yarn-cache:
     name: Check Yarn cache
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -26,6 +27,7 @@ jobs:
   linting-and-tests:
     name: Run linting and tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -47,6 +49,7 @@ jobs:
   validate-templates:
     name: Validate SAM templates
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
