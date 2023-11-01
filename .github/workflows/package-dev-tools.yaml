@@ -16,6 +16,7 @@ jobs:
   build:
     name: Build Lambda functions
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: infrastructure/dev-tools
@@ -44,6 +45,7 @@ jobs:
             .git/
             infrastructure/dev-tools/dist/
             infrastructure/dev-tools/template.yaml
+          retention-days: 7
 
   package:
     strategy:
@@ -95,6 +97,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v3
