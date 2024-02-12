@@ -68,6 +68,9 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
       TableName: !Sub ${AWS::StackName}-user-config
+      Tags:
+        - Key: BackupFrequency
+          Value: Bihourly
 
   ###############
   # WAF Resources
