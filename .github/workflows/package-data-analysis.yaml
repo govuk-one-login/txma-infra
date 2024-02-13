@@ -15,7 +15,8 @@ jobs:
   package:
     strategy:
       matrix:
-        target: [AUDIT_DEV, AUDIT_BUILD]
+        #target: [AUDIT_DEV, AUDIT_BUILD]
+        target: [AUDIT_DEV]
         include:
           - target: AUDIT_DEV
             ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_DATA_ANALYSIS_AUDIT_DEV

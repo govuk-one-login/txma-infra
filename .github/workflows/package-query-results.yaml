@@ -15,7 +15,8 @@ jobs:
   package:
     strategy:
       matrix:
-        target: [QUERY_RESULTS_DEV, QUERY_RESULTS_BUILD]
+        #target: [QUERY_RESULTS_DEV, QUERY_RESULTS_BUILD]
+        target: [QUERY_RESULTS_DEV]
         include:
           - target: QUERY_RESULTS_DEV
             ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_QUERY_RESULTS_DEV
