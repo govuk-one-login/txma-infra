@@ -70,7 +70,7 @@ Resources:
       TableName: !Sub ${AWS::StackName}-user-config
       Tags:
         - Key: BackupFrequency
-          Value: Bihourly
+          Value: Daily
 
   ###############
   # WAF Resources
