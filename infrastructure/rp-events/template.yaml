@@ -49,6 +49,9 @@ Resources:
         SSEEnabled: true
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+      Tags:
+        - Key: BackupFrequency
+          Value: Daily
 
   RelyingPartyPairwiseMappingTable:
     Type: AWS::DynamoDB::Table
@@ -82,6 +85,9 @@ Resources:
         SSEEnabled: true
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+      Tags:
+        - Key: BackupFrequency
+          Value: Daily
 
   RelyingPartyPairwiseMappingTableCrossAccountAccessRole:
     Type: AWS::IAM::Role
