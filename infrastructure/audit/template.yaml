@@ -233,6 +233,9 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
       TableName: !Sub ${AWS::StackName}-event-replay-file-mapping-table
+      Tags:
+        - Key: BackupFrequency
+          Value: Daily
 
   ############################
   # End: Batch Job Resources #

@@ -253,6 +253,9 @@ Resources:
         SSEEnabled: true
         SSEType: KMS
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+      Tags:
+        - Key: BackupFrequency
+          Value: Daily
 
   ###############
   # WAF Resources
