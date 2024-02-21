@@ -67,6 +67,8 @@ Resources:
           AttributeType: S
         - AttributeName: clientPairwiseIdLookup
           AttributeType: S
+        - AttributeName: pairwiseId
+          AttributeType: S
       KeySchema:
         - AttributeName: commonSubjectId
           KeyType: HASH
@@ -76,6 +78,12 @@ Resources:
         - IndexName: ClientPairwiseIdIndex
           KeySchema:
             - AttributeName: clientPairwiseIdLookup
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+        - IndexName: PairwiseIdIndex
+          KeySchema:
+            - AttributeName: pairwiseId
               KeyType: HASH
           Projection:
             ProjectionType: KEYS_ONLY
