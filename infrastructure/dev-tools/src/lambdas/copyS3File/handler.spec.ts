@@ -1,4 +1,9 @@
-import { CopyObjectCommand, S3Client, StorageClass } from '@aws-sdk/client-s3'
+import {
+  CopyObjectCommand,
+  S3Client,
+  StorageClass,
+  CopyObjectCommandInput
+} from '@aws-sdk/client-s3'
 import { mockClient } from 'aws-sdk-client-mock'
 
 import 'aws-sdk-client-mock-jest'
@@ -24,7 +29,7 @@ describe('copyS3File handler', () => {
       StorageClass: StorageClass.STANDARD,
       Tagging: 'autoTest=true',
       TaggingDirective: 'REPLACE'
-    }
+    } as CopyObjectCommandInput
 
     await handler(testInput, mockLambdaContext)
     expect(s3Mock).toHaveReceivedCommandWith(CopyObjectCommand, testInput)
