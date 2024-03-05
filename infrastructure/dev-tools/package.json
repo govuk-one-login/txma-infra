@@ -11,12 +11,12 @@
     "test:cov": "jest --coverage"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "1.14.0",
-    "@aws-sdk/client-cloudformation": "3.405.0",
+    "@aws-lambda-powertools/logger": "1.18.1",
+    "@aws-sdk/client-cloudformation": "3.526.0",
     "@aws-sdk/client-dynamodb": "3.405.0",
     "@aws-sdk/client-firehose": "3.405.0",
-    "@aws-sdk/client-s3": "3.405.0",
-    "@aws-sdk/client-sqs": "3.405.0",
+    "@aws-sdk/client-s3": "3.525.0",
+    "@aws-sdk/client-sqs": "3.525.0",
     "@aws-sdk/lib-dynamodb": "3.405.0",
     "@aws-sdk/types": "3.398.0",
     "@smithy/smithy-client": "2.1.11",
