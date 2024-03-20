@@ -273,6 +273,27 @@ Resources:
       Threshold: 3600
       TreatMissingData: ignore
 
+  RPEventsDeadLetterQueueAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      AlarmDescription: >-
+        Alarm that monitors the RP events output DLQ for any new messages.
+        When messages land in this queue, it indicates that we are unable to .
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt RPEventsDeadLetterQueue.QueueName
+      EvaluationPeriods: 1
+      MetricName: ApproximateNumberOfMessagesVisible
+      Namespace: AWS/SQS
+      Period: 60
+      Statistic: Sum
+      Threshold: 0
+      TreatMissingData: ignore
+
   ################
   # SSM Parameters
   ################
