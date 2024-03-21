@@ -44,11 +44,29 @@ Resources:
         - Key: BackupFrequency
           Value: Daily
 
+  ################
+  # SSM Parameters
+  ################
+
+  UserJourneyIdCacheTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserJourneyIdCacheTableArn
+      Type: String
+      Value: !GetAtt UserJourneyIdCacheTable.Arn
+
+  UserJourneyIdCacheTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserJourneyIdCacheTableName
+      Type: String
+      Value: !Ref UserJourneyIdCacheTable
+
+Outputs:
   ###############
   # Stack Outputs
   ###############
 
-Outputs:
   UserJourneyIdCacheKmsOutput:
     Value: !FindInMap [UserJourneyIdCacheKmsArn, Environment, !Ref Environment]
     Export:
