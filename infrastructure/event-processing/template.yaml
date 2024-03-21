@@ -61,13 +61,3 @@ Resources:
       Name: UserJourneyIdCacheTableName
       Type: String
       Value: !Ref UserJourneyIdCacheTable
-
-Outputs:
-  ###############
-  # Stack Outputs
-  ###############
-
-  UserJourneyIdCacheKmsOutput:
-    Value: !FindInMap [UserJourneyIdCacheKmsArn, Environment, !Ref Environment]
-    Export:
-      Name: UserJourneyIdCacheKmsArn
