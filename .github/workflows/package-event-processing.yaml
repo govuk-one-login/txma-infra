@@ -1,0 +1,53 @@
+name: Package event processing infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - infrastructure/event-processing/**
+  workflow_dispatch: {}
+
+env:
+  AWS_REGION: eu-west-2
+
+jobs:
+  package:
+    strategy:
+      matrix:
+        include:
+          - target: EVENT_PROCESSING_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_EP_EVENTS_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_EP_EVENTS_DEV
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_EP_EVENTS_DEV
+          - target: EVENT_PROCESSING_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_EP_EVENTS_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_EP_EVENTS_BUILD
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_EP_EVENTS_BUILD
+    name: Package template - ${{ matrix.target }}
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS role
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
+      - name: Package SAM app
+        uses: alphagov/di-devplatform-upload-action@v3.3
+        with:
+          artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
+          signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
+          template-file: infrastructure/event-processing/template.yaml
+          working-directory: '.'

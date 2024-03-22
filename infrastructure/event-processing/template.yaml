@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static infrastructure for Event Processing
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Resources:
+  ####################
+  # DynamoDB Resources
+  ####################
+
+  UserJourneyIdCacheTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub ${AWS::StackName}-${Environment}-user-journeyId-cache
+      AttributeDefinitions:
+        - AttributeName: govuk_signin_journey_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: govuk_signin_journey_id
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+      Tags:
+        - Key: BackupFrequency
+          Value: Daily
+
+  ################
+  # SSM Parameters
+  ################
+
+  UserJourneyIdCacheTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserJourneyIdCacheTableArn
+      Type: String
+      Value: !GetAtt UserJourneyIdCacheTable.Arn
+
+  UserJourneyIdCacheTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserJourneyIdCacheTableName
+      Type: String
+      Value: !Ref UserJourneyIdCacheTable
