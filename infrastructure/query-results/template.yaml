@@ -97,6 +97,7 @@ Resources:
       Tags:
         - Key: BackupFrequency
           Value: Daily
+      DeletionProtectionEnabled: true
 
   SecureFraudApiWafIpSet:
     Condition: NotTestEnvironment
