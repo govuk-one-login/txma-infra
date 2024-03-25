@@ -3,6 +3,7 @@ name: Package event processing infrastructure
 on:
   push:
     branches:
+      - TT2-1568
       - main
     paths:
       - infrastructure/event-processing/**
