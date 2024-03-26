@@ -159,6 +159,7 @@ Resources:
     Properties:
       Handler: emptyS3Buckets.handler
       FunctionName: !Sub ${AWS::StackName}-empty-s3-buckets
+      Description: 'Used by feature branches so empty s3 buckets so a feature stack can be deleted'
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
       Policies:
         - Statement:
