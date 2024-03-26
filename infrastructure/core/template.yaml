@@ -35,6 +35,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub ${AWS::StackName}-${Environment}-chatbot-alarm-role
+      Description: 'The IAM roles used by AWS chatbot to send notifications to slack'
       PermissionsBoundary:
         !If [
           UsePermissionsBoundary,
