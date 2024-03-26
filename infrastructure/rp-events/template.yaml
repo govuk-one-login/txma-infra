@@ -52,6 +52,7 @@ Resources:
       Tags:
         - Key: BackupFrequency
           Value: Daily
+      DeletionProtectionEnabled: true
 
   RelyingPartyPairwiseMappingTable:
     Type: AWS::DynamoDB::Table
@@ -96,6 +97,7 @@ Resources:
       Tags:
         - Key: BackupFrequency
           Value: Daily
+      DeletionProtectionEnabled: true
 
   RelyingPartyPairwiseMappingTableCrossAccountAccessRole:
     Type: AWS::IAM::Role
