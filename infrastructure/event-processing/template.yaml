@@ -32,7 +32,7 @@ Resources:
           KeyType: HASH
       TimeToLiveSpecification:
         AttributeName: expiryAt
-        Enabled: false
+        Enabled: true
       BillingMode: PAY_PER_REQUEST
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
