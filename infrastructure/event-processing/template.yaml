@@ -32,7 +32,7 @@ Resources:
           KeyType: HASH
       TimeToLiveSpecification:
         AttributeName: ttl
-        Enabled: true
+        Enabled: false
       BillingMode: PAY_PER_REQUEST
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
