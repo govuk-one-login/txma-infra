@@ -255,7 +255,7 @@ Resources:
         KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
       Tags:
         - Key: BackupFrequency
-          Value: Daily
+          Value: Bihourly
       DeletionProtectionEnabled: true
 
   ###############
