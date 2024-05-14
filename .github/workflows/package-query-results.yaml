@@ -46,7 +46,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
       - name: Package SAM app
-        uses: govuk-one-login/di-devplatform-upload-action@v3.8.1
+        uses: govuk-one-login/devplatform-upload-action@v3.8.1
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET] }}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
