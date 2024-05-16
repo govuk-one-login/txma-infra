@@ -20,7 +20,7 @@ export const handler = async (event: SQSEvent, context: Context) => {
   await sendQueryCompletedQueueMessage(
     eventDetails.athenaQueryId,
     eventDetails.zendeskId,
-    eventDetails.recipientEmail ?? 'mytestrecipientemail@test.gov.uk'
+    eventDetails.recipientEmail ?? 'mytestrecipientemail@example.gov.uk'
   )
   logger.info('Successfully sent Query Completed Message to SQS')
   return eventDetails
