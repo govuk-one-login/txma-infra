@@ -39,14 +39,14 @@ Resources:
   #############################
 
   JTIEncryptionSecret:
-      #checkov:skip=CKV_AWS_149:We will use aws managed kms key
-      Type: AWS::SecretsManager::Secret
-      DeletionPolicy: Retain
-      UpdateReplacePolicy: Retain
-      Properties:
-        Description: 'The key used by the CreateSETFunction to generate JTI'
-        Name: !Sub ${AWS::StackName}-jti-encryption-secret
-        SecretString: 'setUsingOpenSSLExactly16Characters'
+    #checkov:skip=CKV_AWS_149:We will use aws managed kms key
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: 'The key used by the CreateSETFunction to generate JTI'
+      Name: !Sub ${AWS::StackName}-jti-encryption-secret
+      SecretString: 'setUsingOpenSSLExactly16Characters'
 
   JTIEncryptionSecretParameter:
     Type: AWS::SSM::Parameter
