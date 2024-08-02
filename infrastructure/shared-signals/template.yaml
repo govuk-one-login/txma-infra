@@ -48,6 +48,13 @@ Resources:
         Name: !Sub ${AWS::StackName}-jti-encryption-secret
         SecretString: 'setUsingOpenSSLExactly16Characters'
 
+  JTIEncryptionSecretParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: JTIEncryptionSecretArn
+      Type: String
+      Value: !Ref JTIEncryptionSecret
+
   ####################
   # DynamoDB Resources
   ####################
