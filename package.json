@@ -23,6 +23,7 @@
     "@aws-sdk/credential-provider-node": "3.629.0"
   },
   "devDependencies": {
+    "@smithy/core": "2.3.2",
     "@smithy/smithy-client": "2.5.1",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",

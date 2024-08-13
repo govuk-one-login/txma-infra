@@ -39,6 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["@aws-sdk/credential-provider-node", "npm:3.629.0"],\
+            ["@smithy/core", "npm:2.3.2"],\
             ["@smithy/smithy-client", "npm:2.5.1"],\
             ["@typescript-eslint/eslint-plugin", "virtual:72752e4f2a9f14e34b1cba41e91042846bc902333046680a299c8b484f3954825e856e80a749d9162c371a329928b530448a83fec068bee856855f6c624c4e16#npm:5.62.0"],\
             ["@typescript-eslint/parser", "virtual:72752e4f2a9f14e34b1cba41e91042846bc902333046680a299c8b484f3954825e856e80a749d9162c371a329928b530448a83fec068bee856855f6c624c4e16#npm:5.62.0"],\
@@ -8649,6 +8650,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["txma-infra", "workspace:."],\
             ["@aws-sdk/credential-provider-node", "npm:3.629.0"],\
+            ["@smithy/core", "npm:2.3.2"],\
             ["@smithy/smithy-client", "npm:2.5.1"],\
             ["@typescript-eslint/eslint-plugin", "virtual:72752e4f2a9f14e34b1cba41e91042846bc902333046680a299c8b484f3954825e856e80a749d9162c371a329928b530448a83fec068bee856855f6c624c4e16#npm:5.62.0"],\
             ["@typescript-eslint/parser", "virtual:72752e4f2a9f14e34b1cba41e91042846bc902333046680a299c8b484f3954825e856e80a749d9162c371a329928b530448a83fec068bee856855f6c624c4e16#npm:5.62.0"],\

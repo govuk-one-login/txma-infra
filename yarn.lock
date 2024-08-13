@@ -2106,7 +2106,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/core@npm:^2.3.2":
+"@smithy/core@npm:2.3.2, @smithy/core@npm:^2.3.2":
   version: 2.3.2
   resolution: "@smithy/core@npm:2.3.2"
   dependencies:
@@ -7128,6 +7128,7 @@ __metadata:
   resolution: "txma-infra@workspace:."
   dependencies:
     "@aws-sdk/credential-provider-node": 3.629.0
+    "@smithy/core": 2.3.2
     "@smithy/smithy-client": 2.5.1
     "@typescript-eslint/eslint-plugin": 5.62.0
     "@typescript-eslint/parser": 5.62.0
