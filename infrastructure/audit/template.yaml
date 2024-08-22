@@ -409,3 +409,64 @@ Resources:
   #######################
   # End: SSM Parameters #
   #######################
+
+  ############################################
+  # Start: Monitoring and alerting resources #
+  ############################################
+
+  AgeOfOldestMessageOnAuditFileGlacierRestoreQueueAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      AlarmDescription: >-
+        Alarm that monitors the age of the oldest message on the Audit File Glacier Restore Queue.
+        If messages remain on the queue for more than one hour this alarm is triggered.
+      AlarmName: !Sub ${AWS::StackName}-audit-file-glacier-restore-queue-oldest-message-age
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt AuditFileGlacierRestoreQueue.QueueName
+      EvaluationPeriods: 1
+      MetricName: ApproximateAgeOfOldestMessage
+      Namespace: AWS/SQS
+      Statistic: Maximum
+      Period: 60
+      Threshold: 3600
+      TreatMissingData: ignore
+
+  AuditFileGlacierRestoreDLQHasMessages:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      AlarmDescription: >-
+        Alarm that monitors the number of messages on the Dead Letter Queue for the Audit File Glacier Restore Queue.
+        If there any messages in this queue this alarm is triggered.
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Threshold: 1
+      EvaluationPeriods: 1
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt AuditFileGlacierRestoreDeadLetterQueue.QueueName
+      MetricName: ApproximateNumberOfMessagesVisible
+      Namespace: AWS/SQS
+      Period: 60
+      Statistic: Maximum
+
+  ##########################################
+  # End: Monitoring and alerting resources #
+  ##########################################
+
+Outputs:
+  AuditFileGlacierRestoreQueueAlarm:
+    Value: !Ref AgeOfOldestMessageOnAuditFileGlacierRestoreQueueAlarm
+    Export:
+      Name: AgeOfOldestMessageOnAuditFileGlacierRestoreQueueAlarm
+  AuditFileGlacierRestoreDeadLetterQueueAlarm:
+    Value: !Ref AuditFileGlacierRestoreDLQHasMessages
+    Export:
+      Name: AuditFileGlacierRestoreDLQHasMessages
