@@ -100,7 +100,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: dev-tools-sam-template
       - name: Setup Python 3.8
