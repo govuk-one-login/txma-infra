@@ -450,7 +450,7 @@ Resources:
     Type: AWS::SQS::Queue
     Condition: CslsS3Logs
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-s3-csls-dead-letter-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-s3-csls-dlq
       KmsMasterKeyId: !GetAtt CslsKmsKey.Arn
       MessageRetentionPeriod: 1209600 # 14 days
 
