@@ -46,6 +46,7 @@ jobs:
             infrastructure/audit-test-tools/dist/
             infrastructure/audit-test-tools/template.yaml
           retention-days: 7
+          include-hidden-files: true
 
   package:
     strategy:
