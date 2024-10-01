@@ -15,6 +15,8 @@
     "@aws-sdk/client-cloudformation": "3.629.0",
     "@aws-sdk/client-s3": "3.629.0",
     "@aws-sdk/client-sqs": "3.629.0",
+    "@aws-sdk/client-sso-oidc": "3.629.0",
+    "@aws-sdk/client-sts": "3.629.0",
     "axios": "1.7.4"
   },
   "devDependencies": {
