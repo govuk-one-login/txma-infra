@@ -38,6 +38,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
+            ["@aws-sdk/client-sso-oidc", "virtual:3290ecd4e6ba79e27ef4d6dfc48c512ec492be2b3b938c95a166976f99db168beaf4597509aa66732dbd8f85e1dd6f0d3a6149da172051263a9882046968e498#npm:3.629.0"],\
+            ["@aws-sdk/client-sts", "npm:3.629.0"],\
             ["@aws-sdk/credential-provider-node", "npm:3.629.0"],\
             ["@smithy/core", "npm:2.3.2"],\
             ["@smithy/smithy-client", "npm:2.5.1"],\
@@ -4320,8 +4322,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-cloudformation", "npm:3.629.0"],\
             ["@aws-sdk/client-s3", "npm:3.629.0"],\
             ["@aws-sdk/client-sqs", "npm:3.629.0"],\
-            ["@aws-sdk/client-sso-oidc", "virtual:3290ecd4e6ba79e27ef4d6dfc48c512ec492be2b3b938c95a166976f99db168beaf4597509aa66732dbd8f85e1dd6f0d3a6149da172051263a9882046968e498#npm:3.629.0"],\
-            ["@aws-sdk/client-sts", "npm:3.629.0"],\
             ["@types/aws-lambda", "npm:8.10.143"],\
             ["@types/jest", "npm:29.5.12"],\
             ["@types/jest-when", "npm:3.5.5"],\
@@ -8651,6 +8651,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["txma-infra", "workspace:."],\
+            ["@aws-sdk/client-sso-oidc", "virtual:3290ecd4e6ba79e27ef4d6dfc48c512ec492be2b3b938c95a166976f99db168beaf4597509aa66732dbd8f85e1dd6f0d3a6149da172051263a9882046968e498#npm:3.629.0"],\
+            ["@aws-sdk/client-sts", "npm:3.629.0"],\
             ["@aws-sdk/credential-provider-node", "npm:3.629.0"],\
             ["@smithy/core", "npm:2.3.2"],\
             ["@smithy/smithy-client", "npm:2.5.1"],\
