@@ -282,12 +282,42 @@ Resources:
               StringEquals:
                 aws:SourceAccount: !Ref AWS::AccountId
 
+  EventReplayQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-event-replay-queue
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt EventReplayDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  EventReplayDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-${Environment}-event-replay-dlq
+
+  EventReplayQueueQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref EventReplayQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - sqs:*
+            Resource:
+              - !GetAtt EventReplayQueue.Arn
+            Principal:
+              Service:
+                - s3.amazonaws.com
+
   ############################
   # End: SQS queues        #
   ############################
 
   ############################
-  # End: SNS topics #
+  # Start: SNS topics #
   ############################
 
   EventReplaySnsTopic:
@@ -384,6 +414,13 @@ Resources:
       Name: EventReplaySnsTopicArn
       Type: String
       Value: !GetAtt EventReplaySnsTopic.TopicArn
+
+  EventReplaySqsQueueUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventReplaySqsQueueUrl
+      Type: String
+      Value: !GetAtt EventReplaySqsQueue.QueueUrl
 
   EventReplaySnsKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
