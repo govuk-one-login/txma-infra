@@ -244,7 +244,7 @@ Resources:
   AuditDataRequestEventsDeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-dead-letter-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-dlq
       KmsMasterKeyId: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
 
   AuditDataRequestQueuePolicy:
@@ -366,7 +366,7 @@ Resources:
   CloseZendeskTicketDeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-close-zendesk-ticket-dead-letter-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-close-zendesk-ticket-dlq
       KmsMasterKeyId: !GetAtt CloseZendeskTicketQueueKmsKey.Arn
 
   # Query results integration test resources
@@ -476,7 +476,7 @@ Resources:
     Condition: TestEnvironment
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-write-test-data-to-athena-bucket-dead-letter-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-write-test-data-to-athena-bucket-dlq
       KmsMasterKeyId: !GetAtt WriteTestDataToAthenaBucketQueueKmsKey.Arn
 
   QueryResultsBucketArnParameter:
