@@ -536,13 +536,6 @@ Resources:
       Protocol: 'email'
       TopicArn: !GetAtt SlackNotificationsTopic.TopicArn
 
-  EmailToSlackSNSTopicArn:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: EmailToSlackSNSTopicArn
-      Type: String
-      Value: !GetAtt SlackNotificationsTopic.TopicArn
-
   ################
   # SSM Parameters
   ################

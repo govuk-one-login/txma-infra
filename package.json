@@ -20,7 +20,12 @@
     "validate:templates": "bash ./scripts/validate-templates.sh"
   },
   "dependencies": {
+    "@aws-sdk/client-sso-oidc": "3.629.0",
+    "@aws-sdk/client-sts": "3.629.0",
     "@aws-sdk/credential-provider-node": "3.629.0"
+  },
+  "resolutions": {
+    "micromatch": "4.0.8"
   },
   "devDependencies": {
     "@smithy/core": "2.3.2",
