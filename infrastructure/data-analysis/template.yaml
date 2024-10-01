@@ -413,7 +413,7 @@ Resources:
   AuditDataRequestEventsDeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-dead-letter-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-audit-data-request-events-dlq
       KmsMasterKeyId: !GetAtt AuditDataRequestEventsQueueKmsKey.Arn
 
   # Need a separate KMS key here for the query completed queue because we need to grant access to the query-results account
@@ -516,7 +516,7 @@ Resources:
   QueryCompletedDeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-query-completed-dead-letter-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-query-completed-dlq
       KmsMasterKeyId: !GetAtt QueryCompletedQueueKmsKey.Arn
 
   ################

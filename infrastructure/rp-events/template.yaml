@@ -248,7 +248,7 @@ Resources:
   RPEventsDeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-dead-letter-queue
+      QueueName: !Sub ${AWS::StackName}-${Environment}-rp-events-dlq
       KmsMasterKeyId: !GetAtt RPEventsQueueKmsKey.Arn
       MessageRetentionPeriod: 1209600 #14 Days in seconds
 
