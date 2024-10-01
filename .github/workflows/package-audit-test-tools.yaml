@@ -38,7 +38,7 @@ jobs:
         if: always()
         run: yarn build
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: audit-test-tools-sam-template
           path: |
@@ -46,6 +46,7 @@ jobs:
             infrastructure/audit-test-tools/dist/
             infrastructure/audit-test-tools/template.yaml
           retention-days: 7
+          include-hidden-files: true
 
   package:
     strategy:
@@ -68,7 +69,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: audit-test-tools-sam-template
       - name: Setup Python 3.8

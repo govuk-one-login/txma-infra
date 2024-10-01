@@ -46,6 +46,7 @@ jobs:
             infrastructure/dev-tools/dist/
             infrastructure/dev-tools/template.yaml
           retention-days: 7
+          include-hidden-files: true
 
   package:
     strategy:

@@ -4,7 +4,7 @@ Transform: AWS::Serverless-2016-10-31
 
 Parameters:
   CodeSigningConfigArn:
-    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
+    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline.
     Type: String
     Default: none
   Environment:
