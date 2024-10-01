@@ -3,7 +3,8 @@ name: Package audit test tools infrastructure
 on:
   push:
     branches:
-      - main
+      # - main
+      - test-gh-actions
     paths:
       - infrastructure/audit-test-tools/**
       - .yarn/**
