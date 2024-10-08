@@ -171,6 +171,38 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/event-replay-sns-kms-key
       TargetKeyId: !Ref EventReplaySnsKmsKey
 
+  ReplayFromAthenaEcrKmsKey:
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource:
+              - '*'
+          - Effect: Allow
+            Principal:
+              Service: ecr.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+
+  ReplayFromAthenaEcrKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/replay-from-athena-ecr-kms-key
+      TargetKeyId: !Ref ReplayFromAthenaEcrKmsKey
+
   #################
   # End: KMS Keys #
   #################
@@ -405,6 +437,13 @@ Resources:
       Name: AuditFileGlacierRestoreQueueArn
       Type: String
       Value: !GetAtt AuditFileGlacierRestoreQueue.Arn
+
+  ReplayFromAthenaEcrKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: ReplayFromAthenaEcrKmsKeyArn
+      Type: String
+      Value: !GetAtt ReplayFromAthenaEcrKmsKey.Arn
 
   #######################
   # End: SSM Parameters #
