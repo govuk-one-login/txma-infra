@@ -365,6 +365,34 @@ Resources:
       Type: String
       Value: !GetAtt SharedSignalsApiWafAcl.Arn
 
+  ####################
+  # SET signing keys
+  ####################
+
+  SetSigningKMSKey2:
+    #checkov:skip=CKV_AWS_7:We explicitly don't want key rotation for this, because we need to manage it in a controlled way if we do it
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: KMS key for SET signing and verification. Deployed on 2024/11/11
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: EnableRootAccess
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+
+  SetSigningKMSKeyAlias2:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}-${Environment}-SET-signing-key-2
+      TargetKeyId: !Ref SetSigningKMSKey2
+
 Outputs:
   SSFUserPoolId:
     Description: 'user pool id for cognito'
@@ -372,3 +400,8 @@ Outputs:
   UserConfigTableName:
     Description: 'table name for user config table'
     Value: !Ref UserConfigTable
+  SetSigningKMSKey2Arn:
+    Description: 'the arn of SET signing key 2'
+    Value: !GetAtt SetSigningKMSKey2.Arn
+    Export:
+      Name: SetSigningKMSKey2Arn
