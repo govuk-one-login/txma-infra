@@ -377,6 +377,7 @@ Resources:
     Properties:
       Description: KMS key for SET signing and verification. Deployed on 2024/11/12
       # we need to use ES256 for signing SET
+      # reasoning for using ES256: https://govukverify.atlassian.net/wiki/spaces/TMA/pages/4693950567/Signing+SET+and+Key+rotating
       KeySpec: 'ECC_NIST_P256'
       KeyPolicy:
         Version: '2012-10-17'
