@@ -375,7 +375,8 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      Description: KMS key for SET signing and verification. Deployed on 2024/11/11
+      Description: KMS key for SET signing and verification. Deployed on 2024/11/12
+      KeySpec: 'ECC_NIST_P256'
       KeyPolicy:
         Version: '2012-10-17'
         Statement:
