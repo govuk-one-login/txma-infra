@@ -12,6 +12,23 @@ Parameters:
       - staging
       - integration
       - production
+  SlackWorkspaceId:
+    Description: Workspace ID for GDS Slack
+    Type: String
+    Default: T8GT9416G
+
+Mappings:
+  EventValidationSlackChannelIds:
+    dev:
+      SlackChannelId: C07TTRMTY2C
+    build:
+      SlackChannelId: C07TTRMTY2C
+    staging:
+      SlackChannelId: C07TTRMTY2C
+    integration:
+      SlackChannelId: C07TTRMTY2C
+    production:
+      SlackChannelId: C07T268JHGD
 
 Resources:
   ####################
@@ -62,3 +79,66 @@ Resources:
       Name: UserJourneyIdCacheTableName
       Type: String
       Value: !Ref UserJourneyIdCacheTable
+
+  ################################
+  # Event Validation Notifications
+  ################################
+
+  EventValidationNotificationsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub ${AWS::StackName}-event-validation-notifications-topic
+      KmsMasterKeyId: '{{resolve:ssm:CoreSnsKmsKeyArn}}'
+
+  EventValidationNotificationsTopicSubscribePolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Id: AllowSnsSubscribe
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAuditAndEventProcessingAccounts
+            Effect: Allow
+            Action:
+              - sns:Subscribe
+            Principal:
+              AWS:
+                - '{{resolve:ssm:AuditAccountARN}}'
+                - !Sub ${AWS::AccountId}
+            Resource: !Ref EventValidationNotificationsTopic
+      Topics:
+        - !Ref EventValidationNotificationsTopic
+
+  EventValidationNotificationsChatbotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - chatbot.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      RoleName: !Sub ${AWS::StackName}-event-validation-notifications-chatbot-role
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSResourceExplorerReadOnlyAccess
+
+  EventValidationNotificationsChatbotConfiguration:
+    Type: AWS::Chatbot::SlackChannelConfiguration
+    Properties:
+      ConfigurationName: !Sub ${AWS::StackName}-event-validation-notifications
+      GuardrailPolicies:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+      IamRoleArn: !GetAtt EventValidationNotificationsChatbotRole.Arn
+      LoggingLevel: NONE
+      SlackChannelId:
+        !FindInMap [
+          EventValidationSlackChannelIds,
+          !Ref Environment,
+          SlackChannelId
+        ]
+      SlackWorkspaceId: !Ref SlackWorkspaceId
+      SnsTopicArns:
+        - !Ref EventValidationNotificationsTopic
