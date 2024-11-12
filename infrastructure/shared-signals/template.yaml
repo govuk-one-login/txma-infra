@@ -379,6 +379,7 @@ Resources:
       # we need to use ES256 for signing SET
       # reasoning for using ES256: https://govukverify.atlassian.net/wiki/spaces/TMA/pages/4693950567/Signing+SET+and+Key+rotating
       KeySpec: 'ECC_NIST_P256'
+      KeyUsage: 'SIGN_VERIFY'
       KeyPolicy:
         Version: '2012-10-17'
         Statement:
