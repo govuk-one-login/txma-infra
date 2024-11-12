@@ -394,7 +394,7 @@ Resources:
   SETSigningKMSKeyAlias2:
     Type: 'AWS::KMS::Alias'
     Properties:
-      AliasName: !Sub alias/${AWS::StackName}-${Environment}-SET-signing-key-2
+      AliasName: !Sub alias/${AWS::StackName}-SET-signing-key-2
       TargetKeyId: !Ref SETSigningKMSKey2
 
 Outputs:
