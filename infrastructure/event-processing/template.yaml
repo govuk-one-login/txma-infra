@@ -12,6 +12,10 @@ Parameters:
       - staging
       - integration
       - production
+  PermissionsBoundary:
+    Description: The ARN of the permissions boundary to apply to any role created by the template
+    Type: String
+    Default: none
   SlackWorkspaceId:
     Description: Workspace ID for GDS Slack
     Type: String
@@ -29,6 +33,9 @@ Mappings:
       SlackChannelId: C07TTRMTY2C
     production:
       SlackChannelId: C07T268JHGD
+
+Conditions:
+  UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
 
 Resources:
   ####################
@@ -112,6 +119,11 @@ Resources:
   EventValidationNotificationsChatbotRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Sub ${AWS::StackName}-validation-notifications-chatbot-role
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -121,7 +133,6 @@ Resources:
                 - chatbot.amazonaws.com
             Action:
               - sts:AssumeRole
-      RoleName: !Sub ${AWS::StackName}-validation-notifications-chatbot-role
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSResourceExplorerReadOnlyAccess
 
