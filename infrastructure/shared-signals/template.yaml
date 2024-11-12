@@ -369,13 +369,14 @@ Resources:
   # SET signing keys
   ####################
 
-  SetSigningKMSKey2:
+  SETSigningKMSKey2:
     #checkov:skip=CKV_AWS_7:We explicitly don't want key rotation for this, because we need to manage it in a controlled way if we do it
     Type: AWS::KMS::Key
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
       Description: KMS key for SET signing and verification. Deployed on 2024/11/12
+      # we need to use ES256 for signing SET
       KeySpec: 'ECC_NIST_P256'
       KeyPolicy:
         Version: '2012-10-17'
