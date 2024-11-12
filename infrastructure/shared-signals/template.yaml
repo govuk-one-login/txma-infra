@@ -369,13 +369,15 @@ Resources:
   # SET signing keys
   ####################
 
-  SetSigningKMSKey2:
+  SETSigningKMSKey2:
     #checkov:skip=CKV_AWS_7:We explicitly don't want key rotation for this, because we need to manage it in a controlled way if we do it
     Type: AWS::KMS::Key
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
       Description: KMS key for SET signing and verification. Deployed on 2024/11/12
+      # we need to use ES256 for signing SET
+      # reasoning for using ES256: https://govukverify.atlassian.net/wiki/spaces/TMA/pages/4693950567/Signing+SET+and+Key+rotating
       KeySpec: 'ECC_NIST_P256'
       KeyPolicy:
         Version: '2012-10-17'
@@ -392,7 +394,7 @@ Resources:
     Type: 'AWS::KMS::Alias'
     Properties:
       AliasName: !Sub alias/${AWS::StackName}-${Environment}-SET-signing-key-2
-      TargetKeyId: !Ref SetSigningKMSKey2
+      TargetKeyId: !Ref SETSigningKMSKey2
 
 Outputs:
   SSFUserPoolId:
@@ -401,8 +403,8 @@ Outputs:
   UserConfigTableName:
     Description: 'table name for user config table'
     Value: !Ref UserConfigTable
-  SetSigningKMSKey2Arn:
+  SETSigningKMSKey2Arn:
     Description: 'the arn of SET signing key 2'
-    Value: !GetAtt SetSigningKMSKey2.Arn
+    Value: !GetAtt SETSigningKMSKey2.Arn
     Export:
-      Name: SetSigningKMSKey2Arn
+      Name: SETSigningKMSKey2Arn
