@@ -393,7 +393,7 @@ Resources:
     Type: 'AWS::KMS::Alias'
     Properties:
       AliasName: !Sub alias/${AWS::StackName}-${Environment}-SET-signing-key-2
-      TargetKeyId: !Ref SetSigningKMSKey2
+      TargetKeyId: !Ref SETSigningKMSKey2
 
 Outputs:
   SSFUserPoolId:
@@ -402,8 +402,8 @@ Outputs:
   UserConfigTableName:
     Description: 'table name for user config table'
     Value: !Ref UserConfigTable
-  SetSigningKMSKey2Arn:
+  SETSigningKMSKey2Arn:
     Description: 'the arn of SET signing key 2'
-    Value: !GetAtt SetSigningKMSKey2.Arn
+    Value: !GetAtt SETSigningKMSKey2.Arn
     Export:
-      Name: SetSigningKMSKey2Arn
+      Name: SETSigningKMSKey2Arn
