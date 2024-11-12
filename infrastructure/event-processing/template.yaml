@@ -87,7 +87,7 @@ Resources:
   EventValidationNotificationsTopic:
     Type: AWS::SNS::Topic
     Properties:
-      TopicName: !Sub ${AWS::StackName}-event-validation-notifications-topic
+      TopicName: !Sub ${AWS::StackName}-validation-notifications-topic
       KmsMasterKeyId: '{{resolve:ssm:CoreSnsKmsKeyArn}}'
 
   EventValidationNotificationsTopicSubscribePolicy:
@@ -121,14 +121,14 @@ Resources:
                 - chatbot.amazonaws.com
             Action:
               - sts:AssumeRole
-      RoleName: !Sub ${AWS::StackName}-event-validation-notifications-chatbot-role
+      RoleName: !Sub ${AWS::StackName}-validation-notifications-chatbot-role
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSResourceExplorerReadOnlyAccess
 
   EventValidationNotificationsChatbotConfiguration:
     Type: AWS::Chatbot::SlackChannelConfiguration
     Properties:
-      ConfigurationName: !Sub ${AWS::StackName}-event-validation-notifications
+      ConfigurationName: !Sub ${AWS::StackName}-validation-notifications-chatbot-config
       GuardrailPolicies:
         - arn:aws:iam::aws:policy/ReadOnlyAccess
       IamRoleArn: !GetAtt EventValidationNotificationsChatbotRole.Arn
