@@ -393,7 +393,8 @@ Resources:
           - Sid: AllowTestRoleAccess
             Effect: Allow
             Principal:
-              AWS: !ImportValue ssf-build-pipeline-TestRole
+              AWS:
+                Fn::ImportValue: !Sub ssf-${Environment}-pipeline-TestRole
             Action:
               - kms:*
             Resource: '*'
