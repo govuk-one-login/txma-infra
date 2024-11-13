@@ -398,7 +398,7 @@ Resources:
               Effect: Allow
               Principal:
                 AWS:
-                  Fn::ImportValue: !Sub ssf-${Environment}-pipeline-TestRole
+                  Fn::ImportValue: !Sub ssf-${Environment}-pipeline-TestRoleArn
               Action:
                 - kms:*
               Resource: '*'
