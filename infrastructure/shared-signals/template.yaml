@@ -20,6 +20,8 @@ Parameters:
 Conditions:
   IsDev: !Equals [!Ref Environment, dev]
   IsStaging: !Equals [!Ref Environment, staging]
+  IsBuildOrStaging:
+    !Or [!Equals [!Ref Environment, build], !Equals [!Ref Environment, staging]]
   NotTestEnvironment:
     !Or [
       !Equals [!Ref Environment, production],
@@ -390,6 +392,17 @@ Resources:
             Action:
               - kms:*
             Resource: '*'
+          - !If
+            - IsBuildOrStaging
+            - Sid: AllowTestRoleAccess
+              Effect: Allow
+              Principal:
+                AWS:
+                  Fn::ImportValue: !Sub ssf-${Environment}-pipeline-TestRole
+              Action:
+                - kms:*
+              Resource: '*'
+            - !Ref AWS::NoValue
 
   SETSigningKMSKeyAlias2:
     Type: 'AWS::KMS::Alias'
