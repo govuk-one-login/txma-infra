@@ -390,6 +390,13 @@ Resources:
             Action:
               - kms:*
             Resource: '*'
+          - Sid: AllowTestRoleAccess
+            Effect: Allow
+            Principal:
+              AWS: !ImportValue ssf-build-pipeline-TestRole
+            Action:
+              - kms:*
+            Resource: '*'
 
   SETSigningKMSKeyAlias2:
     Type: 'AWS::KMS::Alias'
