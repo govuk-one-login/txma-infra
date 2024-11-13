@@ -410,6 +410,32 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}-SET-signing-key-2
       TargetKeyId: !Ref SETSigningKMSKey2
 
+  SETSigningKMSKey2RSAArn:
+    #checkov:skip=CKV_AWS_7:We explicitly don't want key rotation for this, because we need to manage it in a controlled way if we do it
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: KMS key for SET signing and verification
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: EnableRootAccess
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+      KeySpec: RSA_4096
+      KeyUsage: SIGN_VERIFY
+
+  SETSigningKMSKey2RSAAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}-SET-signing-key-2-rsa
+      TargetKeyId: !Ref SETSigningKMSKey2RSAArn
+
 Outputs:
   SSFUserPoolId:
     Description: 'user pool id for cognito'
@@ -422,3 +448,8 @@ Outputs:
     Value: !GetAtt SETSigningKMSKey2.Arn
     Export:
       Name: SETSigningKMSKey2Arn
+  SETSigningKMSKey2RSAArn:
+    Description: 'the arn of SET signing key 2'
+    Value: !GetAtt SETSigningKMSKey2RSAArn.Arn
+    Export:
+      Name: SETSigningKMSKey2RSAArn
