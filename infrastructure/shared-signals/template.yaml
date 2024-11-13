@@ -427,6 +427,17 @@ Resources:
             Action:
               - kms:*
             Resource: '*'
+          - !If
+            - IsBuildOrStaging
+            - Sid: AllowTestRoleAccess
+              Effect: Allow
+              Principal:
+                AWS:
+                  Fn::ImportValue: !Sub ssf-${Environment}-pipeline-TestRoleArn
+              Action:
+                - kms:*
+              Resource: '*'
+            - !Ref AWS::NoValue
       KeySpec: RSA_4096
       KeyUsage: SIGN_VERIFY
 
