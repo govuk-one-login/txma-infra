@@ -35,18 +35,18 @@ Conditions:
       !Equals [!Ref Environment, staging]
     ]
 
-Mappings:
-  EnvironmentPipelineNames:
-    dev:
-      PipelineName: 'dev'
-    build:
-      PipelineName: 'build'
-    staging:
-      PipelineName: 'stg'
-    integration:
-      PipelineName: 'int'
-    production:
-      PipelineName: 'prod'
+# Mappings:
+#   EnvironmentPipelineNames:
+#     dev:
+#       PipelineName: 'dev'
+#     build:
+#       PipelineName: 'build'
+#     staging:
+#       PipelineName: 'stg'
+#     integration:
+#       PipelineName: 'int'
+#     production:
+#       PipelineName: 'prod'
 
 Resources:
   ####################
