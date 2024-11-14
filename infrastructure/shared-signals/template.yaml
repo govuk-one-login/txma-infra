@@ -35,6 +35,19 @@ Conditions:
       !Equals [!Ref Environment, staging]
     ]
 
+Mappings:
+  EnvironmentPipelineNames:
+    dev:
+      PipelineName: 'dev'
+    build:
+      PipelineName: 'build'
+    staging:
+      PipelineName: 'stg'
+    integration:
+      PipelineName: 'int'
+    production:
+      PipelineName: 'prod'
+
 Resources:
   ####################
   # DynamoDB Resources
@@ -398,7 +411,8 @@ Resources:
               Effect: Allow
               Principal:
                 AWS:
-                  Fn::ImportValue: !Sub ssf-${Environment}-pipeline-TestRoleArn
+                  Fn::ImportValue:
+                    'Fn::Sub': ssf-${Environment}-pipeline-TestRoleArn
               Action:
                 - kms:*
               Resource: '*'
