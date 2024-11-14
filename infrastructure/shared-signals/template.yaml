@@ -35,6 +35,7 @@ Conditions:
       !Equals [!Ref Environment, staging]
     ]
 
+# sam lint doesnt like unused mappings so commenting out to use in part 2 to allow pipelines to run
 # Mappings:
 #   EnvironmentPipelineNames:
 #     dev:
