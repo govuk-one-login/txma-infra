@@ -35,6 +35,20 @@ Conditions:
       !Equals [!Ref Environment, staging]
     ]
 
+# sam lint doesnt like unused mappings so commenting out to use in part 2 to allow pipelines to run
+# Mappings:
+#   EnvironmentPipelineNames:
+#     dev:
+#       PipelineName: 'dev'
+#     build:
+#       PipelineName: 'build'
+#     staging:
+#       PipelineName: 'stg'
+#     integration:
+#       PipelineName: 'int'
+#     production:
+#       PipelineName: 'prod'
+
 Resources:
   ####################
   # DynamoDB Resources
@@ -398,7 +412,8 @@ Resources:
               Effect: Allow
               Principal:
                 AWS:
-                  Fn::ImportValue: !Sub ssf-${Environment}-pipeline-TestRoleArn
+                  Fn::ImportValue:
+                    'Fn::Sub': ssf-${Environment}-pipeline-TestRoleArn
               Action:
                 - kms:*
               Resource: '*'
