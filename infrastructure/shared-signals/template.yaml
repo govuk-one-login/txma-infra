@@ -35,19 +35,19 @@ Conditions:
       !Equals [!Ref Environment, staging]
     ]
 
-# sam lint doesnt like unused mappings so commenting out to use in part 2 to allow pipelines to run
-# Mappings:
-#   EnvironmentPipelineNames:
-#     dev:
-#       PipelineName: 'dev'
-#     build:
-#       PipelineName: 'build'
-#     staging:
-#       PipelineName: 'stg'
-#     integration:
-#       PipelineName: 'int'
-#     production:
-#       PipelineName: 'prod'
+# EnvironmentPipelineNames are the shortened environment names that the pipeline uses
+Mappings:
+  EnvironmentPipelineNames:
+    dev:
+      PipelineName: 'dev'
+    build:
+      PipelineName: 'build'
+    staging:
+      PipelineName: 'stg'
+    integration:
+      PipelineName: 'int'
+    production:
+      PipelineName: 'prod'
 
 Resources:
   ####################
@@ -412,8 +412,14 @@ Resources:
               Effect: Allow
               Principal:
                 AWS:
-                  Fn::ImportValue:
-                    'Fn::Sub': ssf-${Environment}-pipeline-TestRoleArn
+                  Fn::ImportValue: !Sub
+                    - ssf-${pipelineFriendEnv}-pipeline-TestRoleArn
+                    - pipelineFriendEnv:
+                        !FindInMap [
+                          EnvironmentPipelineNames,
+                          !Ref Environment,
+                          PipelineName
+                        ]
               Action:
                 - kms:*
               Resource: '*'
@@ -448,7 +454,14 @@ Resources:
               Effect: Allow
               Principal:
                 AWS:
-                  Fn::ImportValue: !Sub ssf-${Environment}-pipeline-TestRoleArn
+                  Fn::ImportValue: !Sub
+                    - ssf-${pipelineFriendEnv}-pipeline-TestRoleArn
+                    - pipelineFriendEnv:
+                        !FindInMap [
+                          EnvironmentPipelineNames,
+                          !Ref Environment,
+                          PipelineName
+                        ]
               Action:
                 - kms:*
               Resource: '*'
