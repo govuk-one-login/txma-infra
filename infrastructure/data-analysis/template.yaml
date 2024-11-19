@@ -28,6 +28,14 @@ Conditions:
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration]
     ]
+  # temporary condition to progressively remove WebACL related resources as FMS migration progresses
+  NotFMSMigratedEnvironment:
+    !Or [
+      !Equals [!Ref Environment, build],
+      !Equals [!Ref Environment, staging],
+      !Equals [!Ref Environment, integration],
+      !Equals [!Ref Environment, production]
+    ]
 
 Resources:
   #####################
@@ -264,6 +272,7 @@ Resources:
 
   ZendeskWebhookApiWafAcl:
     Type: AWS::WAFv2::WebACL
+    Condition: NotFMSMigratedEnvironment
     Properties:
       DefaultAction:
         Allow: {}
@@ -314,6 +323,7 @@ Resources:
 
   ZendeskWebhookApiWafLogs:
     Type: AWS::Logs::LogGroup
+    Condition: NotFMSMigratedEnvironment
     Properties:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
       LogGroupName: aws-waf-logs-ZendeskWebhookApiWafAcl
@@ -329,6 +339,7 @@ Resources:
 
   ZendeskWebhookApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
+    Condition: NotFMSMigratedEnvironment
     Properties:
       LogDestinationConfigs:
         # Cannot use Fn::GetAtt here since the ARN of a log group includes ':*' at the end, which is not accepted by the WAF service.
@@ -672,6 +683,7 @@ Resources:
 
   ZendeskWebhookApiWafAclArnParameter:
     Type: AWS::SSM::Parameter
+    Condition: NotFMSMigratedEnvironment
     Properties:
       Name: ZendeskWebhookApiWafAclArn
       Type: String
