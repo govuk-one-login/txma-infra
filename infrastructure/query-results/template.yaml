@@ -32,6 +32,14 @@ Conditions:
       !Equals [!Ref Environment, integration]
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
+  # temporary condition to progressively remove WebACL related resources as FMS migration progresses
+  NotFMSMigratedEnvironment:
+    !Or [
+      !Equals [!Ref Environment, build],
+      !Equals [!Ref Environment, staging],
+      !Equals [!Ref Environment, integration],
+      !Equals [!Ref Environment, production]
+    ]
 
 Resources:
   QueryResultsBucket:
@@ -111,6 +119,7 @@ Resources:
 
   SecureFraudApiWafAcl:
     Type: AWS::WAFv2::WebACL
+    Condition: NotFMSMigratedEnvironment
     Properties:
       DefaultAction: !If [NotTestEnvironment, Block: {}, Allow: {}]
       Name: SecureFraudApiWafAcl
@@ -174,6 +183,7 @@ Resources:
 
   SecureFraudApiWafLogs:
     Type: AWS::Logs::LogGroup
+    Condition: NotFMSMigratedEnvironment
     Properties:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
       LogGroupName: aws-waf-logs-SecureFraudApiWafAcl
@@ -189,6 +199,7 @@ Resources:
 
   SecureFraudApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
+    Condition: NotFMSMigratedEnvironment
     Properties:
       LogDestinationConfigs:
         # Cannot use Fn::GetAtt here since the ARN of a log group includes ':*' at the end, which is not accepted by the WAF service.
@@ -509,6 +520,7 @@ Resources:
 
   SecureFraudApiWafAclArnParameter:
     Type: AWS::SSM::Parameter
+    Condition: NotFMSMigratedEnvironment
     Properties:
       Name: SecureFraudApiWafAclArn
       Type: String

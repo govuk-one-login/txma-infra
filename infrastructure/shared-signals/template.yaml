@@ -34,6 +34,14 @@ Conditions:
       !Equals [!Ref Environment, integration],
       !Equals [!Ref Environment, staging]
     ]
+  # temporary condition to progressively remove WebACL related resources as FMS migration progresses
+  NotFMSMigratedEnvironment:
+    !Or [
+      !Equals [!Ref Environment, build],
+      !Equals [!Ref Environment, staging],
+      !Equals [!Ref Environment, integration],
+      !Equals [!Ref Environment, production]
+    ]
 
 # EnvironmentPipelineNames are the shortened environment names that the pipeline uses
 Mappings:
@@ -95,6 +103,7 @@ Resources:
 
   SharedSignalsApiWafAcl:
     Type: AWS::WAFv2::WebACL
+    Condition: NotFMSMigratedEnvironment
     Properties:
       DefaultAction:
         Allow: {}
@@ -145,6 +154,7 @@ Resources:
 
   SharedSignalsApiWafLogs:
     Type: AWS::Logs::LogGroup
+    Condition: NotFMSMigratedEnvironment
     Properties:
       KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
       LogGroupName: aws-waf-logs-SharedSignalsApiWafAcl
@@ -160,6 +170,7 @@ Resources:
 
   SharedSignalsApiWafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
+    Condition: NotFMSMigratedEnvironment
     Properties:
       LogDestinationConfigs:
         # Cannot use Fn::GetAtt here since the ARN of a log group includes ':*' at the end, which is not accepted by the WAF service.
@@ -376,6 +387,7 @@ Resources:
 
   SharedSignalsApiWafAclArnParameter:
     Type: AWS::SSM::Parameter
+    Condition: NotFMSMigratedEnvironment
     Properties:
       Name: SharedSignalsApiWafAclArn
       Type: String
