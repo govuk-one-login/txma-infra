@@ -24,15 +24,15 @@ Parameters:
 Mappings:
   EventValidationSlackChannelIds:
     dev:
-      SlackChannelId: C07TTRMTY2C
+      SlackChannelId: C085NRJTW3V
     build:
-      SlackChannelId: C07TTRMTY2C
+      SlackChannelId: C085NRJTW3V
     staging:
-      SlackChannelId: C07TTRMTY2C
+      SlackChannelId: C085NRJTW3V
     integration:
-      SlackChannelId: C07TTRMTY2C
+      SlackChannelId: C085NRJTW3V
     production:
-      SlackChannelId: C07T268JHGD
+      SlackChannelId: C085NRJTW3V
 
 Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
