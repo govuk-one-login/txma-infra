@@ -69,24 +69,6 @@ Resources:
           Value: Bihourly
       DeletionProtectionEnabled: true
 
-  ################
-  # SSM Parameters
-  ################
-
-  UserJourneyIdCacheTableArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: UserJourneyIdCacheTableArn
-      Type: String
-      Value: !GetAtt UserJourneyIdCacheTable.Arn
-
-  UserJourneyIdCacheTableNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: UserJourneyIdCacheTableName
-      Type: String
-      Value: !Ref UserJourneyIdCacheTable
-
   ################################
   # Event Validation Notifications
   ################################
@@ -153,3 +135,28 @@ Resources:
       SlackWorkspaceId: !Ref SlackWorkspaceId
       SnsTopicArns:
         - !Ref EventValidationNotificationsTopic
+
+  ################
+  # SSM Parameters
+  ################
+
+  UserJourneyIdCacheTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserJourneyIdCacheTableArn
+      Type: String
+      Value: !GetAtt UserJourneyIdCacheTable.Arn
+
+  UserJourneyIdCacheTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserJourneyIdCacheTableName
+      Type: String
+      Value: !Ref UserJourneyIdCacheTable
+
+  EventValidationNotificationsTopicArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventValidationNotificationsTopicName
+      Type: String
+      Value: !Ref EventValidationNotificationsTopic.Arn
