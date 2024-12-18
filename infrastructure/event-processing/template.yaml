@@ -30,9 +30,9 @@ Mappings:
     staging:
       SlackChannelId: C085NRJTW3V
     integration:
-      SlackChannelId: C085NRJTW3V
+      SlackChannelId: C085L7THJKF
     production:
-      SlackChannelId: C085NRJTW3V
+      SlackChannelId: C085P2V4RMG
 
 Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
