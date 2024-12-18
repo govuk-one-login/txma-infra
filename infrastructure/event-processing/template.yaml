@@ -159,4 +159,4 @@ Resources:
     Properties:
       Name: EventValidationNotificationsTopicArn
       Type: String
-      Value: !Ref EventValidationNotificationsTopic.Arn
+      Value: !Ref EventValidationNotificationsTopic
