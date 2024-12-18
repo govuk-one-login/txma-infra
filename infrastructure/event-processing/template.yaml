@@ -157,6 +157,6 @@ Resources:
   EventValidationNotificationsTopicArn:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: EventValidationNotificationsTopicName
+      Name: EventValidationNotificationsTopicArn
       Type: String
       Value: !Ref EventValidationNotificationsTopic.Arn
