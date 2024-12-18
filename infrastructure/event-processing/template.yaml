@@ -24,15 +24,15 @@ Parameters:
 Mappings:
   EventValidationSlackChannelIds:
     dev:
-      SlackChannelId: C07TTRMTY2C
+      SlackChannelId: C085NRJTW3V
     build:
-      SlackChannelId: C07TTRMTY2C
+      SlackChannelId: C085NRJTW3V
     staging:
-      SlackChannelId: C07TTRMTY2C
+      SlackChannelId: C085NRJTW3V
     integration:
-      SlackChannelId: C07TTRMTY2C
+      SlackChannelId: C085L7THJKF
     production:
-      SlackChannelId: C07T268JHGD
+      SlackChannelId: C085P2V4RMG
 
 Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
@@ -68,24 +68,6 @@ Resources:
         - Key: BackupFrequency
           Value: Bihourly
       DeletionProtectionEnabled: true
-
-  ################
-  # SSM Parameters
-  ################
-
-  UserJourneyIdCacheTableArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: UserJourneyIdCacheTableArn
-      Type: String
-      Value: !GetAtt UserJourneyIdCacheTable.Arn
-
-  UserJourneyIdCacheTableNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: UserJourneyIdCacheTableName
-      Type: String
-      Value: !Ref UserJourneyIdCacheTable
 
   ################################
   # Event Validation Notifications
@@ -153,3 +135,28 @@ Resources:
       SlackWorkspaceId: !Ref SlackWorkspaceId
       SnsTopicArns:
         - !Ref EventValidationNotificationsTopic
+
+  ################
+  # SSM Parameters
+  ################
+
+  UserJourneyIdCacheTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserJourneyIdCacheTableArn
+      Type: String
+      Value: !GetAtt UserJourneyIdCacheTable.Arn
+
+  UserJourneyIdCacheTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: UserJourneyIdCacheTableName
+      Type: String
+      Value: !Ref UserJourneyIdCacheTable
+
+  EventValidationNotificationsTopicArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EventValidationNotificationsTopicArn
+      Type: String
+      Value: !Ref EventValidationNotificationsTopic
