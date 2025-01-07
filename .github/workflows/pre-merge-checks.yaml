@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node 18
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
       - name: Node - Enable Corepack
         run: corepack enable
       - name: Install ESBuild binaries
@@ -34,7 +34,7 @@ jobs:
       - name: Setup Node 18
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
       - name: Node - Enable Corepack
         run: corepack enable
       - name: Install ESBuild binaries
