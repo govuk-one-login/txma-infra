@@ -24,9 +24,9 @@ Parameters:
 Mappings:
   EventValidationSlackChannelIds:
     dev:
-      SlackChannelId: C085NRJTW3V
+      SlackChannelId: C08A5BZ8QMP
     build:
-      SlackChannelId: C085NRJTW3V
+      SlackChannelId: C08A5BZ8QMP
     staging:
       SlackChannelId: C085NRJTW3V
     integration:
