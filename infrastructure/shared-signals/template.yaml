@@ -28,20 +28,6 @@ Conditions:
       !Equals [!Ref Environment, integration]
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
-  CslsEgress:
-    !Or [
-      !Equals [!Ref Environment, production],
-      !Equals [!Ref Environment, integration],
-      !Equals [!Ref Environment, staging]
-    ]
-  # temporary condition to progressively remove WebACL related resources as FMS migration progresses
-  NotFMSMigratedEnvironment:
-    !Or [
-      !Equals [!Ref Environment, build],
-      !Equals [!Ref Environment, staging],
-      !Equals [!Ref Environment, integration],
-      !Equals [!Ref Environment, production]
-    ]
 
 # EnvironmentPipelineNames are the shortened environment names that the pipeline uses
 Mappings:
@@ -96,87 +82,6 @@ Resources:
         - Key: BackupFrequency
           Value: Bihourly
       DeletionProtectionEnabled: true
-
-  ###############
-  # WAF Resources
-  ###############
-
-  SharedSignalsApiWafAcl:
-    Type: AWS::WAFv2::WebACL
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      DefaultAction:
-        Allow: {}
-      Name: SharedSignalsApiWafAcl
-      Scope: REGIONAL
-      VisibilityConfig:
-        CloudWatchMetricsEnabled: true
-        MetricName: SharedSignalsApiWafMetric
-        SampledRequestsEnabled: true
-      Rules:
-        - Name: AWSManagedRulesCommonRuleSet
-          Priority: 0
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-              ExcludedRules: []
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: SharedSignalsApiWafCommonRuleSetMetric
-        - Name: AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 1
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: SharedSignalsApiWafKnownBadInputsRuleSetMetric
-            SampledRequestsEnabled: true
-        - Name: AWSManagedRulesAmazonIpReputationList
-          Priority: 2
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAmazonIpReputationList
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: SharedSignalsApiWafIpReputationListMetric
-            SampledRequestsEnabled: true
-
-  SharedSignalsApiWafLogs:
-    Type: AWS::Logs::LogGroup
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
-      LogGroupName: aws-waf-logs-SharedSignalsApiWafAcl
-      RetentionInDays: 30
-
-  SharedSignalsApiWafCslsSubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: CslsEgress
-    Properties:
-      LogGroupName: !Ref SharedSignalsApiWafLogs
-      FilterPattern: ''
-      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
-
-  SharedSignalsApiWafLoggingConfiguration:
-    Type: AWS::WAFv2::LoggingConfiguration
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      LogDestinationConfigs:
-        # Cannot use Fn::GetAtt here since the ARN of a log group includes ':*' at the end, which is not accepted by the WAF service.
-        # The ARN must not include the ':*'.
-        - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${SharedSignalsApiWafLogs}
-      ResourceArn: !GetAtt SharedSignalsApiWafAcl.Arn
 
   ####################
   # Cognito Resources
@@ -384,14 +289,6 @@ Resources:
       Name: IntegrationTestProducerQueueUrl
       Type: String
       Value: !Ref IntegrationTestProducerQueue
-
-  SharedSignalsApiWafAclArnParameter:
-    Type: AWS::SSM::Parameter
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      Name: SharedSignalsApiWafAclArn
-      Type: String
-      Value: !GetAtt SharedSignalsApiWafAcl.Arn
 
   ####################
   # SET signing keys

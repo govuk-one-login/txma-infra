@@ -12,17 +12,8 @@ Parameters:
       - staging
       - integration
       - production
-  SecureDownloadWebsiteAllowedIps:
-    Type: AWS::SSM::Parameter::Value<List<String>>
-    Default: SecureDownloadWebsiteAllowedIps
 
 Conditions:
-  CslsEgress:
-    !Or [
-      !Equals [!Ref Environment, production],
-      !Equals [!Ref Environment, integration],
-      !Equals [!Ref Environment, staging]
-    ]
   IsProduction: !Equals [!Ref Environment, production]
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
@@ -32,14 +23,6 @@ Conditions:
       !Equals [!Ref Environment, integration]
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
-  # temporary condition to progressively remove WebACL related resources as FMS migration progresses
-  NotFMSMigratedEnvironment:
-    !Or [
-      !Equals [!Ref Environment, build],
-      !Equals [!Ref Environment, staging],
-      !Equals [!Ref Environment, integration],
-      !Equals [!Ref Environment, production]
-    ]
 
 Resources:
   QueryResultsBucket:
@@ -106,106 +89,6 @@ Resources:
         - Key: BackupFrequency
           Value: Bihourly
       DeletionProtectionEnabled: true
-
-  SecureFraudApiWafIpSet:
-    Condition: NotTestEnvironment
-    Type: AWS::WAFv2::IPSet
-    Properties:
-      Addresses: !Ref SecureDownloadWebsiteAllowedIps
-      Description: Lock secure download API access to GDS IP ranges
-      IPAddressVersion: IPV4
-      Name: secure-download-api-ip-range
-      Scope: REGIONAL
-
-  SecureFraudApiWafAcl:
-    Type: AWS::WAFv2::WebACL
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      DefaultAction: !If [NotTestEnvironment, Block: {}, Allow: {}]
-      Name: SecureFraudApiWafAcl
-      Scope: REGIONAL
-      VisibilityConfig:
-        CloudWatchMetricsEnabled: true
-        MetricName: SecureFraudApiWafMetric
-        SampledRequestsEnabled: true
-      Rules:
-        - Name: AwsManagedRulesCommonRuleSet
-          Priority: 0
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-              ExcludedRules: []
-          OverrideAction:
-            Count: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: SecureFraudApiCommonRuleSetMetric
-        - Name: AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 1
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: SecureFraudApiKnownBadInputsRuleSetMetric
-            SampledRequestsEnabled: true
-        - Name: AWSManagedRulesAmazonIpReputationList
-          Priority: 2
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAmazonIpReputationList
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: SecureFraudApiIpReputationListMetric
-            SampledRequestsEnabled: true
-        - !If
-          - NotTestEnvironment
-          - Action:
-              Allow: {}
-            Name: SecureFraudSiteIpRestriction
-            Priority: 3
-            Statement:
-              IPSetReferenceStatement:
-                Arn: !GetAtt SecureFraudApiWafIpSet.Arn
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: SecureFraudSiteIpRestrictionMetric
-              SampledRequestsEnabled: true
-          - !Ref AWS::NoValue
-
-  SecureFraudApiWafLogs:
-    Type: AWS::Logs::LogGroup
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
-      LogGroupName: aws-waf-logs-SecureFraudApiWafAcl
-      RetentionInDays: 30
-
-  SecureFraudApiWafCslsSubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: CslsEgress
-    Properties:
-      LogGroupName: !Ref SecureFraudApiWafLogs
-      FilterPattern: ''
-      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
-
-  SecureFraudApiWafLoggingConfiguration:
-    Type: AWS::WAFv2::LoggingConfiguration
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      LogDestinationConfigs:
-        # Cannot use Fn::GetAtt here since the ARN of a log group includes ':*' at the end, which is not accepted by the WAF service.
-        # The ARN must not include the ':*'.
-        - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${SecureFraudApiWafLogs}
-      ResourceArn: !GetAtt SecureFraudApiWafAcl.Arn
 
   # Need a separate KMS key here for the audit queue because we need to grant access to the event processing account
   # and our main KMS key definitions are in 'core', which is a shared set of definitions across all stacks.
@@ -517,14 +400,6 @@ Resources:
       Name: SecureFraudSiteDataTableName
       Type: String
       Value: !Ref SecureFraudSiteDataTable
-
-  SecureFraudApiWafAclArnParameter:
-    Type: AWS::SSM::Parameter
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      Name: SecureFraudApiWafAclArn
-      Type: String
-      Value: !GetAtt SecureFraudApiWafAcl.Arn
 
   AuditDataRequestEventsQueueArnParameter:
     Type: AWS::SSM::Parameter

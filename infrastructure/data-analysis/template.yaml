@@ -14,12 +14,6 @@ Parameters:
       - production
 
 Conditions:
-  CslsEgress:
-    !Or [
-      !Equals [!Ref Environment, production],
-      !Equals [!Ref Environment, integration],
-      !Equals [!Ref Environment, staging]
-    ]
   LockCrossAccountPermissionsToLambdaRoles:
     !Not [!Equals [!Ref Environment, dev]]
   IsProduction: !Equals [!Ref Environment, 'production']
@@ -27,14 +21,6 @@ Conditions:
     !Or [
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration]
-    ]
-  # temporary condition to progressively remove WebACL related resources as FMS migration progresses
-  NotFMSMigratedEnvironment:
-    !Or [
-      !Equals [!Ref Environment, build],
-      !Equals [!Ref Environment, staging],
-      !Equals [!Ref Environment, integration],
-      !Equals [!Ref Environment, production]
     ]
 
 Resources:
@@ -265,87 +251,6 @@ Resources:
         - Key: BackupFrequency
           Value: Bihourly
       DeletionProtectionEnabled: true
-
-  ###############
-  # WAF Resources
-  ###############
-
-  ZendeskWebhookApiWafAcl:
-    Type: AWS::WAFv2::WebACL
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      DefaultAction:
-        Allow: {}
-      Name: ZendeskWebhookApiWafAcl
-      Scope: REGIONAL
-      VisibilityConfig:
-        CloudWatchMetricsEnabled: true
-        MetricName: ZendeskWebhookApiWafMetric
-        SampledRequestsEnabled: true
-      Rules:
-        - Name: AwsManagedRulesCommonRuleSet
-          Priority: 0
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-              ExcludedRules: []
-          OverrideAction:
-            Count: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: ZendeskWebhookApiWafCommonRuleSetMetric
-        - Name: AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 1
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: ZendeskWebhookApiWafKnownBadInputsRuleSetMetric
-            SampledRequestsEnabled: true
-        - Name: AWSManagedRulesAmazonIpReputationList
-          Priority: 2
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAmazonIpReputationList
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: ZendeskWebhookApiWafIpReputationListMetric
-            SampledRequestsEnabled: true
-
-  ZendeskWebhookApiWafLogs:
-    Type: AWS::Logs::LogGroup
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
-      LogGroupName: aws-waf-logs-ZendeskWebhookApiWafAcl
-      RetentionInDays: 30
-
-  ZendeskWebhookApiWafCslsSubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: CslsEgress
-    Properties:
-      LogGroupName: !Ref ZendeskWebhookApiWafLogs
-      FilterPattern: ''
-      DestinationArn: '{{resolve:ssm:CSLSLogsDestination}}'
-
-  ZendeskWebhookApiWafLoggingConfiguration:
-    Type: AWS::WAFv2::LoggingConfiguration
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      LogDestinationConfigs:
-        # Cannot use Fn::GetAtt here since the ARN of a log group includes ':*' at the end, which is not accepted by the WAF service.
-        # The ARN must not include the ':*'.
-        - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${ZendeskWebhookApiWafLogs}
-      ResourceArn: !GetAtt ZendeskWebhookApiWafAcl.Arn
 
   ###################################
   # TICF Automated Queries SQS Queues
@@ -680,11 +585,3 @@ Resources:
       Name: ValidEmailRecipientsBucketName
       Type: String
       Value: !Ref ValidEmailRecipientsBucket
-
-  ZendeskWebhookApiWafAclArnParameter:
-    Type: AWS::SSM::Parameter
-    Condition: NotFMSMigratedEnvironment
-    Properties:
-      Name: ZendeskWebhookApiWafAclArn
-      Type: String
-      Value: !GetAtt ZendeskWebhookApiWafAcl.Arn
