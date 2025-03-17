@@ -4,6 +4,7 @@ import { mockClient } from 'aws-sdk-client-mock'
 import 'aws-sdk-client-mock-jest'
 import { Readable } from 'stream'
 import { s3DownloadFileToString } from './s3DownloadFileToString'
+import { StreamingBlobPayloadOutputTypes } from '@smithy/types'
 
 const s3Mock = mockClient(S3Client)
 const testS3Data = 'some data'
@@ -16,7 +17,9 @@ const createDataStream = () => {
 }
 
 const givenDataIsAvailable = () => {
-  s3Mock.on(GetObjectCommand).resolves({ Body: createDataStream() })
+  s3Mock
+    .on(GetObjectCommand)
+    .resolves({ Body: createDataStream() as StreamingBlobPayloadOutputTypes })
 }
 
 const givenFileDoesNotExist = () => {
