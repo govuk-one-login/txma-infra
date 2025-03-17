@@ -5,10 +5,7 @@
 .gitignore
 .husky
 .prettierignore
-.pnp.*
-.yarn
 CODEOWNERS
 coverage/
 dist/
-yarn.lock
 .nvmrc

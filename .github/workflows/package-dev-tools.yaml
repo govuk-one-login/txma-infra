@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - infrastructure/dev-tools/**
-      - .yarn/**
+      - .node_modules/**
   workflow_dispatch: {}
 
 env:
@@ -22,21 +22,23 @@ jobs:
         working-directory: infrastructure/dev-tools
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Setup Node 18
+        uses: actions/checkout@v4
+      - name: Setup Node 22
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-      - name: Node - Enable Corepack
-        run: corepack enable
-      - name: Install ESBuild binaries
-        run: yarn unplug
+          node-version: 22
+          cache: npm
+          cache-dependancy-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
       - name: Run tests
         if: always()
-        run: yarn test
+        run: npm run test
       - name: Build Lambda functions
         if: always()
-        run: yarn build
+        run: npm run build
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -105,7 +107,7 @@ jobs:
         with:
           name: dev-tools-sam-template
       - name: Setup Python 3.8
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.8'
       - name: Setup SAM CLI

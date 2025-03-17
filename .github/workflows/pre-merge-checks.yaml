@@ -6,45 +6,28 @@ on:
       - main
 
 jobs:
-  check-yarn-cache:
-    name: Check Yarn cache
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Setup Node 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Node - Enable Corepack
-        run: corepack enable
-      - name: Install ESBuild binaries
-        run: yarn unplug
-      - name: Check Yarn cache
-        run: yarn install --immutable --immutable-cache --check-cache
-
   linting-and-tests:
     name: Run linting and tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Setup Node 18
-        uses: actions/setup-node@v3
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
-      - name: Node - Enable Corepack
-        run: corepack enable
-      - name: Install ESBuild binaries
-        run: yarn unplug
+          node-version: 22
+          cache: npm
+          cache-dependancy-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install
       - name: Run linting
-        run: yarn lint
+        run: npm run lint
       - name: Run tests (dev-tools)
-        run: yarn workspace dev-tools test
+        run: npm run --workspace=dev-tools test
       - name: Run tests (audit-test-tools)
-        run: yarn workspace audit-test-tools test
+        run: npm run --workspace=audit-test-tools test
 
   validate-templates:
     name: Validate SAM templates
@@ -52,9 +35,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Python 3.8
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.8'
       - name: Setup SAM CLI
