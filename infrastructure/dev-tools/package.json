@@ -20,7 +20,7 @@
     "@aws-sdk/lib-dynamodb": "3.629.0",
     "@aws-sdk/types": "3.609.0",
     "@smithy/smithy-client": "2.5.1",
-    "axios": "1.7.4"
+    "axios": "1.8.2"
   },
   "devDependencies": {
     "@smithy/types": "2.12.0",
