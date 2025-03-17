@@ -34,7 +34,7 @@ export const handler = async (
   return response
 }
 
-type CommandParameters = {
+interface CommandParameters {
   commandType: S3CommandType
   commandInput: unknown
 }
