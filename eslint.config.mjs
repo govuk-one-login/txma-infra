@@ -9,15 +9,15 @@ export default [
   { files: ['**/*.{js,ts}'] },
   { languageOptions: { globals: globals.node, parser: tsEslintParser } },
   pluginJs.configs.recommended,
-  // ...tsEslint.configs.strictTypeChecked,
-  // ...tsEslint.configs.stylisticTypeChecked,
   ...tsEslint.configs.recommended,
   ...tsEslint.configs.stylistic,
   {
-    ignores: ['.env', 'coverage', 'dist', 'reports', 'eslint.config.mjs']
+    ignores: ['.env', 'coverage', '**/dist', 'reports', 'eslint.config.mjs']
   },
   {
     rules: {
+      // ...tsEslint.configs.strictTypeChecked,
+      // ...tsEslint.configs.stylisticTypeChecked,
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
