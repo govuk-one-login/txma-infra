@@ -28,7 +28,7 @@ describe('list s3 buckets', () => {
           LogicalResourceId: 'LambdaFunction',
           PhysicalResourceId: 'example-lambda-function',
           ResourceType: 'AWS::Lambda::Function',
-          LastUpdatedTimestamp: '2022-09-06T14:52:21.357Z',
+          LastUpdatedTimestamp: new Date('2022-09-06T14:52:21.357Z'),
           ResourceStatus: 'CREATE_COMPLETE'
         }
       ]
@@ -45,7 +45,7 @@ describe('list s3 buckets', () => {
           LogicalResourceId: 'S3Bucket',
           PhysicalResourceId: 'example-s3-bucket',
           ResourceType: 'AWS::S3::Bucket',
-          LastUpdatedTimestamp: '2022-09-06T14:52:21.357Z',
+          LastUpdatedTimestamp: new Date('2022-09-06T14:52:21.357Z'),
           ResourceStatus: 'CREATE_COMPLETE'
         }
       ]

@@ -43,7 +43,7 @@ const isPaginated = (response: ListObjectVersionsCommandOutput) => {
   )
 }
 
-type S3ObjectVersions = {
+interface S3ObjectVersions {
   deleteMarkers: { Key: string; VersionId: string }[]
   versions: { Key: string; VersionId: string }[]
 }
