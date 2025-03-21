@@ -24,7 +24,7 @@ npm install
 Enable the Husky hooks.
 
 ```
-npm install husky
+husky
 ```
 
 ## Code standards
