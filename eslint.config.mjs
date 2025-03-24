@@ -3,7 +3,7 @@ import pluginJs from '@eslint/js'
 import tsEslint from 'typescript-eslint'
 import tsEslintParser from '@typescript-eslint/parser'
 import eslintConfigPrettier from 'eslint-config-prettier'
-import eslintPluginJest from 'eslint-plugin-jest'
+//import eslintPluginJest from 'eslint-plugin-jest'
 
 export default [
   { files: ['**/*.{js,ts}'] },
@@ -11,13 +11,22 @@ export default [
   pluginJs.configs.recommended,
   ...tsEslint.configs.recommended,
   ...tsEslint.configs.stylistic,
+  //...tsEslint.configs.recommendedTypeChecked,
+  // {
+  //   languageOptions: {
+  //     parserOptions: {
+  //       projectService: true,
+  //       tsconfigRootDir: import.meta.dirname
+  //     }
+  //   }
+  // },
+  // ...tsEslint.configs.strictTypeChecked,
+  // ...tsEslint.configs.stylisticTypeChecked,
   {
     ignores: ['.env', 'coverage', '**/dist', 'reports', 'eslint.config.mjs']
   },
   {
     rules: {
-      // ...tsEslint.configs.strictTypeChecked,
-      // ...tsEslint.configs.stylisticTypeChecked,
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
