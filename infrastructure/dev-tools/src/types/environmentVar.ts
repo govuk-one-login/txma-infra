@@ -1,3 +1,3 @@
-export type EnvironmentVar = {
+export interface EnvironmentVar {
   name: 'AWS_REGION'
 }

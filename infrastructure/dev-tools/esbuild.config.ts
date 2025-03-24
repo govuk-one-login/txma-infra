@@ -33,7 +33,7 @@ const entries = lambdas.reduce(
     entries[handlerName] = filepath
     return entries
   },
-  {} as { [key: string]: string }
+  {} as Record<string, string>
 )
 
 esbuild
