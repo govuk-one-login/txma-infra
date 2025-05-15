@@ -14,8 +14,7 @@
   "scripts": {
     "lint": "prettier . --check || exit 1 ; eslint . --max-warnings=0",
     "lint:fix": "prettier . --write ; eslint . --fix",
-    "postinstall": "husky install",
-    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
+    "postinstall": "husky",
     "validate:templates": "bash ./scripts/validate-templates.sh"
   },
   "dependencies": {
