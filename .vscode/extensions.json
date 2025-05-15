@@ -1,7 +1,13 @@
 {
   "recommendations": [
+    "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "editorconfig.editorconfig",
-    "dbaeumer.vscode-eslint"
+    "orta.vscode-jest",
+    "mhutchie.git-graph",
+    "visualstudioexptteam.vscodeintellicode",
+    "mylesmurphy.prettify-ts",
+    "yoavbls.pretty-ts-errors",
+    "sonarsource.sonarlint-vscode",
+    "redhat.vscode-yaml"
   ]
 }
