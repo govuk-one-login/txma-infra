@@ -55,6 +55,7 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${AWS::StackName}-secure-fraud-site-data
+      BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: !If [NotTestEnvironment, false, true]
@@ -73,12 +74,6 @@ Resources:
               KeyType: HASH
           Projection:
             ProjectionType: 'KEYS_ONLY'
-          ProvisionedThroughput:
-            ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
       SSESpecification:
