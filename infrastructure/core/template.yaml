@@ -19,6 +19,13 @@ Parameters:
 
 Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
+  TestEnvironment:
+    !Not [
+      !Or [
+        !Equals [!Ref Environment, production],
+        !Equals [!Ref Environment, integration]
+      ]
+    ]
   CslsS3Logs:
     !Or [
       !Equals [!Ref Environment, production],
@@ -256,7 +263,16 @@ Resources:
             Action:
               - kms:Decrypt
             Resource: '*'
-
+          - !If
+            - TestEnvironment
+            - Sid: Allow Codepipeline test role to access encrypted secrets
+              Effect: Allow
+              Principal:
+                AWS: !ImportValue ssf-build-pipeline-TestRoleArn
+              Action:
+                - kms:Decrypt
+              Resource: '*'
+            - !Ref AWS::NoValue
   SecretsKmsKeyAlias:
     Type: AWS::KMS::Alias
     Properties:
