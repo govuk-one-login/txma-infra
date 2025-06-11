@@ -19,13 +19,7 @@ Parameters:
 
 Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
-  TestEnvironment:
-    !Not [
-      !Or [
-        !Equals [!Ref Environment, production],
-        !Equals [!Ref Environment, integration]
-      ]
-    ]
+  TestEnvironment: !Equals [!Ref Environment, build]
   CslsS3Logs:
     !Or [
       !Equals [!Ref Environment, production],
