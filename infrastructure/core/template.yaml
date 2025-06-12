@@ -262,7 +262,8 @@ Resources:
             - Sid: Allow Codepipeline test role to access encrypted secrets
               Effect: Allow
               Principal:
-                AWS: !ImportValue ssf-build-pipeline-TestRoleArn
+                AWS:
+                  Fn::ImportValue: !Sub '${AWS::StackName}-pipeline-TestRoleArn'
               Action:
                 - kms:Decrypt
               Resource: '*'
