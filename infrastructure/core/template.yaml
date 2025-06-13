@@ -12,11 +12,6 @@ Parameters:
       - staging
       - integration
       - production
-  EnvironmentShortFormat:
-    Description: The environment type in the format used by dev platform cloudformation stacks
-    Type: String
-    AllowedValues:
-      - build
   PermissionsBoundary:
     Description: The ARN of the permissions boundary to apply to any role created by the template
     Type: String
