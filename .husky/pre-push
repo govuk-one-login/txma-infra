@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
 npm run --workspace=dev-tools test
 npm run --workspace=audit-test-tools test

@@ -18,13 +18,9 @@ To run this project you will need the following:
 ## Getting started
 
 ```
+nvm use
 npm install
-```
-
-Enable the Husky hooks.
-
-```
-husky
+npm run prepare
 ```
 
 ## Code standards
