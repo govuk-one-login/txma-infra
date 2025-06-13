@@ -17,7 +17,6 @@ Parameters:
     Type: String
     AllowedValues:
       - build
-      - stg
   PermissionsBoundary:
     Description: The ARN of the permissions boundary to apply to any role created by the template
     Type: String
