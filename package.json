@@ -21,7 +21,7 @@
     "@aws-sdk/client-sso-oidc": "3.758.0",
     "@aws-sdk/client-sts": "3.758.0",
     "@aws-sdk/credential-provider-node": "3.758.0",
-    "typescript-eslint": "^8.26.1"
+    "typescript-eslint": "8.26.1"
   },
   "resolutions": {
     "micromatch": "4.0.8"
@@ -29,21 +29,21 @@
   "devDependencies": {
     "@smithy/core": "3.1.5",
     "@smithy/smithy-client": "4.1.6",
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.26.1",
-    "eslint": "^9.22.0",
+    "@typescript-eslint/eslint-plugin": "8.26.1",
+    "@typescript-eslint/parser": "8.26.1",
+    "eslint": "9.22.0",
     "eslint-config-prettier": "10.1.1",
     "eslint-plugin-jest": "28.11.0",
-    "husky": "^9.1.7",
+    "husky": "9.1.7",
     "lint-staged": "15.5.0",
     "prettier": "3.5.3",
-    "typescript": "^5.8.2"
+    "typescript": "5.8.2"
   },
   "lint-staged": {
     "*": "prettier --write",
     "*.{js,ts}": "eslint --fix"
   },
   "engines": {
-    "node": "^22.0.0"
+    "node": "22.0.0"
   }
 }
