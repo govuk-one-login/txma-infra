@@ -262,11 +262,15 @@ Resources:
             - Sid: Allow Codepipeline test role to access encrypted secrets
               Effect: Allow
               Principal:
-                AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/PL*-${Environment}-pipeline-TestRole-*'
+                AWS: '*'
               Action:
                 - kms:Decrypt
               Resource: '*'
+              Condition:
+                ArnLike:
+                  aws:PrincipalArn': !Sub 'arn:aws:iam::${AWS::AccountId}:role/*pipeline-TestRole*'
             - !Ref AWS::NoValue
+
   SecretsKmsKeyAlias:
     Type: AWS::KMS::Alias
     Properties:
