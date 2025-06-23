@@ -15,7 +15,8 @@
     "lint": "prettier . --check || exit 1 ; eslint . --max-warnings=0",
     "lint:fix": "prettier . --write ; eslint . --fix",
     "validate:templates": "bash ./scripts/validate-templates.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "updateGitHubActions": "./updateGitHubActions.sh"
   },
   "dependencies": {
     "@aws-sdk/client-sso-oidc": "3.758.0",
