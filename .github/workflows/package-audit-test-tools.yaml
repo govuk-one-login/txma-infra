@@ -39,7 +39,7 @@ jobs:
         if: always()
         run: npm run build
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: audit-test-tools-sam-template
           path: |
@@ -70,7 +70,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: audit-test-tools-sam-template
       - name: Setup Python 3.8
