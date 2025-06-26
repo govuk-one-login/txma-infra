@@ -45,7 +45,7 @@ jobs:
       - name: Validate SAM templates
         run: ./scripts/validate-templates.sh
       - name: Run Checkov on SAM templates
-        uses: bridgecrewio/checkov-action@4f966d0f4ad18f9d1c8fa484530d67d1ada2931a # v12.3027.0
+        uses: bridgecrewio/checkov-action@d1ecbbd991738bb77267c875eff09fe1f2c6e044 # v12.3036.0
         with:
           directory: infrastructure/
           quiet: true
