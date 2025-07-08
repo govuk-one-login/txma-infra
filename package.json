@@ -19,9 +19,9 @@
     "updateGitHubActions": "./updateGitHubActions.sh"
   },
   "dependencies": {
-    "@aws-sdk/client-sso-oidc": "3.758.0",
-    "@aws-sdk/client-sts": "3.758.0",
-    "@aws-sdk/credential-provider-node": "3.758.0"
+    "@aws-sdk/client-sso-oidc": "3.840.0",
+    "@aws-sdk/client-sts": "3.840.0",
+    "@aws-sdk/credential-provider-node": "3.840.0"
   },
   "resolutions": {
     "micromatch": "4.0.8"
@@ -29,7 +29,7 @@
   "devDependencies": {
     "@eslint/js": "9.28.0",
     "@smithy/core": "3.1.5",
-    "@smithy/smithy-client": "4.1.6",
+    "@smithy/smithy-client": "4.4.5",
     "@typescript-eslint/eslint-plugin": "8.26.1",
     "@typescript-eslint/parser": "8.26.1",
     "eslint": "9.28.0",
