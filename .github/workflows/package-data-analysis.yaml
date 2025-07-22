@@ -41,7 +41,7 @@ jobs:
       - name: Setup SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Assume AWS role
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1@v2
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
