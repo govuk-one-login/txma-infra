@@ -30,6 +30,9 @@ describe('Read s3 file to string handler', () => {
     )
 
     expect(result).toEqual(testFileContents)
-    expect(s3DownloadFileToString).toBeCalledWith(testBucketName, testFileKey)
+    expect(s3DownloadFileToString).toHaveBeenCalledWith(
+      testBucketName,
+      testFileKey
+    )
   })
 })

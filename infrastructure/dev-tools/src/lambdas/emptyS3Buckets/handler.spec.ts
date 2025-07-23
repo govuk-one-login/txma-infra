@@ -51,7 +51,10 @@ describe('empty s3 buckets handler', () => {
 
     await handler(updateEvent, mockLambdaContext)
 
-    expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
+    expect(httpsRequestSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      successPayload
+    )
   })
 
   test('does nothing if stack contains no s3 buckets', async () => {
@@ -59,7 +62,10 @@ describe('empty s3 buckets handler', () => {
 
     await handler(defaultCustomResourceDeleteEvent, mockLambdaContext)
 
-    expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
+    expect(httpsRequestSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      successPayload
+    )
   })
 
   test('calls empty bucket if stack contains s3 buckets', async () => {
@@ -68,7 +74,10 @@ describe('empty s3 buckets handler', () => {
 
     await handler(defaultCustomResourceDeleteEvent, mockLambdaContext)
 
-    expect(httpsRequestSpy).toBeCalledWith(expect.anything(), successPayload)
+    expect(httpsRequestSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      successPayload
+    )
     expect(emptyS3Bucket).toHaveBeenCalledWith('example-bucket')
   })
 
@@ -86,6 +95,9 @@ describe('empty s3 buckets handler', () => {
       Reason: 'error message'
     }
 
-    expect(httpsRequestSpy).toBeCalledWith(expect.anything(), errorPayload)
+    expect(httpsRequestSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      errorPayload
+    )
   })
 })
