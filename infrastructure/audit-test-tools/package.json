@@ -20,7 +20,7 @@
     "@types/aws-lambda": "^8.10.147",
     "@types/jest": "30.0.0",
     "@types/jest-when": "3.5.5",
-    "@types/node": "24.6.0",
+    "@types/node": "24.7.0",
     "aws-sdk-client-mock": "4.1.0",
     "aws-sdk-client-mock-jest": "4.1.0",
     "esbuild": "0.25.10",
@@ -28,7 +28,7 @@
     "jest-when": "3.7.0",
     "ts-jest": "29.4.4",
     "ts-node": "10.9.2",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "yaml-cfn": "0.3.2"
   },
   "engines": {
