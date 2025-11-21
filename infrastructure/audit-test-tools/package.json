@@ -11,10 +11,10 @@
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.24.0",
-    "@aws-sdk/client-cloudformation": "3.916.0",
-    "@aws-sdk/client-s3": "3.916.0",
-    "@aws-sdk/client-sqs": "3.916.0",
-    "axios": "1.12.2"
+    "@aws-sdk/client-cloudformation": "3.936.0",
+    "@aws-sdk/client-s3": "3.936.0",
+    "@aws-sdk/client-sqs": "3.936.0",
+    "axios": "1.13.2"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
