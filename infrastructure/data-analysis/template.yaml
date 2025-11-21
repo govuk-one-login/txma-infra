@@ -74,6 +74,9 @@ Resources:
         RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
+      Tags:
+        - Key: BackupFrequency
+          Value: Bihourly
 
   ################################
   # Data Analysis Athena Resources

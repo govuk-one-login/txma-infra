@@ -536,6 +536,9 @@ Resources:
         RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
+      Tags:
+        - Key: BackupFrequency
+          Value: Daily
 
   AddFirehoseRecordFunctionNameParameter:
     Type: AWS::SSM::Parameter
