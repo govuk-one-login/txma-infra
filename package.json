@@ -29,16 +29,16 @@
     "@eslint/js": "9.39.1",
     "@smithy/core": "3.18.5",
     "@smithy/smithy-client": "4.9.8",
-    "@typescript-eslint/eslint-plugin": "8.47.0",
-    "@typescript-eslint/parser": "8.47.0",
+    "@typescript-eslint/eslint-plugin": "8.48.0",
+    "@typescript-eslint/parser": "8.48.0",
     "eslint": "9.39.1",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-jest": "29.2.0",
+    "eslint-plugin-jest": "29.2.1",
     "husky": "9.1.7",
     "lint-staged": "16.2.7",
     "prettier": "3.6.2",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.47.0"
+    "typescript-eslint": "8.48.0"
   },
   "lint-staged": {
     "*": "prettier --write",
