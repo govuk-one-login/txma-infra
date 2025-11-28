@@ -18,9 +18,9 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@aws-sdk/client-sso-oidc": "3.936.0",
-    "@aws-sdk/client-sts": "3.936.0",
-    "@aws-sdk/credential-provider-node": "3.936.0"
+    "@aws-sdk/client-sso-oidc": "3.940.0",
+    "@aws-sdk/client-sts": "3.940.0",
+    "@aws-sdk/credential-provider-node": "3.940.0"
   },
   "resolutions": {
     "micromatch": "4.0.8"
