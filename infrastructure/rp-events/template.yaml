@@ -142,6 +142,49 @@ Resources:
             Resource:
               - '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
+  RelyingPartyPairwiseMappingTableFraudCrossAccountAccessRole:
+    Type: AWS::IAM::Role
+    Condition: IsIntegratedEnvironment
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-pairwise-table-fraud-access-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAssumeRoleAccessToFraud
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:FraudAwsAccountRootArn}}'
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref RelyingPartyPairwiseMappingTableFraudCrossAccountAccessPolicy
+
+  RelyingPartyPairwiseMappingTableFraudCrossAccountAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: IsIntegratedEnvironment
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StackName}-pairwise-table-fraud-access-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DynamoPairwiseTableRead
+            Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:Query
+            Resource:
+              - !GetAtt RelyingPartyPairwiseMappingTable.Arn
+              - !Sub ${RelyingPartyPairwiseMappingTable.Arn}/index/*
+          - Sid: DynamoItemsDecrypt
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource:
+              - '{{resolve:ssm:DatabaseKmsKeyArn}}'
+
   ################
   # SQS Resources
   ################
@@ -327,3 +370,19 @@ Resources:
       Name: RPEventsQueueUrl
       Type: String
       Value: !Ref RPEventsQueue
+
+  RelyingPartyPairwiseMappingTableCrossAccountAccessRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Condition: IsIntegratedEnvironment
+    Properties:
+      Name: RelyingPartyPairwiseMappingTableCrossAccountAccessRoleArn
+      Type: String
+      Value: !GetAtt RelyingPartyPairwiseMappingTableCrossAccountAccessRole.Arn
+
+  RelyingPartyPairwiseMappingTableFraudCrossAccountAccessRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Condition: IsIntegratedEnvironment
+    Properties:
+      Name: RelyingPartyPairwiseMappingTableFraudCrossAccountAccessRoleArn
+      Type: String
+      Value: !GetAtt RelyingPartyPairwiseMappingTableFraudCrossAccountAccessRole.Arn
