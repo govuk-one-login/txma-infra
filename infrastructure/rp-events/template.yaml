@@ -142,11 +142,11 @@ Resources:
             Resource:
               - '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
-  RelyingPartyPairwiseMappingTableFraudCrossAccountAccessRole:
+  RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRole:
     Type: AWS::IAM::Role
     Condition: IsIntegratedEnvironment
     Properties:
-      RoleName: !Sub '${AWS::StackName}-pairwise-table-fraud-access-role'
+      RoleName: !Sub '${AWS::StackName}-pairwise-table-fai-access-role'
       PermissionsBoundary: !If
         - UsePermissionsBoundary
         - !Ref PermissionsBoundary
@@ -154,19 +154,19 @@ Resources:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Sid: AllowAssumeRoleAccessToFraud
+          - Sid: AllowAssumeRoleAccessToFai
             Effect: Allow
             Principal:
-              AWS: '{{resolve:ssm:FraudAwsAccountRootArn}}'
+              AWS: '{{resolve:ssm:FaiAwsAccountRootArn}}'
             Action: sts:AssumeRole
       ManagedPolicyArns:
-        - !Ref RelyingPartyPairwiseMappingTableFraudCrossAccountAccessPolicy
+        - !Ref RelyingPartyPairwiseMappingTableFaiCrossAccountAccessPolicy
 
-  RelyingPartyPairwiseMappingTableFraudCrossAccountAccessPolicy:
+  RelyingPartyPairwiseMappingTableFaiCrossAccountAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
     Condition: IsIntegratedEnvironment
     Properties:
-      ManagedPolicyName: !Sub ${AWS::StackName}-pairwise-table-fraud-access-policy
+      ManagedPolicyName: !Sub ${AWS::StackName}-pairwise-table-fai-access-policy
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -379,10 +379,10 @@ Resources:
       Type: String
       Value: !GetAtt RelyingPartyPairwiseMappingTableCrossAccountAccessRole.Arn
 
-  RelyingPartyPairwiseMappingTableFraudCrossAccountAccessRoleArnParameter:
+  RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRoleArnParameter:
     Type: AWS::SSM::Parameter
     Condition: IsIntegratedEnvironment
     Properties:
-      Name: RelyingPartyPairwiseMappingTableFraudCrossAccountAccessRoleArn
+      Name: RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRoleArn
       Type: String
-      Value: !GetAtt RelyingPartyPairwiseMappingTableFraudCrossAccountAccessRole.Arn
+      Value: !GetAtt RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRole.Arn
