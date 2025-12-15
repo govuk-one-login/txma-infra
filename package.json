@@ -18,9 +18,9 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@aws-sdk/client-sso-oidc": "3.936.0",
-    "@aws-sdk/client-sts": "3.936.0",
-    "@aws-sdk/credential-provider-node": "3.936.0"
+    "@aws-sdk/client-sso-oidc": "3.952.0",
+    "@aws-sdk/client-sts": "3.952.0",
+    "@aws-sdk/credential-provider-node": "3.952.0"
   },
   "resolutions": {
     "micromatch": "4.0.8"
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@eslint/js": "9.39.1",
     "@smithy/core": "3.18.5",
-    "@smithy/smithy-client": "4.9.8",
+    "@smithy/smithy-client": "4.9.10",
     "@typescript-eslint/eslint-plugin": "8.47.0",
     "@typescript-eslint/parser": "8.47.0",
     "eslint": "9.39.1",
