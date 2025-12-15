@@ -160,30 +160,7 @@ Resources:
               AWS: '{{resolve:ssm:FaiAwsAccountRootArn}}'
             Action: sts:AssumeRole
       ManagedPolicyArns:
-        - !Ref RelyingPartyPairwiseMappingTableFaiCrossAccountAccessPolicy
-
-  RelyingPartyPairwiseMappingTableFaiCrossAccountAccessPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Condition: IsIntegratedEnvironment
-    Properties:
-      ManagedPolicyName: !Sub ${AWS::StackName}-pairwise-table-fai-access-policy
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: DynamoPairwiseTableRead
-            Effect: Allow
-            Action:
-              - dynamodb:GetItem
-              - dynamodb:Query
-            Resource:
-              - !GetAtt RelyingPartyPairwiseMappingTable.Arn
-              - !Sub ${RelyingPartyPairwiseMappingTable.Arn}/index/*
-          - Sid: DynamoItemsDecrypt
-            Effect: Allow
-            Action:
-              - kms:Decrypt
-            Resource:
-              - '{{resolve:ssm:DatabaseKmsKeyArn}}'
+        - !Ref RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy
 
   ################
   # SQS Resources
