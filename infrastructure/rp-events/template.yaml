@@ -348,14 +348,6 @@ Resources:
       Type: String
       Value: !Ref RPEventsQueue
 
-  RelyingPartyPairwiseMappingTableCrossAccountAccessRoleArnParameter:
-    Type: AWS::SSM::Parameter
-    Condition: IsIntegratedEnvironment
-    Properties:
-      Name: RelyingPartyPairwiseMappingTableCrossAccountAccessRoleArn
-      Type: String
-      Value: !GetAtt RelyingPartyPairwiseMappingTableCrossAccountAccessRole.Arn
-
   RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRoleArnParameter:
     Type: AWS::SSM::Parameter
     Condition: IsIntegratedEnvironment
