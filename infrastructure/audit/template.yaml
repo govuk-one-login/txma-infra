@@ -369,6 +369,14 @@ Resources:
             Resource: !Ref SplunkReplaySnsTopic
       Topics:
         - !Ref SplunkReplaySnsTopic
+
+  SplunkReplayTopicArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SplunkReplayTopicArn
+      Type: String
+      Value: '{{resolve:ssm:SplunkReplayTopicArn}}'
+
   ############################
   # End: SNS topics #
   ############################
