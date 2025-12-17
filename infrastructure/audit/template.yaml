@@ -375,7 +375,7 @@ Resources:
     Properties:
       Name: SplunkReplayTopicArn
       Type: String
-      Value: '{{resolve:ssm:SplunkReplayTopicArn}}'
+      Value: !GetAtt SplunkReplaySnsTopic.TopicArn
 
   ############################
   # End: SNS topics #
