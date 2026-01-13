@@ -142,6 +142,26 @@ Resources:
             Resource:
               - '{{resolve:ssm:DatabaseKmsKeyArn}}'
 
+  RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRole:
+    Type: AWS::IAM::Role
+    Condition: IsIntegratedEnvironment
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-pairwise-table-fai-access-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAssumeRoleAccessToFai
+            Effect: Allow
+            Principal:
+              AWS: '{{resolve:ssm:FaiAwsAccountRootArn}}'
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy
+
   ################
   # SQS Resources
   ################
@@ -327,3 +347,11 @@ Resources:
       Name: RPEventsQueueUrl
       Type: String
       Value: !Ref RPEventsQueue
+
+  RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Condition: IsIntegratedEnvironment
+    Properties:
+      Name: RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRoleArn
+      Type: String
+      Value: !GetAtt RelyingPartyPairwiseMappingTableFaiCrossAccountAccessRole.Arn
