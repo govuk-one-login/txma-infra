@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Static infrastructure for Relying Party Event Processing
+Description: Static infrastructure for Relying Party Event Processing testing
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
