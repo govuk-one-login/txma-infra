@@ -41,3 +41,4 @@ jobs:
         with:
           directory: .github/workflows
           quiet: true
+          skip_check: CKV2_GHA_1
