@@ -25,6 +25,7 @@ jobs:
       template_path: infrastructure/data-analysis/template.yaml
 
   package:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
         target: [AUDIT_DEV, AUDIT_BUILD]

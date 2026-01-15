@@ -25,6 +25,7 @@ jobs:
       template_path: infrastructure/query-results/template.yaml
 
   package:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
         target: [QUERY_RESULTS_DEV, QUERY_RESULTS_BUILD]

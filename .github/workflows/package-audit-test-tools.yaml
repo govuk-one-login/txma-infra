@@ -63,6 +63,7 @@ jobs:
           include-hidden-files: true
 
   package:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
         include:
