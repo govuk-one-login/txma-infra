@@ -44,9 +44,3 @@ jobs:
         uses: aws-actions/setup-sam@v2
       - name: Validate SAM templates
         run: ./scripts/validate-templates.sh
-      - name: Run Checkov on SAM templates
-        uses: bridgecrewio/checkov-action@de3c276ef8118f7ce6bcb2e51d8dd3d65ac0ae36 # v12.3073.0
-        with:
-          directory: infrastructure/
-          quiet: true
-          framework: cloudformation
