@@ -1,1 +1,10 @@
-* @govuk-one-login/txma-team
+infrastructure/audit/ @govuk-one-login/txma-team
+infrastructure/audit-test-tools/ @govuk-one-login/txma-team
+infrastructure/data-analysis/ @govuk-one-login/txma-team
+infrastructure/event-processing/ @govuk-one-login/txma-team
+infrastructure/query-results/ @govuk-one-login/txma-team
+infrastructure/rp-events/ @govuk-one-login/signals-exchange-team
+infrastructure/shared-signals/ @govuk-one-login/signals-exchange-team
+
+# Default: all other files require approval from both teams
+* @govuk-one-login/txma-team @govuk-one-login/signals-exchange-team
