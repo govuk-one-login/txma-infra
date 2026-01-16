@@ -1,0 +1,44 @@
+name: Code Quality Check
+
+on:
+  workflow_call:
+    inputs:
+      template_path:
+        required: true
+        type: string
+        description: 'Path to the CloudFormation template file'
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-scan:
+    name: Validate and Scan Template
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SAM_CLI_TELEMETRY: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - name: Set up SAM CLI
+        uses: aws-actions/setup-sam@c71dd89d980e49367c70391e8ada4353f52f2800 # v2
+        with:
+          use-installer: true
+      - name: SAM Validate
+        run: sam validate --lint -t ${{ inputs.template_path }}
+      - name: Run Checkov on template
+        uses: bridgecrewio/checkov-action@de3c276ef8118f7ce6bcb2e51d8dd3d65ac0ae36
+        with:
+          file: ${{ inputs.template_path }}
+          quiet: true
+      - name: Run Checkov on workflows
+        uses: bridgecrewio/checkov-action@de3c276ef8118f7ce6bcb2e51d8dd3d65ac0ae36
+        with:
+          directory: .github/workflows
+          quiet: true
+          skip_check: CKV2_GHA_1

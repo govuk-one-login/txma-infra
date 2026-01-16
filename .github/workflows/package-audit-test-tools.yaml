@@ -1,6 +1,10 @@
 name: Package audit test tools infrastructure
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - infrastructure/audit-test-tools/**
   push:
     branches:
       - main
@@ -13,6 +17,14 @@ env:
   AWS_REGION: eu-west-2
 
 jobs:
+  code-quality:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.actor != 'dependabot[bot]' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/code-quality-checkov.yaml
+    with:
+      template_path: infrastructure/audit-test-tools/template.yaml
+
   build:
     name: Build Lambda functions
     runs-on: ubuntu-latest
@@ -51,6 +63,7 @@ jobs:
           include-hidden-files: true
 
   package:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
         include:
