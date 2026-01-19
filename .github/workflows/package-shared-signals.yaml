@@ -1,6 +1,10 @@
 name: Package Shared Signals infrastructure
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - infrastructure/shared-signals/**
   push:
     branches:
       - main
@@ -12,7 +16,16 @@ env:
   AWS_REGION: eu-west-2
 
 jobs:
+  code-quality:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.actor != 'dependabot[bot]' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/code-quality-checkov.yaml
+    with:
+      template_path: infrastructure/shared-signals/template.yaml
+
   package:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
         include:
