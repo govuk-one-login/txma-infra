@@ -1,0 +1,66 @@
+name: Package audit DR infrastructure
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - infrastructure/audit-dr/**
+  push:
+    branches:
+      - main
+    paths:
+      - infrastructure/audit-dr/**
+  workflow_dispatch: {}
+
+env:
+  AWS_REGION: eu-west-1
+
+jobs:
+  code-quality:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.actor != 'dependabot[bot]' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/code-quality-checkov.yaml
+    with:
+      template_path: infrastructure/audit-dr/template.yaml
+
+  package:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    strategy:
+      matrix:
+        include:
+          - target: AUDITDR_DEV
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_AUDITDR_AUDITDR_DEV
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_AUDITDR_AUDITDR_DEV
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_AUDITDR_DEV
+          - target: AUDITDR_BUILD
+            ARTIFACT_BUCKET_NAME_SECRET: ARTIFACT_BUCKET_NAME_AUDITDR_AUDITDR_BUILD
+            GH_ACTIONS_ROLE_ARN_SECRET: GH_ACTIONS_ROLE_ARN_AUDITDR_AUDITDR_BUILD
+            SIGNING_PROFILE_SECRET: SIGNING_PROFILE_NAME_AUDITDR_BUILD
+    name: Package template
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Setup Python 3.8
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+        with:
+          python-version: '3.8'
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+      - name: Assume AWS role
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
+      - name: Package SAM app
+        uses: govuk-one-login/devplatform-upload-action@ac4a243a86c2017f5360b83d737dea4268dcf38a # v3.11.1
+        with:
+          artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
+          signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
+          template-file: infrastructure/audit-dr/template.yaml
+          working-directory: '.'
