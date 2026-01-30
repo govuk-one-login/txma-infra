@@ -13,7 +13,7 @@ on:
   workflow_dispatch: {}
 
 env:
-  AWS_REGION: eu-west-1
+  AWS_REGION: eu-west-2
 
 jobs:
   code-quality:
@@ -22,7 +22,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/code-quality-checkov.yaml
     with:
-      template_path: infrastructure/audit-dr/template.yaml
+      template_path: infrastructure/audit-dr/template-london.yaml
 
   package:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
@@ -62,5 +62,5 @@ jobs:
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
-          template-file: infrastructure/audit-dr/template.yaml
+          template-file: infrastructure/audit-dr/template-london.yaml
           working-directory: '.'

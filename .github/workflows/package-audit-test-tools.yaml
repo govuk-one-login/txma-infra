@@ -23,7 +23,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/code-quality-checkov.yaml
     with:
-      template_path: infrastructure/audit-test-tools/template.yaml
+      template_path: infrastructure/audit-test-tools/template-london.yaml
 
   build:
     name: Build Lambda functions
@@ -103,5 +103,5 @@ jobs:
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
-          template-file: infrastructure/audit-test-tools/template.yaml
+          template-file: infrastructure/audit-test-tools/template-london.yaml
           working-directory: '.'

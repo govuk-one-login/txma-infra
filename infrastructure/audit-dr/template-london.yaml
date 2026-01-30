@@ -13,6 +13,11 @@ Parameters:
       - integration
       - production
 
+Outputs:
+  EncryptionGeneratorKmsKeyArn:
+    Description: This is the ARN for the KMS key used for encryption
+    Value: !GetAtt EncryptionGeneratorKmsKey.ARN
+
 Resources:
   ###################
   # Start: KMS Keys #
@@ -23,6 +28,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
+      MultiRegion: true
       EnableKeyRotation: true
       KeyPolicy:
         Version: '2012-10-17'

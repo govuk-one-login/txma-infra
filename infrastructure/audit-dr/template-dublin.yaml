@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static infrastructure for AuditDr Dublin region system
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  WhatToDeploy:
+    Description: What to deploy
+    Type: String
+    AllowedValues:
+      - Param
+      - Key
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Resources:
+  ################
+  # SSM Parameters
+  ################
+
+  EncryptionGeneratorKmsKeyArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EncryptionGeneratorKmsKeyArn
+      Type: String
+      Value: ' '
+
+  ###################
+  # Start: KMS Keys #
+  ###################
+
+  EncryptionGeneratorKmsReplicaKey:
+    Type: AWS::KMS::ReplicaKey
+    Properties:
+      Description: String
+      Enabled: Boolean
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:GenerateDataKey
+            Resource: '*'
+      PrimaryKeyArn: '{{resolve:ssm:EncryptionGeneratorKmsKeyArn}}'
+
+  #################
+  # End: KMS Keys #
+  #################
