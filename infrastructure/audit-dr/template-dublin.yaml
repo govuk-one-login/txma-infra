@@ -3,12 +3,10 @@ Description: Static infrastructure for AuditDr Dublin region system
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  WhatToDeploy:
-    Description: What to deploy
+  PrimaryKeyARN:
+    Description: The ARN of the KMS key used to encrypt the audit trail
     Type: String
-    AllowedValues:
-      - Param
-      - Key
+
   Environment:
     Description: The environment type
     Type: String
@@ -20,17 +18,6 @@ Parameters:
       - production
 
 Resources:
-  ################
-  # SSM Parameters
-  ################
-
-  EncryptionGeneratorKmsKeyArnParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: EncryptionGeneratorKmsKeyArn
-      Type: String
-      Value: ' '
-
   ###################
   # Start: KMS Keys #
   ###################
@@ -59,7 +46,8 @@ Resources:
               - kms:Decrypt
               - kms:GenerateDataKey
             Resource: '*'
-      PrimaryKeyArn: '{{resolve:ssm:EncryptionGeneratorKmsKeyArn}}'
+      PrimaryKeyArn:
+        Ref: PrimaryKeyARN
 
   #################
   # End: KMS Keys #
