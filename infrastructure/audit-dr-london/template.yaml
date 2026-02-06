@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static infrastructure for Audit system
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Outputs:
+  EncryptionGeneratorKmsKeyArn:
+    Description: This is the ARN for the KMS key used for encryption
+    Value: !GetAtt EncryptionGeneratorKmsKey.Arn
+
+Resources:
+  ###################
+  # Start: KMS Keys #
+  ###################
+
+  EncryptionGeneratorKmsKey:
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      MultiRegion: true
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:GenerateDataKey
+            Resource: '*'
+
+  EncryptionGeneratorKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/${Environment}/encryption-generator-kms-key
+      TargetKeyId: !Ref EncryptionGeneratorKmsKey
+
+  #################
+  # End: KMS Keys #
+  #################

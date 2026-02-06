@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static infrastructure for AuditDr Dublin region system
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  PrimaryKeyARN:
+    Description: The ARN of the KMS key used to encrypt the audit trail
+    Type: String
+
+  Environment:
+    Description: The environment type
+    Type: String
+    AllowedValues:
+      - dev
+      - build
+      - staging
+      - integration
+      - production
+
+Resources:
+  ###################
+  # Start: KMS Keys #
+  ###################
+
+  EncryptionGeneratorKmsReplicaKey:
+    Type: AWS::KMS::ReplicaKey
+    Properties:
+      Description: String
+      Enabled: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow AWS Lambda access
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:GenerateDataKey
+            Resource: '*'
+      PrimaryKeyArn:
+        Ref: PrimaryKeyARN
+
+  #################
+  # End: KMS Keys #
+  #################
