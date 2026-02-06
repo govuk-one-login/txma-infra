@@ -16,7 +16,7 @@ interface ILambdaFunction extends IAwsResource {
 const handlerPath = 'src/lambdas'
 
 const { Resources } = yamlParse(
-  readFileSync(join(__dirname, 'template-london.yaml'), 'utf-8')
+  readFileSync(join(__dirname, 'template.yaml'), 'utf-8')
 )
 
 const awsResources = Object.values(Resources) as IAwsResource[]

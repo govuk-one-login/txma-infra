@@ -1,8 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Static infrastructure for Audit system
+Description: Static infrastructure for AuditDr Dublin region system
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+  PrimaryKeyARN:
+    Description: The ARN of the KMS key used to encrypt the audit trail
+    Type: String
+
   Environment:
     Description: The environment type
     Type: String
@@ -13,23 +17,16 @@ Parameters:
       - integration
       - production
 
-Outputs:
-  EncryptionGeneratorKmsKeyArn:
-    Description: This is the ARN for the KMS key used for encryption
-    Value: !GetAtt EncryptionGeneratorKmsKey.ARN
-
 Resources:
   ###################
   # Start: KMS Keys #
   ###################
 
-  EncryptionGeneratorKmsKey:
-    Type: AWS::KMS::Key
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
+  EncryptionGeneratorKmsReplicaKey:
+    Type: AWS::KMS::ReplicaKey
     Properties:
-      MultiRegion: true
-      EnableKeyRotation: true
+      Description: String
+      Enabled: true
       KeyPolicy:
         Version: '2012-10-17'
         Statement:
@@ -49,12 +46,8 @@ Resources:
               - kms:Decrypt
               - kms:GenerateDataKey
             Resource: '*'
-
-  EncryptionGeneratorKmsKeyAlias:
-    Type: AWS::KMS::Alias
-    Properties:
-      AliasName: !Sub alias/${AWS::StackName}/${Environment}/encryption-generator-kms-key
-      TargetKeyId: !Ref EncryptionGeneratorKmsKey
+      PrimaryKeyArn:
+        Ref: PrimaryKeyARN
 
   #################
   # End: KMS Keys #

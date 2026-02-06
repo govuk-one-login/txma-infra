@@ -22,7 +22,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/code-quality-checkov.yaml
     with:
-      template_path: infrastructure/data-analysis/template-london.yaml
+      template_path: infrastructure/data-analysis/template.yaml
 
   package:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
@@ -63,5 +63,5 @@ jobs:
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET] }}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
-          template-file: infrastructure/data-analysis/template-london.yaml
+          template-file: infrastructure/data-analysis/template.yaml
           working-directory: '.'
