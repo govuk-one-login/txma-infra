@@ -18,27 +18,27 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@aws-sdk/client-sso-oidc": "3.936.0",
-    "@aws-sdk/client-sts": "3.936.0",
-    "@aws-sdk/credential-provider-node": "3.936.0"
+    "@aws-sdk/client-sso-oidc": "3.978.0",
+    "@aws-sdk/client-sts": "3.978.0",
+    "@aws-sdk/credential-provider-node": "3.972.2"
   },
   "resolutions": {
     "micromatch": "4.0.8"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
-    "@smithy/core": "3.20.0",
-    "@smithy/smithy-client": "4.9.8",
-    "@typescript-eslint/eslint-plugin": "8.50.1",
-    "@typescript-eslint/parser": "8.50.1",
+    "@smithy/core": "3.22.1",
+    "@smithy/smithy-client": "4.11.1",
+    "@typescript-eslint/eslint-plugin": "8.54.0",
+    "@typescript-eslint/parser": "8.54.0",
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-jest": "29.9.0",
+    "eslint-plugin-jest": "29.12.2",
     "husky": "9.1.7",
     "lint-staged": "16.2.7",
-    "prettier": "3.7.4",
+    "prettier": "3.8.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.50.1"
+    "typescript-eslint": "8.54.0"
   },
   "lint-staged": {
     "*": "prettier --write",

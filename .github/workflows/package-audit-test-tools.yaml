@@ -34,7 +34,7 @@ jobs:
         working-directory: infrastructure/audit-test-tools
     steps:
       - name: Check out repository code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup Node 22
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
@@ -88,7 +88,7 @@ jobs:
         with:
           name: audit-test-tools-sam-template
       - name: Setup Python 3.8
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.8'
       - name: Setup SAM CLI
@@ -99,7 +99,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
       - name: Package SAM app
-        uses: govuk-one-login/devplatform-upload-action@ac4a243a86c2017f5360b83d737dea4268dcf38a # v3.11.1
+        uses: govuk-one-login/devplatform-upload-action@abbf25e43a88b3512b1a43621f9aef4cbea1b648 # v3.12.1
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
