@@ -26,12 +26,12 @@
     "micromatch": "4.0.8"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
+    "@eslint/js": "9.39.2",
     "@smithy/core": "3.22.1",
     "@smithy/smithy-client": "4.11.1",
     "@typescript-eslint/eslint-plugin": "8.55.0",
     "@typescript-eslint/parser": "8.55.0",
-    "eslint": "10.0.0",
+    "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-jest": "29.13.0",
     "husky": "9.1.7",
