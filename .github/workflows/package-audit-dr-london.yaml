@@ -4,12 +4,12 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
-      - ../../infrastructure/audit-dr-london/**
+      - infrastructure/audit-dr-london/**
   push:
     branches:
       - main
     paths:
-      - ../../infrastructure/audit-dr-london/**
+      - infrastructure/audit-dr-london/**
   workflow_dispatch: {}
 
 env:
