@@ -56,7 +56,6 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}/${Environment}/encryption-generator-kms-key
       TargetKeyId: !Ref EncryptionGeneratorKmsKey
 
-
   #################
   # End: KMS Keys #
   #################
