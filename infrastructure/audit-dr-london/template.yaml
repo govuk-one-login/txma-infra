@@ -12,6 +12,7 @@ Parameters:
       - staging
       - integration
       - production
+      - test
 
 Outputs:
   EncryptionGeneratorKmsKeyArn:
