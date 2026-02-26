@@ -12,6 +12,9 @@ Parameters:
       - staging
       - integration
       - production
+  AuditAccountNumber:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: 'txma-audit-account-number'
 
 Outputs:
   EncryptionGeneratorKmsKeyArn:
@@ -36,7 +39,7 @@ Resources:
           - Sid: Enable Root access
             Effect: Allow
             Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+              AWS: !Sub 'arn:aws:iam::${AuditAccountNumber}:root'
             Action:
               - kms:*
             Resource: '*'
