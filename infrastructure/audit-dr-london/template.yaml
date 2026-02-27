@@ -46,7 +46,7 @@ Resources:
           - Sid: Allow AWS Lambda access
             Effect: Allow
             Principal:
-              Service: lambda.amazonaws.com
+              AWS: !Sub 'arn:aws:iam::${AuditAccountNumber}:root'
             Action:
               - kms:Encrypt
               - kms:Decrypt
