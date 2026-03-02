@@ -32,7 +32,6 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       MultiRegion: true
-      EnableKeyRotation: true
       KeyPolicy:
         Version: '2012-10-17'
         Statement:
