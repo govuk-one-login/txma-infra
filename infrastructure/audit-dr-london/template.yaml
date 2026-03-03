@@ -40,18 +40,28 @@ Resources:
       KeyPolicy:
         Version: '2012-10-17'
         Statement:
+          - Sid: Enable Root access
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action:
+              - kms:*
+            Resource: '*'
           - Sid: Allow Lambda execution role access
             Effect: Allow
             Principal:
-              AWS:
-                - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-copy-and-encrypt'
-                - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-decrypt-and-copy'
-                - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-key-rotation'
+              AWS: !Sub 'arn:aws:iam::${AuditAccountNumber}:root'
             Action:
               - kms:Encrypt
               - kms:Decrypt
               - kms:GenerateDataKey
             Resource: '*'
+            Condition:
+              StringLike:
+                aws:PrincipalArn:
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-copy-and-encrypt'
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-decrypt-and-copy'
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-key-rotation'
 
   EncryptionGeneratorKmsKeyAlias:
     Type: AWS::KMS::Alias
