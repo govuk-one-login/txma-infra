@@ -59,9 +59,9 @@ Resources:
             Condition:
               StringLike:
                 aws:PrincipalArn:
-                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-copy-and-encrypt'
-                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-decrypt-and-copy'
-                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-key-rotation'
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-copy-and-encrypt-role'
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-decrypt-and-copy-role'
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-key-rotation-role'
 
   EncryptionGeneratorKmsKeyAlias:
     Type: AWS::KMS::Alias
