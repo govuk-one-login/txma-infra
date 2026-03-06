@@ -30,20 +30,24 @@ Resources:
     Type: AWS::KMS::Key
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
+    Metadata:
+      checkov:
+        skip:
+          - id: CKV_AWS_7
+            comment: Automatic key rotation is not supported for multi-region keys
     Properties:
       MultiRegion: true
-      EnableKeyRotation: true
       KeyPolicy:
         Version: '2012-10-17'
         Statement:
           - Sid: Enable Root access
             Effect: Allow
             Principal:
-              AWS: !Sub 'arn:aws:iam::${AuditAccountNumber}:root'
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
             Action:
               - kms:*
             Resource: '*'
-          - Sid: Allow AWS Lambda access
+          - Sid: Allow Lambda execution role access
             Effect: Allow
             Principal:
               AWS: !Sub 'arn:aws:iam::${AuditAccountNumber}:root'
@@ -52,6 +56,12 @@ Resources:
               - kms:Decrypt
               - kms:GenerateDataKey
             Resource: '*'
+            Condition:
+              StringLike:
+                aws:PrincipalArn:
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-copy-and-encrypt-role'
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-decrypt-and-copy-role'
+                  - !Sub 'arn:aws:iam::${AuditAccountNumber}:role/*-s3-key-rotation-role'
 
   EncryptionGeneratorKmsKeyAlias:
     Type: AWS::KMS::Alias
