@@ -42,6 +42,30 @@ To run the linting:
 npm run lint
 ```
 
+## Previewing a stack change set
+
+The `scripts/preview-template.sh` script creates a CloudFormation change set against a live stack and saves the output to the `preview/` folder. This is useful for inspecting what changes will be applied before deploying.
+
+Ensure you are logged in via SSO first:
+
+```
+export AWS_PROFILE=<your-profile> && aws sso login
+```
+
+Then run:
+
+```
+./scripts/preview-template.sh <template-path> <stack-name>
+```
+
+For example:
+
+```
+./scripts/preview-template.sh infrastructure/audit-dr-london/template.yaml auditdr-infra
+```
+
+The change set output is saved to `preview/<stack-name>-changeset.json` and the change set is automatically deleted afterwards.
+
 ## Licence
 
 [MIT License](LICENCE)
