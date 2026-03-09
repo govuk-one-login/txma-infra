@@ -319,6 +319,7 @@ Resources:
 
   MockReceiverSETTableNameParameter:
     Type: AWS::SSM::Parameter
+    Condition: TestEnvironment
     Properties:
       Name: MockReceiverSETTableName
       Type: String
@@ -326,6 +327,7 @@ Resources:
 
   MockReceiverSETTableArnParameter:
     Type: AWS::SSM::Parameter
+    Condition: TestEnvironment
     Properties:
       Name: MockReceiverSETTableArn
       Type: String
