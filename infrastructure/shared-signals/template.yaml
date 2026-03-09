@@ -83,6 +83,32 @@ Resources:
           Value: Bihourly
       DeletionProtectionEnabled: true
 
+  MockReceiverSETTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    #checkov:skip=CKV_AWS_28:Test-only table, PITR not required
+    Properties:
+      TableName: !Sub ${AWS::StackName}-mock-receiver-set-table
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
+      AttributeDefinitions:
+        - AttributeName: jti
+          AttributeType: S
+        - AttributeName: clientId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: jti
+          KeyType: HASH
+        - AttributeName: clientId
+          KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
   ####################
   # Cognito Resources
   ####################
@@ -289,6 +315,20 @@ Resources:
       Name: IntegrationTestProducerQueueUrl
       Type: String
       Value: !Ref IntegrationTestProducerQueue
+
+  MockReceiverSETTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: MockReceiverSETTableName
+      Type: String
+      Value: !Ref MockReceiverSETTable
+
+  MockReceiverSETTableArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: MockReceiverSETTableArn
+      Type: String
+      Value: !GetAtt MockReceiverSETTable.Arn
 
   ####################
   # SET signing keys
