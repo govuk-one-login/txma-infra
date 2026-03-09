@@ -85,6 +85,7 @@ Resources:
 
   MockReceiverSETTable:
     Type: AWS::DynamoDB::Table
+    Condition: TestEnvironment
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     #checkov:skip=CKV_AWS_28:Test-only table, PITR not required
