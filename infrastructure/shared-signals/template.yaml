@@ -321,7 +321,7 @@ Resources:
     Type: AWS::SSM::Parameter
     Condition: TestEnvironment
     Properties:
-      Name: MockReceiverSETTableName
+      Name: /tests/MockReceiverSETTableName
       Type: String
       Value: !Ref MockReceiverSETTable
 
@@ -329,7 +329,7 @@ Resources:
     Type: AWS::SSM::Parameter
     Condition: TestEnvironment
     Properties:
-      Name: MockReceiverSETTableArn
+      Name: /tests/MockReceiverSETTableArn
       Type: String
       Value: !GetAtt MockReceiverSETTable.Arn
 
