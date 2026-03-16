@@ -94,8 +94,6 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       SSESpecification:
         SSEEnabled: true
-        SSEType: KMS
-        KMSMasterKeyId: '{{resolve:ssm:DatabaseKmsKeyArn}}'
       AttributeDefinitions:
         - AttributeName: jti
           AttributeType: S
