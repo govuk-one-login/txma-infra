@@ -1,5 +1,7 @@
+import { describe, test, expect, beforeEach } from 'vitest'
 import { mockClient } from 'aws-sdk-client-mock'
-import { listS3ObjectVersions } from './listS3ObjectVersions'
+import 'aws-sdk-client-mock-vitest/extend'
+import { listS3ObjectVersions } from './listS3ObjectVersions.js'
 import {
   S3Client,
   ListObjectVersionsCommand,
@@ -8,8 +10,11 @@ import {
 import {
   TEST_KEY,
   TEST_VERSION_ID
-} from '../../utils/tests/constants/testConstants'
-import 'aws-sdk-client-mock-jest'
+} from '../../utils/tests/constants/testConstants.js'
+
+// aws-sdk-client-mock-vitest requires Partial<Input & Record<string, unknown>>
+// AWS SDK command inputs don't carry an index signature, so we cast via this helper
+const asMatcherInput = (v: object) => v as Record<string, unknown>
 
 const s3Mock = mockClient(S3Client)
 
@@ -30,7 +35,10 @@ describe('list S3 objects', () => {
 
     const result = await listS3ObjectVersions(input)
 
-    expect(s3Mock).toHaveReceivedCommandWith(ListObjectVersionsCommand, input)
+    expect(s3Mock).toHaveReceivedCommandWith(
+      ListObjectVersionsCommand,
+      asMatcherInput(input)
+    )
     expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 1)
     expect(result).toEqual({
       deleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
@@ -45,7 +53,10 @@ describe('list S3 objects', () => {
 
     const result = await listS3ObjectVersions(input)
 
-    expect(s3Mock).toHaveReceivedCommandWith(ListObjectVersionsCommand, input)
+    expect(s3Mock).toHaveReceivedCommandWith(
+      ListObjectVersionsCommand,
+      asMatcherInput(input)
+    )
     expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 1)
     expect(result).toEqual({
       deleteMarkers: [],
@@ -60,7 +71,10 @@ describe('list S3 objects', () => {
 
     const result = await listS3ObjectVersions(input)
 
-    expect(s3Mock).toHaveReceivedCommandWith(ListObjectVersionsCommand, input)
+    expect(s3Mock).toHaveReceivedCommandWith(
+      ListObjectVersionsCommand,
+      asMatcherInput(input)
+    )
     expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 1)
     expect(result).toEqual({
       deleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
@@ -73,7 +87,10 @@ describe('list S3 objects', () => {
 
     const result = await listS3ObjectVersions(input)
 
-    expect(s3Mock).toHaveReceivedCommandWith(ListObjectVersionsCommand, input)
+    expect(s3Mock).toHaveReceivedCommandWith(
+      ListObjectVersionsCommand,
+      asMatcherInput(input)
+    )
     expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 1)
     expect(result).toEqual({ deleteMarkers: [], versions: [] })
   })
@@ -95,14 +112,18 @@ describe('list S3 objects', () => {
 
     expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 2)
     expect(s3Mock).toHaveReceivedNthCommandWith(
-      1,
       ListObjectVersionsCommand,
-      input
+      1,
+      asMatcherInput(input)
     )
-    expect(s3Mock).toHaveReceivedNthCommandWith(2, ListObjectVersionsCommand, {
-      ...input,
-      KeyMarker: TEST_KEY + 1
-    })
+    expect(s3Mock).toHaveReceivedNthCommandWith(
+      ListObjectVersionsCommand,
+      2,
+      asMatcherInput({
+        ...input,
+        KeyMarker: TEST_KEY + 1
+      })
+    )
     expect(result).toEqual({
       deleteMarkers: [
         { Key: TEST_KEY, VersionId: TEST_VERSION_ID },
@@ -129,14 +150,18 @@ describe('list S3 objects', () => {
 
     expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 2)
     expect(s3Mock).toHaveReceivedNthCommandWith(
-      1,
       ListObjectVersionsCommand,
-      input
+      1,
+      asMatcherInput(input)
     )
-    expect(s3Mock).toHaveReceivedNthCommandWith(2, ListObjectVersionsCommand, {
-      ...input,
-      VersionIdMarker: TEST_VERSION_ID + 1
-    })
+    expect(s3Mock).toHaveReceivedNthCommandWith(
+      ListObjectVersionsCommand,
+      2,
+      asMatcherInput({
+        ...input,
+        VersionIdMarker: TEST_VERSION_ID + 1
+      })
+    )
     expect(result).toEqual({
       deleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
       versions: [
@@ -164,14 +189,18 @@ describe('list S3 objects', () => {
 
     expect(s3Mock).toHaveReceivedCommandTimes(ListObjectVersionsCommand, 2)
     expect(s3Mock).toHaveReceivedNthCommandWith(
-      1,
       ListObjectVersionsCommand,
-      input
+      1,
+      asMatcherInput(input)
     )
-    expect(s3Mock).toHaveReceivedNthCommandWith(2, ListObjectVersionsCommand, {
-      ...input,
-      VersionIdMarker: TEST_VERSION_ID + 1
-    })
+    expect(s3Mock).toHaveReceivedNthCommandWith(
+      ListObjectVersionsCommand,
+      2,
+      asMatcherInput({
+        ...input,
+        VersionIdMarker: TEST_VERSION_ID + 1
+      })
+    )
     expect(result).toEqual({
       deleteMarkers: [{ Key: TEST_KEY, VersionId: TEST_VERSION_ID }],
       versions: [

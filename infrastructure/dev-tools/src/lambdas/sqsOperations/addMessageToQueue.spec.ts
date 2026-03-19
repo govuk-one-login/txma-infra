@@ -1,7 +1,8 @@
+import { describe, test, expect } from 'vitest'
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import { mockClient } from 'aws-sdk-client-mock'
-import { addMessageToQueue } from './addMessageToQueue'
-import 'aws-sdk-client-mock-jest'
+import 'aws-sdk-client-mock-vitest/extend'
+import { addMessageToQueue } from './addMessageToQueue.js'
 
 const sqsMock = mockClient(SQSClient)
 

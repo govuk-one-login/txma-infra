@@ -1,20 +1,21 @@
-import { constructSqsEvent } from '../../utils/tests/constructSqsEvent'
+import { vi } from 'vitest'
+import { constructSqsEvent } from '../../utils/tests/constructSqsEvent.js'
 import {
   EXPECTED_DEFAULT_EMAIL_ADDRESS,
   TEST_ATHENA_QUERY_ID,
   TEST_EMAIL_ADDRESS,
   TEST_FILE_CONTENTS,
   TEST_ZENDESK_ID
-} from '../../utils/tests/testConstants'
-import { handler } from './handler'
-import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
-import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage'
-import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
-jest.mock('./writeTestFileToAthenaOutputBucket', () => ({
-  writeTestFileToAthenaOutputBucket: jest.fn()
+} from '../../utils/tests/testConstants.js'
+import { handler } from './handler.js'
+import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket.js'
+import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage.js'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext.js'
+vi.mock('./writeTestFileToAthenaOutputBucket.js', () => ({
+  writeTestFileToAthenaOutputBucket: vi.fn()
 }))
-jest.mock('./sendQueryCompletedQueueMessage', () => ({
-  sendQueryCompletedQueueMessage: jest.fn()
+vi.mock('./sendQueryCompletedQueueMessage.js', () => ({
+  sendQueryCompletedQueueMessage: vi.fn()
 }))
 
 describe('writeTestDataToAthenaBucket handler', () => {

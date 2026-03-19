@@ -18,34 +18,39 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@aws-sdk/client-sso-oidc": "3.1010.0",
-    "@aws-sdk/client-sts": "3.1010.0",
-    "@aws-sdk/credential-provider-node": "3.972.21"
+    "@aws-sdk/client-sso-oidc": "^3.1016.0",
+    "@aws-sdk/client-sts": "^3.1016.0",
+    "@aws-sdk/credential-provider-node": "^3.972.25"
   },
   "resolutions": {
     "micromatch": "4.0.8"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
-    "@smithy/core": "3.23.12",
-    "@smithy/smithy-client": "4.12.6",
-    "@typescript-eslint/eslint-plugin": "8.57.1",
-    "@typescript-eslint/parser": "8.57.1",
-    "eslint": "10.0.3",
+    "@eslint/js": "^10.0.1",
+    "@smithy/core": "3.22.1",
+    "@smithy/smithy-client": "4.11.2",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^10.0.1",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-jest": "29.15.0",
-    "globals": "15.14.0",
+    "@vitest/eslint-plugin": "1.6.9",
+    "vitest-when": "^0.10.0",
     "husky": "9.1.7",
-    "lint-staged": "16.4.0",
+    "lint-staged": "16.2.7",
+    "globals": "^16.5.0",
     "prettier": "3.8.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.57.1"
+    "typescript-eslint": "^8.56.0"
   },
   "lint-staged": {
     "*": "prettier --write",
     "*.{js,ts}": "eslint --fix"
   },
   "engines": {
-    "node": "^22.0.0"
+    "node": "^24.0.0"
+  },
+  "overrides": {
+    "fast-xml-parser": "5.5.6"
   }
 }

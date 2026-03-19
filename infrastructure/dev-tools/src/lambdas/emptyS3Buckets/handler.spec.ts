@@ -1,22 +1,25 @@
+import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest'
+import type { MockedFunction, MockInstance } from 'vitest'
 import { CloudFormationCustomResourceUpdateEvent } from 'aws-lambda'
-import { emptyS3Bucket } from './emptyS3Bucket'
-import { listS3Buckets } from './listS3Buckets'
-import { defaultCustomResourceDeleteEvent } from '../../utils/tests/events/defaultCustomResourceDeleteEvent'
-import { handler } from './handler'
+import { emptyS3Bucket } from './emptyS3Bucket.js'
+import { listS3Buckets } from './listS3Buckets.js'
+import { defaultCustomResourceDeleteEvent } from '../../utils/tests/events/defaultCustomResourceDeleteEvent.js'
+import { handler } from './handler.js'
 import axios from 'axios'
-import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext.js'
 
-jest.mock('./listS3Buckets', () => ({
-  listS3Buckets: jest.fn()
+vi.mock('./listS3Buckets.js', () => ({
+  listS3Buckets: vi.fn()
 }))
 
-jest.mock('./emptyS3Bucket', () => ({
-  emptyS3Bucket: jest.fn()
+vi.mock('./emptyS3Bucket.js', () => ({
+  emptyS3Bucket: vi.fn()
 }))
 
-const mockListS3Buckets = listS3Buckets as jest.Mock<Promise<string[]>>
-const mockEmptyS3Bucket = emptyS3Bucket as jest.Mock<Promise<void>>
-let httpsRequestSpy: jest.SpyInstance
+const mockListS3Buckets = listS3Buckets as MockedFunction<typeof listS3Buckets>
+const mockEmptyS3Bucket = emptyS3Bucket as MockedFunction<typeof emptyS3Bucket>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let httpsRequestSpy: MockInstance<(...args: any[]) => any>
 
 const successPayload = {
   PhysicalResourceId: defaultCustomResourceDeleteEvent.PhysicalResourceId,
@@ -36,7 +39,7 @@ describe('empty s3 buckets handler', () => {
   }
 
   beforeEach(() => {
-    httpsRequestSpy = jest.spyOn(axios, 'put').mockResolvedValue({})
+    httpsRequestSpy = vi.spyOn(axios, 'put').mockResolvedValue({})
   })
 
   afterEach(() => {

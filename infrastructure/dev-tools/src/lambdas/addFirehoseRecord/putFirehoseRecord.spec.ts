@@ -1,8 +1,9 @@
+import { describe, test, expect } from 'vitest'
 import { mockClient } from 'aws-sdk-client-mock'
+import 'aws-sdk-client-mock-vitest/extend'
 import { FirehoseClient, PutRecordCommand } from '@aws-sdk/client-firehose'
-import { putFirehoseRecord } from './putFirehoseRecord'
-import { jsonToUint8Array } from '../../utils/helpers'
-import 'aws-sdk-client-mock-jest'
+import { putFirehoseRecord } from './putFirehoseRecord.js'
+import { jsonToUint8Array } from '../../utils/helpers.js'
 
 const firehoseMock = mockClient(FirehoseClient)
 

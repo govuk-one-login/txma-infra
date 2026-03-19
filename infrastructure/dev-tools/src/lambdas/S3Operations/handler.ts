@@ -1,6 +1,6 @@
 import { Context } from 'aws-lambda'
-import { initialiseLogger, logger } from '../../utils/logger'
-import { s3Client } from '../../sharedServices/s3/s3Client'
+import { initialiseLogger, logger } from '../../utils/logger.js'
+import { s3Client } from '../../sharedServices/s3/s3Client.js'
 import {
   CopyObjectCommand,
   CopyObjectCommandInput,
@@ -19,7 +19,7 @@ import {
   PutObjectTaggingCommand,
   PutObjectTaggingCommandInput
 } from '@aws-sdk/client-s3'
-import { S3CommandType } from '../../types/s3CommandType'
+import { S3CommandType } from '../../types/s3CommandType.js'
 
 export const handler = async (
   commandParameters: CommandParameters,

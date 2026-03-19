@@ -1,24 +1,23 @@
-import { emptyS3Bucket } from './emptyS3Bucket'
+import { vi, describe, test, expect, beforeEach } from 'vitest'
+import type { MockedFunction } from 'vitest'
+import 'aws-sdk-client-mock-vitest/extend'
+import { emptyS3Bucket } from './emptyS3Bucket.js'
 import { mockClient } from 'aws-sdk-client-mock'
-import 'aws-sdk-client-mock-jest'
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { listS3ObjectVersions } from './listS3ObjectVersions'
+import { listS3ObjectVersions } from './listS3ObjectVersions.js'
 import {
   TEST_KEY,
   TEST_LIST_OF_S3_OBJECT_VERSIONS,
   TEST_VERSION_ID
-} from '../../utils/tests/constants/testConstants'
+} from '../../utils/tests/constants/testConstants.js'
 
 const s3Mock = mockClient(S3Client)
 
-jest.mock('./listS3ObjectVersions', () => ({
-  listS3ObjectVersions: jest.fn()
+vi.mock('./listS3ObjectVersions.js', () => ({
+  listS3ObjectVersions: vi.fn()
 }))
-const mockListS3ObjectVersions = listS3ObjectVersions as jest.Mock<
-  Promise<{
-    deleteMarkers: { Key: string; VersionId: string }[]
-    versions: { Key: string; VersionId: string }[]
-  }>
+const mockListS3ObjectVersions = listS3ObjectVersions as MockedFunction<
+  typeof listS3ObjectVersions
 >
 
 const bucketName = 'example-bucket'

@@ -1,9 +1,9 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import 'aws-sdk-client-mock-vitest/extend'
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { mockClient } from 'aws-sdk-client-mock'
-
-import 'aws-sdk-client-mock-jest'
 import { Readable } from 'stream'
-import { s3DownloadFileToString } from './s3DownloadFileToString'
+import { s3DownloadFileToString } from './s3DownloadFileToString.js'
 import { StreamingBlobPayloadOutputTypes } from '@smithy/types'
 
 const s3Mock = mockClient(S3Client)
@@ -32,7 +32,7 @@ const givenGenericErrorDownloadingFile = () => {
 
 describe('readS3DataToString', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const testBucket = 'myTestBucket'
@@ -58,6 +58,6 @@ describe('readS3DataToString', () => {
 
   it('throws if there is another error downloading the data', async () => {
     givenGenericErrorDownloadingFile()
-    expect(s3DownloadFileToString(testBucket, testKey)).rejects.toThrow()
+    await expect(s3DownloadFileToString(testBucket, testKey)).rejects.toThrow()
   })
 })

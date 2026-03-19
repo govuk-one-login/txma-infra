@@ -1,11 +1,11 @@
-import { when } from 'jest-when'
-import { jsonToUint8Array } from '../../utils/helpers'
-import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
-import { handler } from './handler'
-import { putFirehoseRecord } from './putFirehoseRecord'
+import { vi, describe, it, expect } from 'vitest'
+import { jsonToUint8Array } from '../../utils/helpers.js'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext.js'
+import { handler } from './handler.js'
+import { putFirehoseRecord } from './putFirehoseRecord.js'
 
-jest.mock('./putFirehoseRecord', () => ({
-  putFirehoseRecord: jest.fn()
+vi.mock('./putFirehoseRecord.js', () => ({
+  putFirehoseRecord: vi.fn()
 }))
 
 describe('add firehose record handler', () => {
@@ -17,7 +17,7 @@ describe('add firehose record handler', () => {
   }
 
   it('returns record id when called with valid parameters', async () => {
-    when(putFirehoseRecord).mockResolvedValue({
+    vi.mocked(putFirehoseRecord).mockResolvedValue({
       RecordId: '12345',
       $metadata: {}
     })
@@ -31,7 +31,9 @@ describe('add firehose record handler', () => {
   })
 
   it('logs error an error if Firehose command fails', async () => {
-    when(putFirehoseRecord).mockRejectedValue(new Error('Some firehose error'))
+    vi.mocked(putFirehoseRecord).mockRejectedValue(
+      new Error('Some firehose error')
+    )
 
     await expect(handler(params, mockLambdaContext)).rejects.toThrow(
       'Some firehose error'

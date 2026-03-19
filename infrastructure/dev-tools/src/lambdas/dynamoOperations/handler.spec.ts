@@ -1,32 +1,33 @@
-import { when } from 'jest-when'
-import { DynamoDbOperation, Operation } from '../../types/dynamoDbOperation'
-import { logger } from '../../utils/logger'
+import { vi, describe, expect, it } from 'vitest'
+
+import { DynamoDbOperation, Operation } from '../../types/dynamoDbOperation.js'
 import {
   TEST_DYNAMO_TABLE_NAME,
   TEST_DYNAMO_KEY,
   TEST_ITEM,
   TEST_DESIRED_ATTRIBUTE_NAME
-} from '../../utils/tests/constants/testConstants'
-import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
-import { dynamoDbDelete } from './dynamoDbDelete'
-import { dynamoDbGet } from './dynamoDbGet'
-import { dynamoDbPut } from './dynamoDbPut'
-import { handler } from './handler'
-import 'aws-sdk-client-mock-jest'
+} from '../../utils/tests/constants/testConstants.js'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext.js'
+import { dynamoDbDelete } from './dynamoDbDelete.js'
+import { dynamoDbGet } from './dynamoDbGet.js'
+import { dynamoDbPut } from './dynamoDbPut.js'
+import { handler } from './handler.js'
 
-jest.mock('./dynamoDbGet', () => ({
-  dynamoDbGet: jest.fn()
+vi.mock('../../utils/logger.js', () => ({
+  initialiseLogger: vi.fn(),
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
 }))
-jest.mock('./dynamoDbPut', () => ({
-  dynamoDbPut: jest.fn()
+vi.mock('./dynamoDbGet.js', () => ({
+  dynamoDbGet: vi.fn()
 }))
-jest.mock('./dynamoDbDelete', () => ({
-  dynamoDbDelete: jest.fn()
+vi.mock('./dynamoDbPut.js', () => ({
+  dynamoDbPut: vi.fn()
+}))
+vi.mock('./dynamoDbDelete.js', () => ({
+  dynamoDbDelete: vi.fn()
 }))
 
 describe('dynamo db operations handler', () => {
-  beforeEach(() => jest.spyOn(logger, 'info'))
-
   const generateDynamoOperationParams = (operation: Operation) => {
     return {
       operation,
@@ -47,7 +48,7 @@ describe('dynamo db operations handler', () => {
   }
 
   const dynamoDbGetReturnsEntry = () => {
-    when(dynamoDbGet).mockResolvedValue(TEST_ITEM)
+    vi.mocked(dynamoDbGet).mockResolvedValue(TEST_ITEM)
   }
 
   it('returns a dynamoDbEntry when handler is called with correct GET params', async () => {
@@ -84,8 +85,8 @@ describe('dynamo db operations handler', () => {
     })
   })
 
-  it('throws an error when dynamo operation is not recognised', () => {
-    expect(
+  it('throws an error when dynamo operation is not recognised', async () => {
+    await expect(
       handler(
         generateDynamoOperationParams('something else' as Operation),
         mockLambdaContext
@@ -93,8 +94,8 @@ describe('dynamo db operations handler', () => {
     ).rejects.toThrow('Dynamo operation not recognised')
   })
 
-  it('throws an error when parameter is undefined', () => {
-    expect(
+  it('throws an error when parameter is undefined', async () => {
+    await expect(
       handler(undefined as unknown as DynamoDbOperation, mockLambdaContext)
     ).rejects.toThrow('Function called with undefined params')
   })

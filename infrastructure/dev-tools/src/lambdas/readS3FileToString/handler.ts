@@ -1,7 +1,7 @@
 import { Context } from 'aws-lambda'
-import { S3FileDetails } from '../../types/s3FileDetails'
-import { initialiseLogger, logger } from '../../utils/logger'
-import { s3DownloadFileToString } from './s3DownloadFileToString'
+import { S3FileDetails } from '../../types/s3FileDetails.js'
+import { initialiseLogger, logger } from '../../utils/logger.js'
+import { s3DownloadFileToString } from './s3DownloadFileToString.js'
 
 export const handler = async (
   params: S3FileDetails,

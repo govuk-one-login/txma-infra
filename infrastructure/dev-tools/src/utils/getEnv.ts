@@ -1,4 +1,4 @@
-import { EnvironmentVar } from '../types/environmentVar'
+import { EnvironmentVar } from '../types/environmentVar.js'
 
 export const getEnv = (name: EnvironmentVar['name']) => {
   const env = process.env[name]

@@ -1,7 +1,7 @@
 import { Context } from 'aws-lambda'
-import { SqsOperation } from '../../types/sqsOperation'
-import { initialiseLogger, logger } from '../../utils/logger'
-import { addMessageToQueue } from './addMessageToQueue'
+import { SqsOperation } from '../../types/sqsOperation.js'
+import { initialiseLogger, logger } from '../../utils/logger.js'
+import { addMessageToQueue } from './addMessageToQueue.js'
 
 export const handler = async (params: SqsOperation, context: Context) => {
   initialiseLogger(context)

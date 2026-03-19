@@ -1,13 +1,13 @@
+import { vi } from 'vitest'
+import 'aws-sdk-client-mock-vitest/extend'
 import {
   HeadObjectCommand,
   HeadObjectCommandOutput,
   S3Client
 } from '@aws-sdk/client-s3'
 import { mockClient } from 'aws-sdk-client-mock'
-
-import 'aws-sdk-client-mock-jest'
-import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
-import { handler } from './handler'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext.js'
+import { handler } from './handler.js'
 
 const s3Mock = mockClient(S3Client)
 
@@ -16,7 +16,7 @@ const testKey = 'myKey'
 
 describe('checkS3FileExists handler', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should return true if the response from S3 indicates that the file exists', async () => {

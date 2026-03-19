@@ -1,6 +1,6 @@
 import { GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb'
-import { OperationParams } from '../../types/dynamoDbOperation'
-import { documentClient } from './dynamoDbClient'
+import { OperationParams } from '../../types/dynamoDbOperation.js'
+import { documentClient } from './dynamoDbClient.js'
 
 export const dynamoDbGet = async (operationParams: OperationParams) => {
   const getCommand = {

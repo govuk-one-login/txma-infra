@@ -1,5 +1,5 @@
 import { PutRecordCommand } from '@aws-sdk/client-firehose'
-import { firehoseClient } from './firehoseClient'
+import { firehoseClient } from './firehoseClient.js'
 
 export const putFirehoseRecord = async (firehose: string, data: Uint8Array) => {
   const input = {

@@ -2,9 +2,10 @@ import {
   CloudFormationClient,
   ListStackResourcesCommand
 } from '@aws-sdk/client-cloudformation'
+import { getEnv } from '../../utils/getEnv.js'
 
 export const listS3Buckets = async (stackId: string): Promise<string[]> => {
-  const client = new CloudFormationClient({ region: process.env['AWS_REGION'] })
+  const client = new CloudFormationClient({ region: getEnv('AWS_REGION') })
   const command = new ListStackResourcesCommand({ StackName: stackId })
   const response = await client.send(command)
 
