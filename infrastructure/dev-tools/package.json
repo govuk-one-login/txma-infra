@@ -10,15 +10,15 @@
     "test:cov": "jest --coverage"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "2.31.0",
-    "@aws-sdk/client-cloudformation": "3.1010.0",
-    "@aws-sdk/client-dynamodb": "3.1010.0",
-    "@aws-sdk/client-firehose": "3.1010.0",
+    "@aws-lambda-powertools/logger": "2.32.0",
+    "@aws-sdk/client-cloudformation": "3.1015.0",
+    "@aws-sdk/client-dynamodb": "3.1015.0",
+    "@aws-sdk/client-firehose": "3.1015.0",
     "@aws-sdk/client-s3": "^3.983.0",
-    "@aws-sdk/client-sqs": "3.1010.0",
-    "@aws-sdk/lib-dynamodb": "3.1010.0",
+    "@aws-sdk/client-sqs": "3.1015.0",
+    "@aws-sdk/lib-dynamodb": "3.1015.0",
     "@aws-sdk/types": "3.973.6",
-    "@smithy/smithy-client": "4.12.6",
+    "@smithy/smithy-client": "4.12.7",
     "axios": "1.13.6"
   },
   "devDependencies": {
