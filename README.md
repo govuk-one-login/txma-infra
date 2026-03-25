@@ -7,13 +7,13 @@ Infrastructure for querying data in Transaction Monitoring & Audit. There is an 
 To run this project you will need the following:
 
 - [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) - Used to build and deploy the application
-- [Node.js](https://nodejs.org/en/) version 22 - Recommended way to install is via [NVM](https://github.com/nvm-sh/nvm)
+- [Node.js](https://nodejs.org/en/) version 24 - Recommended way to install is via [NVM](https://github.com/nvm-sh/nvm)
 - [Docker](https://docs.docker.com/get-docker/) - Required to run SAM locally
 - [Checkov](https://www.checkov.io/) - Scans cloud infrastructure configurations to find misconfigurations before they're deployed. Added as a Husky pre-commit hook.
 
 ### Important
 
-- **Node version 22** is required since the runtimes for Lambda functions are fixed.
+- **Node version 24** is required since the runtimes for Lambda functions are fixed.
 
 ## Getting started
 
@@ -65,6 +65,22 @@ For example:
 ```
 
 The change set output is saved to `preview/<stack-name>-changeset.json` and the change set is automatically deleted afterwards.
+
+## Testing
+
+Unit and integration tests are found within;
+
+### infrastructure/audit-test-tools
+
+```
+cd infrastructure/audit-test-tools && npx vitest run
+```
+
+### infrastructure/dev-tools
+
+```
+cd infrastructure/dev-tools && npx vitest run
+```
 
 ## Licence
 

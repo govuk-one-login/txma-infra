@@ -1,8 +1,8 @@
 import { HeadObjectCommand } from '@aws-sdk/client-s3'
 import { Context } from 'aws-lambda'
-import { s3Client } from '../../sharedServices/s3/s3Client'
-import { S3FileDetails } from '../../types/s3FileDetails'
-import { initialiseLogger, logger } from '../../utils/logger'
+import { s3Client } from '../../sharedServices/s3/s3Client.js'
+import { S3FileDetails } from '../../types/s3FileDetails.js'
+import { initialiseLogger, logger } from '../../utils/logger.js'
 
 export const handler = async (
   s3FileDetails: S3FileDetails,

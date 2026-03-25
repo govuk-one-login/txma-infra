@@ -1,7 +1,7 @@
 import { CopyObjectCommand, CopyObjectCommandInput } from '@aws-sdk/client-s3'
 import { Context } from 'aws-lambda'
-import { initialiseLogger, logger } from '../../utils/logger'
-import { s3Client } from '../../sharedServices/s3/s3Client'
+import { initialiseLogger, logger } from '../../utils/logger.js'
+import { s3Client } from '../../sharedServices/s3/s3Client.js'
 
 export const handler = async (
   copyObjectCommandInput: CopyObjectCommandInput,

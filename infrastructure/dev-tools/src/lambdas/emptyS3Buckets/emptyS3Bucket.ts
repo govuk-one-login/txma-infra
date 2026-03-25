@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { logger } from '../../utils/logger'
-import { listS3ObjectVersions } from './listS3ObjectVersions'
+import { logger } from '../../utils/logger.js'
+import { listS3ObjectVersions } from './listS3ObjectVersions.js'
 
 export const emptyS3Bucket = async (bucketName: string): Promise<void> => {
   const objects = await listS3ObjectVersions({ Bucket: bucketName })
@@ -32,7 +32,9 @@ const deleteObject = async (
   key: string,
   versionId: string
 ) => {
-  const s3Client = new S3Client({ region: process.env['AWS_REGION'] })
+  const s3Client = new S3Client({
+    ...(process.env['AWS_REGION'] && { region: process.env['AWS_REGION'] })
+  })
   const command = new DeleteObjectCommand({
     Bucket: bucketName,
     Key: key,

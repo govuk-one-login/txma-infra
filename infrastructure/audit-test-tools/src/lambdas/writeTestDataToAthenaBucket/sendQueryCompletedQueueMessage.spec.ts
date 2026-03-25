@@ -1,14 +1,15 @@
+import { describe, it, expect } from 'vitest'
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
-import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage'
+import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage.js'
 import { mockClient } from 'aws-sdk-client-mock'
-import 'aws-sdk-client-mock-jest'
+import 'aws-sdk-client-mock-vitest/extend'
 import {
   TEST_QUERY_COMPLETED_QUEUE_URL,
   TEST_ATHENA_QUERY_ID,
   TEST_MESSAGE_ID,
   TEST_ZENDESK_ID,
   TEST_EMAIL_ADDRESS
-} from '../../utils/tests/testConstants'
+} from '../../utils/tests/testConstants.js'
 
 const sqsMock = mockClient(SQSClient)
 

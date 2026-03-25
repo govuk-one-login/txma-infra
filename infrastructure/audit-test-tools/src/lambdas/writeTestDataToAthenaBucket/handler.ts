@@ -3,9 +3,9 @@ import {
   logger,
   appendZendeskIdToLogger,
   initialiseLogger
-} from '../../utils/logger'
-import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage'
-import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
+} from '../../utils/logger.js'
+import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage.js'
+import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket.js'
 
 export const handler = async (event: SQSEvent, context: Context) => {
   initialiseLogger(context)
@@ -27,11 +27,12 @@ export const handler = async (event: SQSEvent, context: Context) => {
 }
 
 const parseRequestDetails = (event: SQSEvent) => {
-  if (!event.Records.length) {
+  const record = event.Records[0]
+  if (!record) {
     throw Error('No data in event')
   }
 
-  const eventBody = event.Records[0].body
+  const eventBody = record.body
   if (!eventBody) {
     throw Error('No body found in event')
   }

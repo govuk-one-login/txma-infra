@@ -1,5 +1,5 @@
 import { mockClient } from 'aws-sdk-client-mock'
-import { listS3Buckets } from './listS3Buckets'
+import { listS3Buckets } from './listS3Buckets.js'
 import {
   CloudFormationClient,
   ListStackResourcesCommand

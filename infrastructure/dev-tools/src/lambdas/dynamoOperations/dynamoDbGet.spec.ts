@@ -1,12 +1,12 @@
 import { mockClient } from 'aws-sdk-client-mock'
+import 'aws-sdk-client-mock-vitest/extend'
 import {
   TEST_DESIRED_ATTRIBUTE_NAME,
   TEST_DYNAMO_TABLE_NAME,
   TEST_ITEM,
   TEST_DYNAMO_KEY
-} from '../../utils/tests/constants/testConstants'
-import { dynamoDbGet } from './dynamoDbGet'
-import 'aws-sdk-client-mock-jest'
+} from '../../utils/tests/constants/testConstants.js'
+import { dynamoDbGet } from './dynamoDbGet.js'
 import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb'
 
 const dynamoMock = mockClient(DynamoDBDocumentClient)

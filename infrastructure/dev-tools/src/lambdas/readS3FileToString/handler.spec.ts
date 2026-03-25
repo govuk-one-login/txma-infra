@@ -1,16 +1,17 @@
-import { when } from 'jest-when'
-import { S3FileDetails } from '../../types/s3FileDetails'
-import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
-import { handler } from './handler'
-import { s3DownloadFileToString } from './s3DownloadFileToString'
+import { vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
+import { S3FileDetails } from '../../types/s3FileDetails.js'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext.js'
+import { handler } from './handler.js'
+import { s3DownloadFileToString } from './s3DownloadFileToString.js'
 
-jest.mock('./s3DownloadFileToString', () => ({
-  s3DownloadFileToString: jest.fn()
+vi.mock('./s3DownloadFileToString.js', () => ({
+  s3DownloadFileToString: vi.fn()
 }))
 
 describe('Read s3 file to string handler', () => {
   it('returns error with invalid parameters', async () => {
-    expect(
+    await expect(
       handler(
         { invalid: 'test' } as unknown as S3FileDetails,
         mockLambdaContext
@@ -22,7 +23,7 @@ describe('Read s3 file to string handler', () => {
     const testBucketName = 'myBucketName'
     const testFileKey = 'myFileKey'
     const testFileContents = 'my file contents'
-    when(s3DownloadFileToString).mockResolvedValue(testFileContents)
+    vi.mocked(s3DownloadFileToString).mockResolvedValue(testFileContents)
 
     const result = await handler(
       { bucketName: testBucketName, key: testFileKey },

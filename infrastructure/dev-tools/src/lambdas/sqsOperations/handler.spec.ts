@@ -1,11 +1,12 @@
-import { when } from 'jest-when'
-import { SqsOperation } from '../../types/sqsOperation'
-import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext'
-import { addMessageToQueue } from './addMessageToQueue'
-import { handler } from './handler'
+import { vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
+import { SqsOperation } from '../../types/sqsOperation.js'
+import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext.js'
+import { addMessageToQueue } from './addMessageToQueue.js'
+import { handler } from './handler.js'
 
-jest.mock('./addMessageToQueue', () => ({
-  addMessageToQueue: jest.fn()
+vi.mock('./addMessageToQueue.js', () => ({
+  addMessageToQueue: vi.fn()
 }))
 
 describe('sqs operations handler', () => {
@@ -15,7 +16,7 @@ describe('sqs operations handler', () => {
   }
 
   const messageAddedToQueue = () => {
-    when(addMessageToQueue).mockResolvedValue({
+    vi.mocked(addMessageToQueue).mockResolvedValue({
       MessageId: '12345',
       $metadata: {}
     })
@@ -33,13 +34,13 @@ describe('sqs operations handler', () => {
   })
 
   it('returns error with invalid parameters', async () => {
-    expect(
+    await expect(
       handler({ invalid: 'test' } as unknown as SqsOperation, mockLambdaContext)
     ).rejects.toThrow('Function called with invalid parameters')
   })
 
   it('returns error when no parameters sent', async () => {
-    expect(
+    await expect(
       handler(undefined as unknown as SqsOperation, mockLambdaContext)
     ).rejects.toThrow('Function called with invalid parameters')
   })

@@ -1,8 +1,8 @@
 import { Context } from 'aws-lambda'
-import { FirehosePutOperation } from '../../types/firehosePutOperation'
-import { jsonToUint8Array } from '../../utils/helpers'
-import { initialiseLogger, logger } from '../../utils/logger'
-import { putFirehoseRecord } from './putFirehoseRecord'
+import { FirehosePutOperation } from '../../types/firehosePutOperation.js'
+import { jsonToUint8Array } from '../../utils/helpers.js'
+import { initialiseLogger, logger } from '../../utils/logger.js'
+import { putFirehoseRecord } from './putFirehoseRecord.js'
 
 export const handler = async (
   firehosePutParams: FirehosePutOperation,

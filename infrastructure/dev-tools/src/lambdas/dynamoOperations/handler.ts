@@ -1,9 +1,9 @@
 import { Context } from 'aws-lambda'
-import { DynamoDbOperation } from '../../types/dynamoDbOperation'
-import { initialiseLogger, logger } from '../../utils/logger'
-import { dynamoDbDelete } from './dynamoDbDelete'
-import { dynamoDbGet } from './dynamoDbGet'
-import { dynamoDbPut } from './dynamoDbPut'
+import { DynamoDbOperation } from '../../types/dynamoDbOperation.js'
+import { initialiseLogger, logger } from '../../utils/logger.js'
+import { dynamoDbDelete } from './dynamoDbDelete.js'
+import { dynamoDbGet } from './dynamoDbGet.js'
+import { dynamoDbPut } from './dynamoDbPut.js'
 
 export const handler = async (
   dynamoDbOperation: DynamoDbOperation,
