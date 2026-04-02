@@ -162,6 +162,98 @@ Resources:
       ManagedPolicyArns:
         - !Ref RelyingPartyPairwiseMappingTableCrossAccountAccessPolicy
 
+  ####################
+  # CloudWatch Alarms
+  ####################
+
+  RelyingPartyConfigTableReadThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      AlarmDescription: >-
+        Alarm that monitors read throttle events on the RelyingPartyConfig DynamoDB table.
+        Triggers when any read throttle events occur within a 5 minute period.
+      AlarmName: !Sub ${AWS::StackName}-rp-config-table-read-throttle-events
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: TableName
+          Value: !Ref RelyingPartyConfigTable
+      EvaluationPeriods: 1
+      MetricName: ReadThrottleEvents
+      Namespace: AWS/DynamoDB
+      Statistic: Sum
+      Period: 300
+      Threshold: 0
+      TreatMissingData: notBreaching
+
+  RelyingPartyConfigTableWriteThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      AlarmDescription: >-
+        Alarm that monitors write throttle events on the RelyingPartyConfig DynamoDB table.
+        Triggers when any write throttle events occur within a 5 minute period.
+      AlarmName: !Sub ${AWS::StackName}-rp-config-table-write-throttle-events
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: TableName
+          Value: !Ref RelyingPartyConfigTable
+      EvaluationPeriods: 1
+      MetricName: WriteThrottleEvents
+      Namespace: AWS/DynamoDB
+      Statistic: Sum
+      Period: 300
+      Threshold: 0
+      TreatMissingData: notBreaching
+
+  RelyingPartyPairwiseMappingTableReadThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      AlarmDescription: >-
+        Alarm that monitors read throttle events on the RelyingPartyPairwiseMapping DynamoDB table.
+        Triggers when any read throttle events occur within a 5 minute period.
+      AlarmName: !Sub ${AWS::StackName}-rp-pairwise-mapping-table-read-throttle-events
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: TableName
+          Value: !Ref RelyingPartyPairwiseMappingTable
+      EvaluationPeriods: 1
+      MetricName: ReadThrottleEvents
+      Namespace: AWS/DynamoDB
+      Statistic: Sum
+      Period: 300
+      Threshold: 0
+      TreatMissingData: notBreaching
+
+  RelyingPartyPairwiseMappingTableWriteThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+      AlarmDescription: >-
+        Alarm that monitors write throttle events on the RelyingPartyPairwiseMapping DynamoDB table.
+        Triggers when any write throttle events occur within a 5 minute period.
+      AlarmName: !Sub ${AWS::StackName}-rp-pairwise-mapping-table-write-throttle-events
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: TableName
+          Value: !Ref RelyingPartyPairwiseMappingTable
+      EvaluationPeriods: 1
+      MetricName: WriteThrottleEvents
+      Namespace: AWS/DynamoDB
+      Statistic: Sum
+      Period: 300
+      Threshold: 0
+      TreatMissingData: notBreaching
+
   ################
   # SQS Resources
   ################
