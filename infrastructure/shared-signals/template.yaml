@@ -120,7 +120,7 @@ Resources:
         - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
       AlarmDescription: >-
         Alarm that monitors read throttle events on the UserConfig DynamoDB table.
-        Triggers when any read throttle events occur within a 5 minute period.
+        Triggers when any read throttle events occur within a 1 minute period.
       AlarmName: !Sub ${AWS::StackName}-user-config-table-read-throttle-events
       ComparisonOperator: GreaterThanThreshold
       DatapointsToAlarm: 1
@@ -131,7 +131,7 @@ Resources:
       MetricName: ReadThrottleEvents
       Namespace: AWS/DynamoDB
       Statistic: Sum
-      Period: 300
+      Period: 60
       Threshold: 0
       TreatMissingData: notBreaching
 
@@ -142,7 +142,7 @@ Resources:
         - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
       AlarmDescription: >-
         Alarm that monitors write throttle events on the UserConfig DynamoDB table.
-        Triggers when any write throttle events occur within a 5 minute period.
+        Triggers when any write throttle events occur within a 1 minute period.
       AlarmName: !Sub ${AWS::StackName}-user-config-table-write-throttle-events
       ComparisonOperator: GreaterThanThreshold
       DatapointsToAlarm: 1
@@ -153,7 +153,7 @@ Resources:
       MetricName: WriteThrottleEvents
       Namespace: AWS/DynamoDB
       Statistic: Sum
-      Period: 300
+      Period: 60
       Threshold: 0
       TreatMissingData: notBreaching
 
