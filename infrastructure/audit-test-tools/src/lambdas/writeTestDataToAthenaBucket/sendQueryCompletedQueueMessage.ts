@@ -4,7 +4,7 @@ import {
   SendMessageCommand
 } from '@aws-sdk/client-sqs'
 
-import { getEnv } from '../../utils/getEnv'
+import { getEnv } from '../../utils/getEnv.js'
 
 export const sendQueryCompletedQueueMessage = async (
   athenaQueryId: string,

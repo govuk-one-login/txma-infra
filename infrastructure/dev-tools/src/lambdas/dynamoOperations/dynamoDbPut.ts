@@ -1,6 +1,6 @@
 import { PutCommand } from '@aws-sdk/lib-dynamodb'
-import { OperationParams } from '../../types/dynamoDbOperation'
-import { documentClient } from './dynamoDbClient'
+import { OperationParams } from '../../types/dynamoDbOperation.js'
+import { documentClient } from './dynamoDbClient.js'
 
 export const dynamoDbPut = async (operationParams: OperationParams) => {
   const putCommand = {

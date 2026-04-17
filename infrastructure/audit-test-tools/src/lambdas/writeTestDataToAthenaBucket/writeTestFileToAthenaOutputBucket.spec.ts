@@ -1,12 +1,13 @@
-import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket'
+import { describe, it, expect } from 'vitest'
+import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket.js'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { mockClient } from 'aws-sdk-client-mock'
-import 'aws-sdk-client-mock-jest'
+import 'aws-sdk-client-mock-vitest/extend'
 import {
   TEST_ATHENA_OUTPUT_BUCKET_NAME,
   TEST_FILE_CONTENTS,
   TEST_ATHENA_QUERY_ID
-} from '../../utils/tests/testConstants'
+} from '../../utils/tests/testConstants.js'
 
 const s3ClientMock = mockClient(S3Client)
 describe('writeTestFileToAthenaOutputBucket', () => {

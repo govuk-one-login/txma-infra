@@ -4,12 +4,13 @@ import {
   ListObjectVersionsCommandOutput,
   S3Client
 } from '@aws-sdk/client-s3'
+import { getEnv } from '../../utils/getEnv.js'
 
 export const listS3ObjectVersions = async (
   input: ListObjectVersionsCommandInput,
   objectVersions: S3ObjectVersions = { deleteMarkers: [], versions: [] }
 ) => {
-  const client = new S3Client({ region: process.env['AWS_REGION'] })
+  const client = new S3Client({ region: getEnv('AWS_REGION') })
   const command = new ListObjectVersionsCommand(input)
   const response = await client.send(command)
 

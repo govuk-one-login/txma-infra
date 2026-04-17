@@ -32,12 +32,12 @@ jobs:
       - name: SAM Validate
         run: sam validate --lint -t ${{ inputs.template_path }}
       - name: Run Checkov on template
-        uses: bridgecrewio/checkov-action@f9b0a2206b0401cad02ac0a66be2a7934a5be838
+        uses: bridgecrewio/checkov-action@de2bfaecd21d58ef232e0d2a3391c33c32c460d7
         with:
           file: ${{ inputs.template_path }}
           quiet: true
       - name: Run Checkov on workflows
-        uses: bridgecrewio/checkov-action@f9b0a2206b0401cad02ac0a66be2a7934a5be838
+        uses: bridgecrewio/checkov-action@de2bfaecd21d58ef232e0d2a3391c33c32c460d7
         with:
           directory: .github/workflows
           quiet: true

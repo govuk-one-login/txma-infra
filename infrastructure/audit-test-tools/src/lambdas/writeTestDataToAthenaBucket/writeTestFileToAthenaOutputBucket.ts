@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
-import { getEnv } from '../../utils/getEnv'
-import { logger } from '../../utils/logger'
+import { getEnv } from '../../utils/getEnv.js'
+import { logger } from '../../utils/logger.js'
 
 export const writeTestFileToAthenaOutputBucket = (
   athenaQueryId: string,

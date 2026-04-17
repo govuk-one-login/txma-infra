@@ -1,13 +1,13 @@
 import { CloudFormationCustomResourceEvent, Context } from 'aws-lambda'
-import { emptyS3Bucket } from './emptyS3Bucket'
-import { listS3Buckets } from './listS3Buckets'
+import { emptyS3Bucket } from './emptyS3Bucket.js'
+import { listS3Buckets } from './listS3Buckets.js'
 import axios from 'axios'
 import {
   appendKeyAttributeDataToLogger,
   initialiseLogger,
   logger,
   removeLoggerKeys
-} from '../../utils/logger'
+} from '../../utils/logger.js'
 
 export const handler = async (
   event: CloudFormationCustomResourceEvent,

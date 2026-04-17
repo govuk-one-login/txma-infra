@@ -1,10 +1,11 @@
+import { describe, it, expect } from 'vitest'
 import { mockClient } from 'aws-sdk-client-mock'
+import 'aws-sdk-client-mock-vitest/extend'
 import {
   TEST_DYNAMO_TABLE_NAME,
   TEST_DYNAMO_KEY
-} from '../../utils/tests/constants/testConstants'
-import { dynamoDbDelete } from './dynamoDbDelete'
-import 'aws-sdk-client-mock-jest'
+} from '../../utils/tests/constants/testConstants.js'
+import { dynamoDbDelete } from './dynamoDbDelete.js'
 import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 
 const dynamoMock = mockClient(DynamoDBDocumentClient)
