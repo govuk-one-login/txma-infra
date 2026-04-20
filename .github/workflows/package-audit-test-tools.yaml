@@ -36,7 +36,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup Node 24
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
           cache: npm
@@ -99,7 +99,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets[matrix.GH_ACTIONS_ROLE_ARN_SECRET] }}
       - name: Package SAM app
-        uses: govuk-one-login/devplatform-upload-action@b7bc01ed6e0b61d54f42e7f3d12dd3fdbb0f172a # v3.13.0
+        uses: govuk-one-login/devplatform-upload-action@5879c30205266ad61e8299a4fcea76364530c9c1 # v3.14.0
         with:
           artifact-bucket-name: ${{ secrets[matrix.ARTIFACT_BUCKET_NAME_SECRET]}}
           signing-profile-name: ${{ secrets[matrix.SIGNING_PROFILE_SECRET] }}
