@@ -27,21 +27,21 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@smithy/core": "3.24.3",
+    "@smithy/core": "3.24.4",
     "@smithy/smithy-client": "4.13.3",
-    "@typescript-eslint/eslint-plugin": "^8.59.4",
-    "@typescript-eslint/parser": "^8.59.4",
-    "@vitest/coverage-v8": "^4.1.6",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
+    "@vitest/coverage-v8": "^4.1.7",
     "eslint": "^10.4.0",
     "eslint-config-prettier": "10.1.8",
-    "@vitest/eslint-plugin": "1.6.17",
+    "@vitest/eslint-plugin": "1.6.18",
     "vitest-when": "^0.10.0",
     "husky": "9.1.7",
     "lint-staged": "17.0.5",
     "globals": "^17.6.0",
     "prettier": "3.8.3",
     "typescript": "6.0.3",
-    "typescript-eslint": "^8.59.4"
+    "typescript-eslint": "^8.60.0"
   },
   "lint-staged": {
     "*": "prettier --write",
