@@ -23,7 +23,7 @@
     "axios": "1.16.1"
   },
   "devDependencies": {
-    "@smithy/types": "4.14.2",
+    "@smithy/types": "4.14.3",
     "@types/aws-lambda": "8.10.161",
     "@types/node": "25.9.1",
     "@vitest/coverage-v8": "^4.0.18",
