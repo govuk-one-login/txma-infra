@@ -23,9 +23,9 @@
     "axios": "1.18.1"
   },
   "devDependencies": {
-    "@smithy/types": "4.15.0",
+    "@smithy/types": "4.15.1",
     "@types/aws-lambda": "8.10.162",
-    "@types/node": "25.9.3",
+    "@types/node": "26.1.0",
     "@vitest/coverage-v8": "^4.0.18",
     "aws-sdk-client-mock": "4.1.0",
     "aws-sdk-client-mock-vitest": "^7.0.1",
