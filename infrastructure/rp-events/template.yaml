@@ -170,7 +170,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmActions:
-        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+        - !ImportValue slack-build-notifications-CriticalAlertsTopicArn
       AlarmDescription: >-
         Alarm that monitors read throttle events on the RelyingPartyConfig DynamoDB table.
         Triggers when any read throttle events occur within a 1 minute period.
@@ -192,7 +192,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmActions:
-        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+        - !ImportValue slack-build-notifications-CriticalAlertsTopicArn
       AlarmDescription: >-
         Alarm that monitors write throttle events on the RelyingPartyConfig DynamoDB table.
         Triggers when any write throttle events occur within a 1 minute period.
@@ -214,7 +214,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmActions:
-        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+        - !ImportValue slack-build-notifications-CriticalAlertsTopicArn
       AlarmDescription: >-
         Alarm that monitors read throttle events on the RelyingPartyPairwiseMapping DynamoDB table.
         Triggers when any read throttle events occur within a 1 minute period.
@@ -236,7 +236,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmActions:
-        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+        - !ImportValue slack-build-notifications-CriticalAlertsTopicArn
       AlarmDescription: >-
         Alarm that monitors write throttle events on the RelyingPartyPairwiseMapping DynamoDB table.
         Triggers when any write throttle events occur within a 1 minute period.
@@ -368,7 +368,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmActions:
-        - !ImportValue txma-alarms-slack-alerts-BuildNotificationTopicArn
+        - !ImportValue slack-build-notifications-CriticalAlertsTopicArn
       AlarmDescription: >-
         Alarm that monitors the age of the oldest message on the RPEvents Queue.
         If messages remain on the queue for more than one hour it suggests that our
