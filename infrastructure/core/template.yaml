@@ -135,7 +135,11 @@ Resources:
               - kms:Encrypt
               - kms:GenerateDataKey*
               - kms:DescribeKey
+              - kms:CreateGrant
             Resource: '*'
+            Condition:
+              Bool:
+                kms:GrantIsForAWSResource: true
 
   FirehoseKmsKeyAlias:
     Type: AWS::KMS::Alias
