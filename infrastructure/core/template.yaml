@@ -659,7 +659,7 @@ Resources:
     Properties:
       Name: S3LogsBucketName
       Type: String
-      Value: !Ref S3LogsBucket
+      Value: !Sub 'di-s3-access-logs-${AWS::AccountId}-${AWS::Region}'
 
   S3QueueNotificationsKmsKeyArnParameter:
     Type: AWS::SSM::Parameter
