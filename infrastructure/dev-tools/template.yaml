@@ -110,6 +110,18 @@ Resources:
               Action:
                 - firehose:PutRecord
               Resource: '*'
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey*
+                - kms:DescribeKey
+                - kms:CreateGrant
+              Resource:
+                - '{{resolve:ssm:FirehoseKmsKeyArn}}'
+              Condition:
+                Bool:
+                  kms:GrantIsForAWSResource: true
 
   AddFirehoseRecordLogs:
     Type: AWS::Logs::LogGroup
