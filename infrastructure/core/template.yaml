@@ -491,7 +491,7 @@ Resources:
     Condition: CslsS3Logs
     Properties:
       AlarmActions:
-        - !ImportValue slack-build-notifications-CriticalAlertsTopicArn
+        - '{{resolve:ssm:CriticalNotificationsTopicArn}}'
       AlarmDescription: >-
         Alarm that monitors the S3Csls DLQ for any new messages.
         When messages land in this queue, it indicates that log alerts
