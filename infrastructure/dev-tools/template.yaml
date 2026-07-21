@@ -116,6 +116,10 @@ Resources:
                 - kms:Encrypt
                 - kms:GenerateDataKey*
                 - kms:DescribeKey
+              Resource:
+                - '{{resolve:ssm:FirehoseKmsKeyArn}}'
+            - Effect: Allow
+              Action:
                 - kms:CreateGrant
               Resource:
                 - '{{resolve:ssm:FirehoseKmsKeyArn}}'
