@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: Core infrastructure that should not change often.
 Transform: AWS::Serverless-2016-10-31
 
@@ -20,11 +20,12 @@ Parameters:
 Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
   TestEnvironment: !Equals [!Ref Environment, build]
+  DevEnvironment: !Equals [!Ref Environment, dev]
   CslsS3Logs:
     !Or [
       !Equals [!Ref Environment, production],
       !Equals [!Ref Environment, integration],
-      !Equals [!Ref Environment, staging]
+      !Equals [!Ref Environment, staging],
     ]
 
 Resources:
@@ -36,21 +37,21 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub ${AWS::StackName}-${Environment}-chatbot-alarm-role
-      Description: 'The IAM roles used by AWS chatbot to send notifications to slack'
+      Description: "The IAM roles used by AWS chatbot to send notifications to slack"
       PermissionsBoundary:
         !If [
           UsePermissionsBoundary,
           !Ref PermissionsBoundary,
-          !Ref AWS::NoValue
+          !Ref AWS::NoValue,
         ]
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
-          - Effect: 'Allow'
+          - Effect: "Allow"
             Principal:
-              Service: 'chatbot.amazonaws.com'
+              Service: "chatbot.amazonaws.com"
             Action:
-              - 'sts:AssumeRole'
+              - "sts:AssumeRole"
 
   SNSCriticalAlarmTopic:
     Type: AWS::SNS::Topic
@@ -62,12 +63,12 @@ Resources:
     Type: AWS::SNS::TopicPolicy
     Properties:
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
               Service: cloudwatch.amazonaws.com
-            Action: 'sns:Publish'
+            Action: "sns:Publish"
             Resource: !GetAtt SNSCriticalAlarmTopic.TopicArn
             Condition:
               ArnLike:
@@ -90,7 +91,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: Enable Root access
             Effect: Allow
@@ -98,14 +99,14 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action:
               - kms:*
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow AWS Lambda access
             Effect: Allow
             Principal:
               Service: lambda.amazonaws.com
             Action:
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
 
   DatabaseKmsKeyAlias:
     Type: AWS::KMS::Alias
@@ -118,7 +119,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -126,7 +127,7 @@ Resources:
             Action:
               - kms:*
             Resource:
-              - '*'
+              - "*"
           - Effect: Allow
             Principal:
               Service: firehose.amazonaws.com
@@ -135,16 +136,29 @@ Resources:
               - kms:Encrypt
               - kms:GenerateDataKey*
               - kms:DescribeKey
-              - kms:CreateGrant
-            Resource: '*'
-            Condition:
-              Bool:
-                kms:GrantIsForAWSResource: true
+            Resource: "*"
+          - !If
+            - DevEnvironment
+            - Sid: Allow Codepipeline test role to access encrypted secrets
+              Effect: Allow
+              Principal:
+                AWS: "*"
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey*
+                - kms:DescribeKey
+                - kms:CreateGrant
+              Resource: "*"
+              Condition:
+                Bool:
+                  kms:GrantIsForAWSResource: true
+            - !Ref AWS::NoValue
 
   FirehoseKmsKeyAlias:
     Type: AWS::KMS::Alias
     Properties:
-      AliasName: !Sub 'alias/${AWS::StackName}/${Environment}/firehose-kms-key'
+      AliasName: !Sub "alias/${AWS::StackName}/${Environment}/firehose-kms-key"
       TargetKeyId: !Ref FirehoseKmsKey
 
   LambdaKmsKey:
@@ -152,7 +166,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: Enable Root access
             Effect: Allow
@@ -160,14 +174,14 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action:
               - kms:*
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow Lambda to decrypt environment variables
             Effect: Allow
             Principal:
               Service: lambda.amazonaws.com
             Action:
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
 
   LambdaKmsKeyAlias:
     Type: AWS::KMS::Alias
@@ -180,7 +194,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: Enable Root access
             Effect: Allow
@@ -188,7 +202,7 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action:
               - kms:*
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow CloudWatch Logs to use key
             Effect: Allow
             Principal:
@@ -199,7 +213,7 @@ Resources:
               - kms:Encrypt*
               - kms:GenerateDataKey*
               - kms:ReEncrypt*
-            Resource: '*'
+            Resource: "*"
             Condition:
               ArnLike:
                 kms:EncryptionContext:aws:logs:arn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
@@ -217,7 +231,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -225,14 +239,14 @@ Resources:
             Action:
               - kms:*
             Resource:
-              - '*'
+              - "*"
           - Effect: Allow
             Principal:
               Service: s3.amazonaws.com
             Action:
               - kms:Decrypt
               - kms:GenerateDataKey
-            Resource: '*'
+            Resource: "*"
 
   S3QueueNotificationsKmsKeyAlias:
     Type: AWS::KMS::Alias
@@ -245,7 +259,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: Enable Root access
             Effect: Allow
@@ -253,26 +267,26 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action:
               - kms:*
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow AWS Lambda access
             Effect: Allow
             Principal:
               Service: lambda.amazonaws.com
             Action:
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
           - !If
             - TestEnvironment
             - Sid: Allow Codepipeline test role to access encrypted secrets
               Effect: Allow
               Principal:
-                AWS: '*'
+                AWS: "*"
               Action:
                 - kms:Decrypt
-              Resource: '*'
+              Resource: "*"
               Condition:
                 ArnLike:
-                  aws:PrincipalArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*pipeline-TestRole*'
+                  aws:PrincipalArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/*pipeline-TestRole*"
             - !Ref AWS::NoValue
 
   SecretsKmsKeyAlias:
@@ -286,7 +300,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: Enable Root access
             Effect: Allow
@@ -294,7 +308,7 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action:
               - kms:*
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow access for Key User (SNS Service Principal)
             Effect: Allow
             Principal:
@@ -302,7 +316,7 @@ Resources:
             Action:
               - kms:GenerateDataKey*
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow access for CloudWatch
             Effect: Allow
             Principal:
@@ -310,7 +324,7 @@ Resources:
             Action:
               - kms:GenerateDataKey*
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow access for lambda
             Effect: Allow
             Principal:
@@ -318,7 +332,7 @@ Resources:
             Action:
               - kms:GenerateDataKey*
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
 
   SnsKmsKeyAlias:
     Type: AWS::KMS::Alias
@@ -331,7 +345,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: Enable Root access
             Effect: Allow
@@ -339,7 +353,7 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action:
               - kms:*
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow AWS Lambda access
             Effect: Allow
             Principal:
@@ -348,7 +362,7 @@ Resources:
               - kms:GenerateDataKey
               - kms:Encrypt
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow AWS SNS access
             Effect: Allow
             Principal:
@@ -359,7 +373,7 @@ Resources:
               - kms:ReEncrypt*
               - kms:GenerateDataKey*
               - kms:Describe*
-            Resource: '*'
+            Resource: "*"
 
   SqsKmsKeyAlias:
     Type: AWS::KMS::Alias
@@ -373,7 +387,7 @@ Resources:
     Properties:
       EnableKeyRotation: true
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: Enable Root access
             Effect: Allow
@@ -381,7 +395,7 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action:
               - kms:*
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow AWS Lambda access
             Effect: Allow
             Principal:
@@ -390,14 +404,14 @@ Resources:
               - kms:GenerateDataKey
               - kms:Encrypt
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
           - Sid: CSLS Access
             Effect: Allow
             Principal:
-              AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
+              AWS: "{{resolve:ssm:CSLSS3LambdaARN}}"
             Action:
               - kms:Decrypt*
-            Resource: '*'
+            Resource: "*"
           - Sid: Allow s3 access
             Effect: Allow
             Principal:
@@ -406,7 +420,7 @@ Resources:
               - kms:GenerateDataKey
               - kms:Encrypt
               - kms:Decrypt
-            Resource: '*'
+            Resource: "*"
 
   CslsKmsKeyAlias:
     Type: AWS::KMS::Alias
@@ -443,18 +457,18 @@ Resources:
         Statement:
           - Sid: SQSLogshipping
             Action:
-              - 'sqs:ChangeMessageVisibility'
-              - 'sqs:DeleteMessage'
-              - 'sqs:GetQueueAttributes'
-              - 'sqs:ReceiveMessage'
-            Effect: 'Allow'
+              - "sqs:ChangeMessageVisibility"
+              - "sqs:DeleteMessage"
+              - "sqs:GetQueueAttributes"
+              - "sqs:ReceiveMessage"
+            Effect: "Allow"
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
-              AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
+              AWS: "{{resolve:ssm:CSLSS3LambdaARN}}"
           - Sid: S3Notification
             Action:
-              - 'sqs:SendMessage'
-            Effect: 'Allow'
+              - "sqs:SendMessage"
+            Effect: "Allow"
             Resource: !GetAtt S3CslsQueue.Arn
             Principal:
               Service: s3.amazonaws.com
@@ -477,7 +491,7 @@ Resources:
     Condition: CslsS3Logs
     Properties:
       AlarmActions:
-        - '{{resolve:ssm:CriticalNotificationsTopicArn}}'
+        - "{{resolve:ssm:CriticalNotificationsTopicArn}}"
       AlarmDescription: >-
         Alarm that monitors the S3Csls DLQ for any new messages.
         When messages land in this queue, it indicates that log alerts
@@ -511,16 +525,16 @@ Resources:
     Properties:
       BucketName:
         !Join [
-          '-',
+          "-",
           [
             !Ref AWS::StackName,
             !Ref Environment,
             s3-logs,
             !Select [
               4,
-              !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]
-            ]
-          ]
+              !Split ["-", !Select [2, !Split ["/", !Ref AWS::StackId]]],
+            ],
+          ],
         ]
       BucketEncryption:
         ServerSideEncryptionConfiguration:
@@ -536,7 +550,7 @@ Resources:
       NotificationConfiguration:
         QueueConfigurations: !If
           - CslsS3Logs
-          - - Event: 's3:ObjectCreated:*'
+          - - Event: "s3:ObjectCreated:*"
               Queue: !GetAtt S3CslsQueue.Arn
           - !Ref AWS::NoValue
       OwnershipControls:
@@ -561,7 +575,7 @@ Resources:
     Properties:
       Bucket: !Ref S3LogsBucket
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: AllowLogging
             Effect: Allow
@@ -584,7 +598,7 @@ Resources:
                 - !Sub ${S3LogsBucket.Arn}
                 - !Sub ${S3LogsBucket.Arn}/*
               Principal:
-                AWS: '{{resolve:ssm:CSLSS3LambdaARN}}'
+                AWS: "{{resolve:ssm:CSLSS3LambdaARN}}"
               Action:
                 - s3:List*
                 - s3:Get*
