@@ -20,6 +20,7 @@ Parameters:
 Conditions:
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
   TestEnvironment: !Equals [!Ref Environment, build]
+  DevEnvironment: !Equals [!Ref Environment, dev]
   CslsS3Logs:
     !Or [
       !Equals [!Ref Environment, production],
@@ -135,11 +136,24 @@ Resources:
               - kms:Encrypt
               - kms:GenerateDataKey*
               - kms:DescribeKey
-              - kms:CreateGrant
             Resource: '*'
-            Condition:
-              Bool:
-                kms:GrantIsForAWSResource: true
+          - !If
+            - DevEnvironment
+            - Sid: Allow Codepipeline test role to access encrypted secrets
+              Effect: Allow
+              Principal:
+                AWS: '*'
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey*
+                - kms:DescribeKey
+                - kms:CreateGrant
+              Resource: '*'
+              Condition:
+                Bool:
+                  kms:GrantIsForAWSResource: true
+            - !Ref AWS::NoValue
 
   FirehoseKmsKeyAlias:
     Type: AWS::KMS::Alias
