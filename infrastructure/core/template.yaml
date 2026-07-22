@@ -139,7 +139,7 @@ Resources:
             Resource: '*'
           - !If
             - DevEnvironment
-            - Sid: Allow Codepipeline test role to access encrypted secrets
+            - Sid: Allow Integration test runner role to access encrypted secrets
               Effect: Allow
               Principal:
                 AWS: '*'
