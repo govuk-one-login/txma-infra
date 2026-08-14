@@ -892,36 +892,6 @@ Resources:
         - !Ref PermissionsBoundary
         - !Ref AWS::NoValue
 
-  IntegrationTestsRepository:
-    Condition: FeatureBranches
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: !Sub '${AWS::StackName}-integration-test-repository'
-      ImageScanningConfiguration:
-        ScanOnPush: true
-      ImageTagMutability: IMMUTABLE
-      EncryptionConfiguration:
-        EncryptionType: KMS
-        KmsKey: !GetAtt EcrEncryptionKey.Arn
-      LifecyclePolicy:
-        LifecyclePolicyText: |
-          {
-            "rules": [
-              {
-                "rulePriority": 1,
-                "description": "Keep only the last 5 images",
-                "selection": {
-                  "tagStatus": "any",
-                  "countType": "imageCountMoreThan",
-                  "countNumber": 5
-                },
-                "action": {
-                  "type": "expire"
-                }
-              }
-            ]
-          }
-
   EcrEncryptionKey:
     Condition: FeatureBranches
     Type: AWS::KMS::Key
