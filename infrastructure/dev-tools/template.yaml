@@ -665,7 +665,7 @@ Resources:
           Environment:
             - Name: AWS_REGION
               Value: !Sub '${AWS::Region}'
-            - Name: $TEST_ENVIRONMENT
+            - Name: TEST_ENVIRONMENT
               Value: 'dev'
       Cpu: 4096 # 4 CPUs
       Memory: 8192
@@ -709,7 +709,7 @@ Resources:
               - Action:
                   - cloudformation:DescribeStacks
                 Resource:
-                  - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*'
+                  - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*'
                 Effect: Allow
               - Action:
                   - ssm:GetParameter*
@@ -846,8 +846,8 @@ Resources:
                   - s3:ListBucket
                   - s3:DeleteObject
                 Resource:
-                  - !Sub 'arn:aws:s3:::${AWS::StackName}-*'
-                  - !Sub 'arn:aws:s3:::${AWS::StackName}-*/*'
+                  - !Sub 'arn:aws:s3:::*'
+                  - !Sub 'arn:aws:s3:::*/*'
                 Effect: Allow
                 Sid: IntegrationTestS3Access
       PermissionsBoundary: !If
