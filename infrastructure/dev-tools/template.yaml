@@ -211,6 +211,9 @@ Resources:
       Handler: dynamoOperations.handler
       FunctionName: !Sub ${AWS::StackName}-dynamo-operations
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: '' # Disable Dynatrace for this utility function
       Policies:
         - Statement:
             - Sid: DecryptKmsKeys
