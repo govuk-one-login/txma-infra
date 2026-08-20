@@ -12,11 +12,17 @@ export const handler = async (
   initialiseLogger(context)
 
   if (!dynamoDbOperation) {
-    throw Error('Function called with undefined params')
+    throw new Error('Function called with undefined params')
   }
 
   let result
-  switch (dynamoDbOperation.operation) {
+  const operation = dynamoDbOperation.operation
+
+  logger.info('dynamo operation to run', {
+    operation
+  })
+
+  switch (operation) {
     case 'GET':
       result = await dynamoDbGet(dynamoDbOperation.params)
       logger.info('GetItemCommand successfully sent to Dynamo', {
