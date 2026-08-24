@@ -28,7 +28,13 @@ export const handler = async (
   }
 
   let result
-  switch (dynamoDbOperation.operation) {
+  const operation = dynamoDbOperation.operation
+
+  logger.info('dynamo operation to run', {
+    operation
+  })
+
+  switch (operation) {
     case 'GET':
       result = await dynamoDbGet(dynamoDbOperation.params)
       logger.info('GetItemCommand successfully sent to Dynamo', {
