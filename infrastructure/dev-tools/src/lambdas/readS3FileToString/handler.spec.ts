@@ -8,6 +8,13 @@ import { s3DownloadFileToString } from './s3DownloadFileToString.js'
 vi.mock('./s3DownloadFileToString.js', () => ({
   s3DownloadFileToString: vi.fn()
 }))
+vi.mock('../../utils/logger.js', () => ({
+  initialiseLogger: vi.fn(),
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
+}))
+vi.mock('../../utils/errorCodes.js', () => ({
+  ERROR_CODES: { DT002: 'DT002' }
+}))
 
 describe('Read s3 file to string handler', () => {
   it('returns error with invalid parameters', async () => {

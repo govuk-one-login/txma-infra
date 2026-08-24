@@ -5,49 +5,66 @@ import axios from 'axios'
 import {
   appendKeyAttributeDataToLogger,
   initialiseLogger,
-  logger,
-  removeLoggerKeys
+  logger
 } from '../../utils/logger.js'
+import { ERROR_CODES } from '../../utils/errorCodes.js'
 
 export const handler = async (
   event: CloudFormationCustomResourceEvent,
   context: Context
 ): Promise<void> => {
   initialiseLogger(context)
-  removeLoggerKeys(['stackId'])
 
   const stackId = event.StackId
   appendKeyAttributeDataToLogger({ stackId })
 
+  const startTime = Date.now()
+  logger.info('Handler started', { requestType: event.RequestType })
+
   try {
     if (event.RequestType !== 'Delete') {
-      logger.info('RequestType is not Delete')
+      logger.info('RequestType is not Delete, skipping bucket empty')
       return await sendResponse(event, 'SUCCESS')
     }
 
-    logger.info(
-      'CloudFormationCustomResourceEvent is Delete. Attempting to empty S3 Buckets'
-    )
+    logger.info('Delete event received, attempting to empty S3 buckets')
 
     const s3Buckets = await listS3Buckets(stackId)
 
     if (s3Buckets.length === 0) {
-      logger.info('No S3 buckets found')
+      logger.info('No S3 buckets found for stack')
       return await sendResponse(event, 'SUCCESS')
     }
-    logger.info(`Found ${s3Buckets.length} S3 bucket(s)`, { s3Buckets })
+
+    logger.info('S3 buckets found for stack', { bucketCount: s3Buckets.length })
 
     await Promise.all(s3Buckets.map((bucket) => emptyS3Bucket(bucket)))
 
     await sendResponse(event, 'SUCCESS')
-    logger.info('Successfully emptied all buckets')
+    logger.info('Handler completed', {
+      outcome: 'success',
+      duration: Date.now() - startTime
+    })
   } catch (error: unknown) {
     if (error instanceof Error) {
+      logger.error('Handler failed', {
+        outcome: 'failure',
+        duration: Date.now() - startTime,
+        error: {
+          code: ERROR_CODES.DT001,
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        }
+      })
       await sendResponse(event, 'FAILED', error.message)
-      logger.info('Lambda error occurred', { error })
     } else {
+      logger.error('Handler failed with unknown error', {
+        outcome: 'failure',
+        duration: Date.now() - startTime,
+        error: { code: ERROR_CODES.DT001, message: 'Unknown error' }
+      })
       await sendResponse(event, 'FAILED', 'Unknown error')
-      logger.info(`Lambda error occurred with 'Unknown error'`)
     }
   }
 }

@@ -103,4 +103,25 @@ describe('empty s3 buckets handler', () => {
       errorPayload
     )
   })
+
+  test('sends error payload with unknown error when non-Error is thrown', async () => {
+    givenS3Buckets()
+    mockEmptyS3Bucket.mockImplementationOnce(() => {
+       
+      throw 'a string error'
+    })
+
+    await handler(defaultCustomResourceDeleteEvent, mockLambdaContext)
+
+    const errorPayload = {
+      ...successPayload,
+      Status: 'FAILED',
+      Reason: 'Unknown error'
+    }
+
+    expect(httpsRequestSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      errorPayload
+    )
+  })
 })

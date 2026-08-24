@@ -4,10 +4,9 @@ import { listS3ObjectVersions } from './listS3ObjectVersions.js'
 
 export const emptyS3Bucket = async (bucketName: string): Promise<void> => {
   const objects = await listS3ObjectVersions({ Bucket: bucketName })
-  logger.info(
-    `Found ${objects.versions.length + objects.deleteMarkers.length} objects`,
-    { bucketName }
-  )
+  const objectCount = objects.versions.length + objects.deleteMarkers.length
+
+  logger.info('Objects found in bucket', { bucketName, objectCount })
 
   if (objects.versions.length === 0 && objects.deleteMarkers.length === 0) {
     logger.info('No objects to delete', { bucketName })
