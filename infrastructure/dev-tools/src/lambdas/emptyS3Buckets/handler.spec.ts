@@ -107,7 +107,6 @@ describe('empty s3 buckets handler', () => {
   test('sends error payload with unknown error when non-Error is thrown', async () => {
     givenS3Buckets()
     mockEmptyS3Bucket.mockImplementationOnce(() => {
-       
       throw 'a string error'
     })
 
