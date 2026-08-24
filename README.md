@@ -82,6 +82,42 @@ cd infrastructure/audit-test-tools && npx vitest run
 cd infrastructure/dev-tools && npx vitest run
 ```
 
+## Error Codes
+
+All Lambda functions use structured error logging with assigned error codes to aid cross-service debugging and CloudWatch Insights queries. Each error log entry includes an `error.code` field.
+
+### dev-tools
+
+| Code    | Description                                | Lambda                  |
+| ------- | ------------------------------------------ | ----------------------- |
+| `DT001` | Handler failed — empty S3 buckets          | `emptyS3Buckets`        |
+| `DT002` | Handler failed due to invalid parameters   | `readS3FileToString`    |
+| `DT003` | S3 file not found (`NoSuchKey`)            | `readS3FileToString`    |
+| `DT004` | Handler failed due to undefined params     | `dynamoOperations`      |
+| `DT005` | Dynamo operation not recognised            | `dynamoOperations`      |
+| `DT006` | Handler failed — add Firehose record       | `addFirehoseRecord`     |
+| `DT007` | Handler failed due to invalid parameters   | `sqsOperations`         |
+| `DT008` | Handler failed — copy S3 file              | `copyS3File`            |
+| `DT009` | Handler failed — write zipped string to S3 | `writeZippedStringToS3` |
+| `DT010` | Handler failed — S3 operations             | `S3Operations`          |
+| `DT011` | Unknown S3 command type                    | `S3Operations`          |
+| `DT012` | No message ID returned from SQS            | `sqsOperations`         |
+
+Error codes are defined in [`infrastructure/dev-tools/src/utils/errorCodes.ts`](infrastructure/dev-tools/src/utils/errorCodes.ts).
+
+### audit-test-tools
+
+| Code    | Description                                              | Lambda                        |
+| ------- | -------------------------------------------------------- | ----------------------------- |
+| `AT001` | Handler failed — write test data to Athena bucket        | `writeTestDataToAthenaBucket` |
+| `AT002` | No data in SQS event                                     | `writeTestDataToAthenaBucket` |
+| `AT003` | No body found in SQS event record                        | `writeTestDataToAthenaBucket` |
+| `AT004` | Event data was not of the correct type                   | `writeTestDataToAthenaBucket` |
+| `AT005` | Error parsing JSON body                                  | `writeTestDataToAthenaBucket` |
+| `AT006` | Handler failed — write test file to Athena output bucket | `writeTestDataToAthenaBucket` |
+
+Error codes are defined in [`infrastructure/audit-test-tools/src/utils/errorCodes.ts`](infrastructure/audit-test-tools/src/utils/errorCodes.ts).
+
 ## Licence
 
 [MIT License](LICENCE)

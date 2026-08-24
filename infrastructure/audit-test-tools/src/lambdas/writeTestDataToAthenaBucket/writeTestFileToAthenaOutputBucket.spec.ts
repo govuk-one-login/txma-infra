@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket.js'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { mockClient } from 'aws-sdk-client-mock'
@@ -8,6 +8,10 @@ import {
   TEST_FILE_CONTENTS,
   TEST_ATHENA_QUERY_ID
 } from '../../utils/tests/testConstants.js'
+
+vi.mock('../../utils/logger.js', () => ({
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
+}))
 
 const s3ClientMock = mockClient(S3Client)
 describe('writeTestFileToAthenaOutputBucket', () => {
