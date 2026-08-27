@@ -11,11 +11,10 @@
     "test:cov": "vitest run --coverage"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^2.34.0",
-    "@aws-sdk/client-cloudformation": "3.1100.0",
+    "@aws-lambda-powertools/logger": "^2.31.0",
+    "@aws-sdk/client-cloudformation": "3.1116.0",
     "@aws-sdk/client-s3": "^3.1000.0",
-    "@aws-sdk/client-sqs": "3.1100.0",
-    "@govuk-one-login/dpt-logging": "^1.0.0",
+    "@aws-sdk/client-sqs": "3.1116.0",
     "axios": "1.19.0"
   },
   "devDependencies": {

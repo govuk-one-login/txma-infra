@@ -54,4 +54,42 @@ describe('list s3 buckets', () => {
     const result = await listS3Buckets(stackId)
     expect(result).toEqual(['example-s3-bucket'])
   })
+
+  test('response is paginated across multiple pages', async () => {
+    cloudFormationMock
+      .on(ListStackResourcesCommand)
+      .resolvesOnce({
+        StackResourceSummaries: [
+          {
+            LogicalResourceId: 'LambdaFunction',
+            PhysicalResourceId: 'example-lambda-function',
+            ResourceType: 'AWS::Lambda::Function',
+            LastUpdatedTimestamp: new Date('2022-09-06T14:52:21.357Z'),
+            ResourceStatus: 'CREATE_COMPLETE'
+          }
+        ],
+        NextToken: 'page-2-token'
+      })
+      .resolvesOnce({
+        StackResourceSummaries: [
+          {
+            LogicalResourceId: 'S3Bucket',
+            PhysicalResourceId: 'example-s3-bucket',
+            ResourceType: 'AWS::S3::Bucket',
+            LastUpdatedTimestamp: new Date('2022-09-06T14:52:21.357Z'),
+            ResourceStatus: 'CREATE_COMPLETE'
+          },
+          {
+            LogicalResourceId: 'AnotherS3Bucket',
+            PhysicalResourceId: 'another-s3-bucket',
+            ResourceType: 'AWS::S3::Bucket',
+            LastUpdatedTimestamp: new Date('2022-09-06T14:52:21.357Z'),
+            ResourceStatus: 'CREATE_COMPLETE'
+          }
+        ]
+      })
+
+    const result = await listS3Buckets(stackId)
+    expect(result).toEqual(['example-s3-bucket', 'another-s3-bucket'])
+  })
 })
