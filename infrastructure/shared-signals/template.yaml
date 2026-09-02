@@ -16,6 +16,10 @@ Parameters:
     Description: Name of the audience GSI
     Type: String
     Default: audGSI
+  PermissionsBoundary:
+    Description: The ARN of the permissions boundary to apply to any role created by the template
+    Type: String
+    Default: none
 
 Conditions:
   IsDev: !Equals [!Ref Environment, dev]
@@ -28,6 +32,7 @@ Conditions:
       !Equals [!Ref Environment, integration]
     ]
   TestEnvironment: !Not [Condition: NotTestEnvironment]
+  UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
 
 # EnvironmentPipelineNames are the shortened environment names that the pipeline uses
 Mappings:
@@ -474,6 +479,281 @@ Resources:
       AliasName: !Sub alias/${AWS::StackName}-SET-signing-key-2-rsa
       TargetKeyId: !Ref SETSigningKMSKey2RSAArn
 
+  MetricsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-metrics
+      LoggingConfiguration:
+        DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-metrics/
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: BackupFrequency
+          Value: Bihourly
+
+  MetricsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref MetricsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyDeletion
+            Effect: Deny
+            Action:
+              - s3:DeleteObject
+              - s3:DeleteObjectVersion
+              - s3:DeleteBucket
+              - s3:DeleteBucketPolicy
+            Resource:
+              - !GetAtt MetricsBucket.Arn
+              - !Sub ${MetricsBucket.Arn}/*
+            Principal:
+              AWS: '*'
+
+  MetricsAthenaResultsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${AWS::StackName}-${Environment}-metrics-athena-results
+      LifecycleConfiguration:
+        Rules:
+          - Id: AnalysisCleanupRule
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 1
+      LoggingConfiguration:
+        DestinationBucketName: '{{resolve:ssm:S3LogsBucketName}}'
+        LogFilePrefix: !Sub ${AWS::StackName}-${Environment}-metrics-athena-results/
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  MetricsAthenaResultsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref MetricsAthenaResultsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyDeletion
+            Effect: Deny
+            Action:
+              - s3:DeleteObject
+              - s3:DeleteObjectVersion
+              - s3:DeleteBucket
+              - s3:DeleteBucketPolicy
+            Resource:
+              - !GetAtt MetricsAthenaResultsBucket.Arn
+              - !Sub ${MetricsAthenaResultsBucket.Arn}/*
+            Principal:
+              AWS: '*'
+
+  MetricsAthenaWorkgroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: !Sub ${AWS::StackName}-${Environment}-metrics
+      Description: WorkGroup for querying metric records in Athena
+      State: ENABLED
+      WorkGroupConfiguration:
+        EnforceWorkGroupConfiguration: true
+        PublishCloudWatchMetricsEnabled: true
+        ResultConfiguration:
+          OutputLocation: !Sub s3://${MetricsAthenaResultsBucket}/query-results/
+          EncryptionConfiguration:
+            EncryptionOption: SSE_S3
+
+  MetricsGlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name:
+          !Join [
+            '',
+            [
+              !Join ['', !Split ['-', !Ref AWS::StackName]],
+              !Sub '_${Environment}_metrics'
+            ]
+          ]
+        Description: Database for querying metric records in Athena
+
+  MetricsGlueTable:
+    Type: AWS::Glue::Table
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseName: !Ref MetricsGlueDatabase
+      TableInput:
+        Description: Table to query metric records from the metrics bucket
+        Name:
+          !Join [
+            '',
+            [
+              !Join ['', !Split ['-', !Ref AWS::StackName]],
+              !Sub '_${Environment}_metrics_table'
+            ]
+          ]
+        Parameters:
+          classification: json
+          projection.enabled: true
+          projection.datetime.type: date
+          projection.datetime.range: 2024/01/01/00,NOW
+          projection.datetime.format: yyyy/MM/dd/HH
+          projection.datetime.interval: 1
+          projection.datetime.interval.unit: HOURS
+          storage.location.template:
+            !Join ['', ['s3://', !Ref MetricsBucket, '/${datetime}/']]
+        PartitionKeys:
+          - Name: datetime
+            Type: string
+        StorageDescriptor:
+          Columns:
+            - Name: metric_name
+              Type: string
+            - Name: audit_event_name
+              Type: string
+            - Name: signal_name
+              Type: string
+            - Name: environment
+              Type: string
+            - Name: rp_user_client_id
+              Type: string
+            - Name: friendly_name
+              Type: string
+            - Name: event_id
+              Type: string
+            - Name: timestamp
+              Type: bigint
+          Compressed: true
+          InputFormat: org.apache.hadoop.mapred.TextInputFormat
+          Location: !Sub s3://${MetricsBucket}/
+          OutputFormat: org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+          SerdeInfo:
+            Parameters:
+              {
+                'ignore.malformed.json': true,
+                'serialization.format': 1,
+                'case.insensitive': false
+              }
+            SerializationLibrary: org.openx.data.jsonserde.JsonSerDe
+          StoredAsSubDirectories: false
+        TableType: EXTERNAL_TABLE
+
+  MetricsFirehoseLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub /aws/kinesisfirehose/${AWS::StackName}-metrics
+      RetentionInDays: 30
+
+  MetricsFirehoseDestinationLogStream:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName: !Ref MetricsFirehoseLogs
+      LogStreamName: DestinationDelivery
+
+  MetricsFirehoseRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-metrics-firehose-role
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowFirehoseToAssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - firehose.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref MetricsFirehosePolicy
+
+  MetricsFirehosePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StackName}-metrics-firehose-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3Access
+            Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListBucketMultipartUploads
+              - s3:PutObject
+            Resource:
+              - !GetAtt MetricsBucket.Arn
+              - !Sub ${MetricsBucket.Arn}/*
+          - Sid: AllowFirehoseLogging
+            Effect: Allow
+            Action:
+              - logs:PutLogEvents
+            Resource:
+              - !GetAtt MetricsFirehoseLogs.Arn
+
+  MetricsDeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: !Sub ${AWS::StackName}-metrics
+      DeliveryStreamType: DirectPut
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !GetAtt MetricsBucket.Arn
+        RoleARN: !GetAtt MetricsFirehoseRole.Arn
+        BufferingHints:
+          IntervalInSeconds: !If
+            - TestEnvironment
+            - 60
+            - 900
+          SizeInMBs: 128
+        CompressionFormat: GZIP
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName: !Ref MetricsFirehoseLogs
+          LogStreamName: !Ref MetricsFirehoseDestinationLogStream
+        DynamicPartitioningConfiguration:
+          Enabled: true
+        Prefix: !Sub '!{partitionKeyFromQuery:year}/!{partitionKeyFromQuery:month}/!{partitionKeyFromQuery:day}/!{partitionKeyFromQuery:hour}/'
+        ErrorOutputPrefix: 'failures/!{firehose:error-output-type}/'
+        ProcessingConfiguration:
+          Enabled: true
+          Processors:
+            - Type: MetadataExtraction
+              Parameters:
+                - ParameterName: MetadataExtractionQuery
+                  ParameterValue: '{year:(.timestamp|strftime("%Y")),month:(.timestamp|strftime("%m")),day:(.timestamp|strftime("%d")),hour:(.timestamp|strftime("%H"))}'
+                - ParameterName: JsonParsingEngine
+                  ParameterValue: JQ-1.6
+            - Type: AppendDelimiterToRecord
+              Parameters:
+                - ParameterName: Delimiter
+                  ParameterValue: '\n'
+        S3BackupMode: Disabled
+
 Outputs:
   SSFUserPoolId:
     Description: 'user pool id for cognito'
@@ -491,3 +771,12 @@ Outputs:
     Value: !GetAtt SETSigningKMSKey2RSAArn.Arn
     Export:
       Name: SETSigningKMSKey2RSAArn
+  MetricsBucketName:
+    Description: 'The name of the S3 bucket that stores metric records'
+    Value: !Ref MetricsBucket
+  MetricsDeliveryStreamName:
+    Description: 'The name of the Firehose delivery stream for metrics'
+    Value: !Ref MetricsDeliveryStream
+  MetricsGlueTableName:
+    Description: 'The Glue table for querying metric records in Athena'
+    Value: !Ref MetricsGlueTable
