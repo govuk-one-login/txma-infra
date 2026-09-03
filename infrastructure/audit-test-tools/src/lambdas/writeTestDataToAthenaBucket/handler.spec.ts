@@ -17,6 +17,14 @@ vi.mock('./writeTestFileToAthenaOutputBucket.js', () => ({
 vi.mock('./sendQueryCompletedQueueMessage.js', () => ({
   sendQueryCompletedQueueMessage: vi.fn()
 }))
+vi.mock('../../utils/logger.js', () => ({
+  initialiseLogger: vi.fn(),
+  appendZendeskIdToLogger: vi.fn(),
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
+}))
+vi.mock('../../utils/errorCodes.js', () => ({
+  ERROR_CODES: { AT001: 'AT001', AT005: 'AT005' }
+}))
 
 describe('writeTestDataToAthenaBucket handler', () => {
   it('should throw an appropriate error if there is no data in the event', async () => {

@@ -21,6 +21,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.actor != 'dependabot[bot]' }}
     permissions:
       contents: read
+      packages: read
     uses: ./.github/workflows/code-quality-checkov.yaml
     with:
       template_path: infrastructure/dev-tools/template.yaml
@@ -41,10 +42,14 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependancy-path: package-lock.json
+          scope: '@govuk-one-login'
+          registry-url: 'https://npm.pkg.github.com'
 
       - name: Install dependencies
         run: npm ci
         working-directory: .
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
         if: always()
@@ -113,6 +118,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      packages: read
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

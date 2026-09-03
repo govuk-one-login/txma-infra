@@ -29,8 +29,8 @@
     "@eslint/js": "^10.0.1",
     "@smithy/core": "3.33.3",
     "@smithy/smithy-client": "4.15.2",
-    "@typescript-eslint/eslint-plugin": "^8.67.0",
-    "@typescript-eslint/parser": "^8.67.0",
+    "@typescript-eslint/eslint-plugin": "8.68.0",
+    "@typescript-eslint/parser": "8.68.0",
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/eslint-plugin": "1.6.27",
     "esbuild": "0.28.2",
@@ -40,8 +40,8 @@
     "husky": "9.1.7",
     "lint-staged": "17.3.0",
     "prettier": "3.9.6",
-    "typescript": "6.0.3",
-    "typescript-eslint": "^8.67.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.68.0",
     "vitest-when": "^0.10.0"
   },
   "lint-staged": {

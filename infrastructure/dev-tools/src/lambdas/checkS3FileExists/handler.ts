@@ -9,12 +9,22 @@ export const handler = async (
   context: Context
 ) => {
   initialiseLogger(context)
-  logger.info('Received request to check if file exists', { s3FileDetails })
+
+  const startTime = Date.now()
+  logger.info('Handler started', {
+    bucketName: s3FileDetails.bucketName,
+    key: s3FileDetails.key
+  })
+
   const doesFileExist = await s3FileExists(s3FileDetails)
-  logger.info('File existence result', { doesFileExist })
-  return {
+
+  logger.info('Handler completed', {
+    outcome: 'success',
+    duration: Date.now() - startTime,
     fileExists: doesFileExist
-  }
+  })
+
+  return { fileExists: doesFileExist }
 }
 
 const s3FileExists = async (s3FileDetails: S3FileDetails): Promise<boolean> => {

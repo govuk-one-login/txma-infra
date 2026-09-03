@@ -9,6 +9,11 @@ import { mockClient } from 'aws-sdk-client-mock'
 import { mockLambdaContext } from '../../utils/tests/mocks/mockLambdaContext.js'
 import { handler } from './handler.js'
 
+vi.mock('../../utils/logger.js', () => ({
+  initialiseLogger: vi.fn(),
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
+}))
+
 const s3Mock = mockClient(S3Client)
 
 const testBucket = 'myBucket'
