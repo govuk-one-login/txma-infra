@@ -6,24 +6,55 @@ import {
 } from '../../utils/logger.js'
 import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage.js'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket.js'
+import { ERROR_CODES } from '../../utils/errorCodes.js'
 
 export const handler = async (event: SQSEvent, context: Context) => {
   initialiseLogger(context)
 
-  const eventDetails = parseRequestDetails(event)
-  appendZendeskIdToLogger(eventDetails.zendeskId)
-  await writeTestFileToAthenaOutputBucket(
-    eventDetails.athenaQueryId,
-    eventDetails.fileContents
-  )
+  const startTime = Date.now()
+  const correlationId = event.Records[0]?.messageId
+  logger.info('Handler started', {
+    correlationId,
+    recordCount: event.Records.length
+  })
 
-  await sendQueryCompletedQueueMessage(
-    eventDetails.athenaQueryId,
-    eventDetails.zendeskId,
-    eventDetails.recipientEmail ?? 'mytestrecipientemail@example.gov.uk'
-  )
-  logger.info('Successfully sent Query Completed Message to SQS')
-  return eventDetails
+  try {
+    const eventDetails = parseRequestDetails(event)
+    appendZendeskIdToLogger(eventDetails.zendeskId)
+
+    await writeTestFileToAthenaOutputBucket(
+      eventDetails.athenaQueryId,
+      eventDetails.fileContents
+    )
+
+    await sendQueryCompletedQueueMessage(
+      eventDetails.athenaQueryId,
+      eventDetails.zendeskId,
+      eventDetails.recipientEmail ?? 'mytestrecipientemail@example.gov.uk'
+    )
+
+    logger.info('Handler completed', {
+      correlationId,
+      outcome: 'success',
+      duration: Date.now() - startTime
+    })
+
+    return eventDetails
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error))
+    logger.error('Handler failed', {
+      correlationId,
+      outcome: 'failure',
+      duration: Date.now() - startTime,
+      error: {
+        code: ERROR_CODES.AT001,
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      }
+    })
+    throw error
+  }
 }
 
 const parseRequestDetails = (event: SQSEvent) => {
@@ -55,7 +86,15 @@ const tryParseJSON = (jsonString: string) => {
   try {
     return JSON.parse(jsonString)
   } catch (error) {
-    logger.error('Error parsing JSON: ', error as Error)
+    const err = error instanceof Error ? error : new Error(String(error))
+    logger.error('Error parsing JSON body', {
+      error: {
+        code: ERROR_CODES.AT005,
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      }
+    })
     return {}
   }
 }

@@ -17,6 +17,12 @@ vi.mock('../../utils/logger.js', () => ({
   initialiseLogger: vi.fn(),
   logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
 }))
+vi.mock('../../utils/errorCodes.js', () => ({
+  ERROR_CODES: {
+    DT004: 'DT004',
+    DT005: 'DT005'
+  }
+}))
 vi.mock('./dynamoDbGet.js', () => ({
   dynamoDbGet: vi.fn()
 }))

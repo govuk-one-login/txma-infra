@@ -20,18 +20,41 @@ import {
   PutObjectTaggingCommandInput
 } from '@aws-sdk/client-s3'
 import { S3CommandType } from '../../types/s3CommandType.js'
+import { ERROR_CODES } from '../../utils/errorCodes.js'
 
 export const handler = async (
   commandParameters: CommandParameters,
   context: Context
 ) => {
   initialiseLogger(context)
-  const response = await runCommandFromParameters(commandParameters)
-  logger.info('Completed s3 Operation', {
-    commandParameters,
-    response
-  })
-  return response
+
+  const startTime = Date.now()
+  logger.info('Handler started', { commandType: commandParameters.commandType })
+
+  try {
+    const response = await runCommandFromParameters(commandParameters)
+
+    logger.info('Handler completed', {
+      outcome: 'success',
+      duration: Date.now() - startTime,
+      commandType: commandParameters.commandType
+    })
+
+    return response
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error))
+    logger.error('Handler failed', {
+      outcome: 'failure',
+      duration: Date.now() - startTime,
+      error: {
+        code: ERROR_CODES.DT010,
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      }
+    })
+    throw error
+  }
 }
 
 interface CommandParameters {

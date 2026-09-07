@@ -7,7 +7,7 @@ export const writeTestFileToAthenaOutputBucket = (
   fileContents: string
 ): Promise<unknown> => {
   const client = new S3Client(getEnv('AWS_REGION'))
-  logger.info(`Writing test output file to ${athenaQueryId}.csv`)
+  logger.info('Writing test output file to Athena bucket', { athenaQueryId })
   return client.send(
     new PutObjectCommand({
       Key: `ticf-automated-audit-data-queries/${athenaQueryId}.csv`,

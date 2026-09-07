@@ -8,6 +8,13 @@ import { handler } from './handler.js'
 vi.mock('./addMessageToQueue.js', () => ({
   addMessageToQueue: vi.fn()
 }))
+vi.mock('../../utils/logger.js', () => ({
+  initialiseLogger: vi.fn(),
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
+}))
+vi.mock('../../utils/errorCodes.js', () => ({
+  ERROR_CODES: { DT007: 'DT007', DT012: 'DT012' }
+}))
 
 describe('sqs operations handler', () => {
   const validParameters = {
@@ -43,5 +50,13 @@ describe('sqs operations handler', () => {
     await expect(
       handler(undefined as unknown as SqsOperation, mockLambdaContext)
     ).rejects.toThrow('Function called with invalid parameters')
+  })
+
+  it('throws when no message id is returned from SQS', async () => {
+    vi.mocked(addMessageToQueue).mockResolvedValue({ $metadata: {} })
+
+    await expect(handler(validParameters, mockLambdaContext)).rejects.toThrow(
+      'No message id returned'
+    )
   })
 })

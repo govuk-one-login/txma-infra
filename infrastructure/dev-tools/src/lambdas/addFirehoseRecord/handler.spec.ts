@@ -7,6 +7,13 @@ import { putFirehoseRecord } from './putFirehoseRecord.js'
 vi.mock('./putFirehoseRecord.js', () => ({
   putFirehoseRecord: vi.fn()
 }))
+vi.mock('../../utils/logger.js', () => ({
+  initialiseLogger: vi.fn(),
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
+}))
+vi.mock('../../utils/errorCodes.js', () => ({
+  ERROR_CODES: { DT006: 'DT006' }
+}))
 
 describe('add firehose record handler', () => {
   const params = {

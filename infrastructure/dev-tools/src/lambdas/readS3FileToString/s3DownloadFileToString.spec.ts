@@ -6,6 +6,13 @@ import { Readable } from 'stream'
 import { s3DownloadFileToString } from './s3DownloadFileToString.js'
 import { StreamingBlobPayloadOutputTypes } from '@smithy/types'
 
+vi.mock('../../utils/logger.js', () => ({
+  logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }
+}))
+vi.mock('../../utils/errorCodes.js', () => ({
+  ERROR_CODES: { DT003: 'DT003' }
+}))
+
 const s3Mock = mockClient(S3Client)
 const testS3Data = 'some data'
 
