@@ -16,6 +16,15 @@ vi.mock('./emptyS3Bucket.js', () => ({
   emptyS3Bucket: vi.fn()
 }))
 
+vi.mock('../../utils/logger.js', () => ({
+  initialiseLogger: vi.fn(),
+  appendKeyAttributeDataToLogger: vi.fn(),
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }
+}))
+vi.mock('../../utils/errorCodes.js', () => ({
+  ERROR_CODES: { DT001: 'DT001' }
+}))
+
 const mockListS3Buckets = listS3Buckets as MockedFunction<typeof listS3Buckets>
 const mockEmptyS3Bucket = emptyS3Bucket as MockedFunction<typeof emptyS3Bucket>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
