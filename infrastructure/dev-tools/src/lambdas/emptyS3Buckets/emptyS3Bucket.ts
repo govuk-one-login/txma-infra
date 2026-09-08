@@ -48,7 +48,7 @@ const bucketExists = async (
     return true
   } catch (error: unknown) {
     if (isBucketNotFoundError(error)) {
-      logger.info('Bucket not found', { bucketName })
+      logger.warn('Bucket not found', { bucketName })
       return false
     }
 
