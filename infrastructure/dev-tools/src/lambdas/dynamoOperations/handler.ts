@@ -5,6 +5,7 @@ import { dynamoDbDelete } from './dynamoDbDelete.js'
 import { dynamoDbGet } from './dynamoDbGet.js'
 import { dynamoDbPut } from './dynamoDbPut.js'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (
   dynamoDbOperation: DynamoDbOperation,
@@ -13,7 +14,9 @@ export const handler = async (
   initialiseLogger(context)
 
   const startTime = Date.now()
-  logger.info('Handler started', { operation: dynamoDbOperation?.operation })
+  logger.info('Handler started', {
+    operation: sanitise(dynamoDbOperation?.operation)
+  })
 
   if (!dynamoDbOperation) {
     logger.error('Handler failed due to undefined params', {

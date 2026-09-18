@@ -3,12 +3,13 @@ import { SqsOperation } from '../../types/sqsOperation.js'
 import { initialiseLogger, logger } from '../../utils/logger.js'
 import { addMessageToQueue } from './addMessageToQueue.js'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (params: SqsOperation, context: Context) => {
   initialiseLogger(context)
 
   const startTime = Date.now()
-  logger.info('Handler started', { queueUrl: params?.queueUrl })
+  logger.info('Handler started', { queueUrl: sanitise(params?.queueUrl) })
 
   if (!params?.message || !params?.queueUrl) {
     logger.error('Handler failed due to invalid parameters', {
@@ -37,11 +38,11 @@ export const handler = async (params: SqsOperation, context: Context) => {
     throw Error('No message id returned')
   }
 
-  logger.info('Message added to queue', {
+  logger.info('Handler completed', {
     outcome: 'success',
     duration: Date.now() - startTime,
     messageId: addToQueueResponse.MessageId,
-    queueUrl: params.queueUrl
+    queueUrl: sanitise(params.queueUrl)
   })
 
   return addToQueueResponse.MessageId
