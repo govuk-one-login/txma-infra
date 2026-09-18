@@ -21,6 +21,7 @@ import {
 } from '@aws-sdk/client-s3'
 import { S3CommandType } from '../../types/s3CommandType.js'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (
   commandParameters: CommandParameters,
@@ -29,7 +30,9 @@ export const handler = async (
   initialiseLogger(context)
 
   const startTime = Date.now()
-  logger.info('Handler started', { commandType: commandParameters.commandType })
+  logger.info('Handler started', {
+    commandType: sanitise(commandParameters.commandType)
+  })
 
   try {
     const response = await runCommandFromParameters(commandParameters)
@@ -37,7 +40,7 @@ export const handler = async (
     logger.info('Handler completed', {
       outcome: 'success',
       duration: Date.now() - startTime,
-      commandType: commandParameters.commandType
+      commandType: sanitise(commandParameters.commandType)
     })
 
     return response
@@ -113,8 +116,6 @@ const runCommandFromParameters = (commandParameters: CommandParameters) => {
         )
       )
     default:
-      throw Error(
-        `Unknown CommandType provided '${commandParameters.commandType}'`
-      )
+      throw Error('Unknown CommandType provided')
   }
 }

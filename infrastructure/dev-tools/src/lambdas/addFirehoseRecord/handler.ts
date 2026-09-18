@@ -4,6 +4,7 @@ import { jsonToUint8Array } from '../../utils/helpers.js'
 import { initialiseLogger, logger } from '../../utils/logger.js'
 import { putFirehoseRecord } from './putFirehoseRecord.js'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (
   firehosePutParams: FirehosePutOperation,
@@ -14,8 +15,8 @@ export const handler = async (
   const startTime = Date.now()
   const eventId = (firehosePutParams.data as { event_id?: string })?.event_id
   logger.info('Handler started', {
-    firehoseStream: firehosePutParams.firehose,
-    eventId
+    firehoseStream: sanitise(firehosePutParams.firehose),
+    eventId: sanitise(eventId)
   })
 
   try {
@@ -27,7 +28,7 @@ export const handler = async (
     logger.info('Handler completed', {
       outcome: 'success',
       duration: Date.now() - startTime,
-      firehoseStream: firehosePutParams.firehose,
+      firehoseStream: sanitise(firehosePutParams.firehose),
       recordId: putRecordResponse.RecordId
     })
 

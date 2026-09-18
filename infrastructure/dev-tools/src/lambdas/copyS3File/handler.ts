@@ -3,6 +3,7 @@ import { Context } from 'aws-lambda'
 import { initialiseLogger, logger } from '../../utils/logger.js'
 import { s3Client } from '../../sharedServices/s3/s3Client.js'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (
   copyObjectCommandInput: CopyObjectCommandInput,
@@ -12,9 +13,9 @@ export const handler = async (
 
   const startTime = Date.now()
   logger.info('Handler started', {
-    sourceBucket: copyObjectCommandInput.CopySource,
-    destinationBucket: copyObjectCommandInput.Bucket,
-    key: copyObjectCommandInput.Key
+    sourceBucket: sanitise(copyObjectCommandInput.CopySource),
+    destinationBucket: sanitise(copyObjectCommandInput.Bucket),
+    key: sanitise(copyObjectCommandInput.Key)
   })
 
   try {

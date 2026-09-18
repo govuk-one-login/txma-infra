@@ -3,6 +3,7 @@ import { S3FileDetails } from '../../types/s3FileDetails.js'
 import { initialiseLogger, logger } from '../../utils/logger.js'
 import { s3DownloadFileToString } from './s3DownloadFileToString.js'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (
   params: S3FileDetails,
@@ -12,8 +13,8 @@ export const handler = async (
 
   const startTime = Date.now()
   logger.info('Handler started', {
-    bucketName: params?.bucketName,
-    key: params?.key
+    bucketName: sanitise(params?.bucketName),
+    key: sanitise(params?.key)
   })
 
   if (!params?.bucketName || !params?.key) {

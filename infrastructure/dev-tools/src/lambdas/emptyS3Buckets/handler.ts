@@ -8,6 +8,7 @@ import {
   logger
 } from '../../utils/logger.js'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (
   event: CloudFormationCustomResourceEvent,
@@ -15,15 +16,19 @@ export const handler = async (
 ): Promise<void> => {
   initialiseLogger(context)
 
-  const stackId = event.StackId
+  const stackId = sanitise(event.StackId)
   appendKeyAttributeDataToLogger({ stackId })
 
   const startTime = Date.now()
-  logger.info('Handler started', { requestType: event.RequestType })
+  logger.info('Handler started', { requestType: sanitise(event.RequestType) })
 
   try {
     if (event.RequestType !== 'Delete') {
-      logger.info('RequestType is not Delete, skipping bucket empty')
+      logger.info('Handler completed', {
+        outcome: 'success',
+        duration: Date.now() - startTime,
+        reason: 'RequestType is not Delete, skipping bucket empty'
+      })
       return await sendResponse(event, 'SUCCESS')
     }
 
@@ -32,7 +37,11 @@ export const handler = async (
     const s3Buckets = await listS3Buckets(stackId)
 
     if (s3Buckets.length === 0) {
-      logger.info('No S3 buckets found for stack')
+      logger.info('Handler completed', {
+        outcome: 'success',
+        duration: Date.now() - startTime,
+        reason: 'No S3 buckets found for stack'
+      })
       return await sendResponse(event, 'SUCCESS')
     }
 

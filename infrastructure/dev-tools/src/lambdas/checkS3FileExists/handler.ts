@@ -3,6 +3,7 @@ import { Context } from 'aws-lambda'
 import { s3Client } from '../../sharedServices/s3/s3Client.js'
 import { S3FileDetails } from '../../types/s3FileDetails.js'
 import { initialiseLogger, logger } from '../../utils/logger.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (
   s3FileDetails: S3FileDetails,
@@ -12,8 +13,8 @@ export const handler = async (
 
   const startTime = Date.now()
   logger.info('Handler started', {
-    bucketName: s3FileDetails.bucketName,
-    key: s3FileDetails.key
+    bucketName: sanitise(s3FileDetails.bucketName),
+    key: sanitise(s3FileDetails.key)
   })
 
   const doesFileExist = await s3FileExists(s3FileDetails)
