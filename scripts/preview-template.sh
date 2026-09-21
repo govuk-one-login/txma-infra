@@ -36,12 +36,20 @@ aws cloudformation create-change-set \
   --template-body "file://$TEMPLATE_PATH" \
   --change-set-name "$CHANGE_SET_NAME" \
   --parameters $PARAMETERS \
-  --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
+  --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
 
 echo "Waiting for change set to be created..."
-aws cloudformation wait change-set-create-complete \
+if ! aws cloudformation wait change-set-create-complete \
   --stack-name "$STACK_NAME" \
-  --change-set-name "$CHANGE_SET_NAME"
+  --change-set-name "$CHANGE_SET_NAME"; then
+  echo "Change set creation failed. Reason:"
+  aws cloudformation describe-change-set \
+    --stack-name "$STACK_NAME" \
+    --change-set-name "$CHANGE_SET_NAME" \
+    --query 'StatusReason' \
+    --output text
+  exit 1
+fi
 
 echo "Saving output to $OUTPUT_FILE"
 aws cloudformation describe-change-set \
