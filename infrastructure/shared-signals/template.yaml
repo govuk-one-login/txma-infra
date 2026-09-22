@@ -20,6 +20,10 @@ Parameters:
     Description: The ARN of the permissions boundary to apply to any role created by the template
     Type: String
     Default: none
+  FeatureTestImageOrganizationIds:
+    Description: Comma-separated AWS Organization IDs permitted to pull the dev feature branch test image
+    Type: CommaDelimitedList
+    Default: 'o-pjzf8d99ys,o-dpp53lco28'
 
 Conditions:
   IsDev: !Equals [!Ref Environment, dev]
@@ -748,7 +752,460 @@ Resources:
                   ParameterValue: '\n'
         S3BackupMode: Disabled
 
+  #########################################
+  # Feature branch integration test runner
+  #########################################
+
+  FeatureBranchIntegrationTestImageRepository:
+    Type: AWS::ECR::Repository
+    Condition: IsDev
+    # Temporary infrastructure: delete alongside the runner when ephemeral tests/dev pipeline land.
+    #checkov:skip=CKV_AWS_136:Feature test images are non-sensitive and AWS-managed encryption is sufficient
+    Properties:
+      RepositoryName: !Sub ${AWS::StackName}-feature-branch-integration-tests
+      ImageTagMutability: IMMUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      EncryptionConfiguration:
+        EncryptionType: KMS
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Expire temporary feature test images after 14 days",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "sinceImagePushed",
+                  "countUnit": "days",
+                  "countNumber": 14
+                },
+                "action": { "type": "expire" }
+              }
+            ]
+          }
+      RepositoryPolicyText:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowOrganisationPull
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:BatchGetImage
+              - ecr:GetDownloadUrlForLayer
+            Condition:
+              StringEquals:
+                aws:PrincipalOrgID: !Ref FeatureTestImageOrganizationIds
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-feature-branch-integration-tests
+
+  FeatureBranchIntegrationTestSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: IsDev
+    Properties:
+      GroupDescription: Allow the feature branch test runner to call HTTPS endpoints
+      SecurityGroupEgress:
+        # Egress is scoped to in-VPC destinations only:
+        #  - the shared interface-endpoint SG covers ECR API/DKR, Logs, KMS, STS/SSM,
+        #    Secrets Manager, execute-api, Firehose, etc. (reached via private DNS
+        #    resolving to the VPC interface endpoint ENIs).
+        #  - the S3 gateway prefix list covers ECR image-layer downloads from S3.
+        - DestinationSecurityGroupId: !ImportValue vpc-AWSServicesEndpointSecurityGroupId
+          Description: Allow HTTPS to the VPC interface endpoints (ECR API/DKR, Logs, KMS, STS/SSM, Secrets Manager, execute-api, Firehose)
+          FromPort: 443
+          IpProtocol: tcp
+          ToPort: 443
+        - DestinationPrefixListId: pl-7ca54015 # eu-west-2 S3 gateway endpoint prefix list (com.amazonaws.eu-west-2.s3)
+          Description: Allow HTTPS to S3 via the gateway endpoint (ECR image layer download)
+          FromPort: 443
+          IpProtocol: tcp
+          ToPort: 443
+      VpcId: !ImportValue vpc-VpcId
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-feature-branch-integration-tests
+
+  FeatureBranchIntegrationTestLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: IsDev
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub /aws/codebuild/${AWS::StackName}-feature-branch-integration-tests
+      RetentionInDays: 30
+
+  FeatureBranchIntegrationTestReportGroup:
+    Type: AWS::CodeBuild::ReportGroup
+    Condition: IsDev
+    Properties:
+      DeleteReports: true
+      ExportConfig:
+        ExportConfigType: NO_EXPORT
+      Name: !Sub ${AWS::StackName}-feature-branch-integration-tests
+      Type: TEST
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-feature-branch-integration-tests
+
+  FeatureBranchIntegrationTestExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: IsDev
+    #checkov:skip=CKV_AWS_111:EC2 describe and ENI lifecycle actions do not support useful resource-level restrictions
+    #checkov:skip=CKV_AWS_356:ListUserPools and ECR authorization token actions require Resource '*'
+    Properties:
+      Description: Runtime permissions for the VPC-attached feature branch CodeBuild project
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: WriteBuildLogs
+            Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource:
+              - !GetAtt FeatureBranchIntegrationTestLogGroup.Arn
+              - !Sub ${FeatureBranchIntegrationTestLogGroup.Arn}:*
+          - Sid: PublishTestReports
+            Effect: Allow
+            Action:
+              - codebuild:BatchPutTestCases
+              - codebuild:CreateReport
+              - codebuild:UpdateReport
+            Resource: !GetAtt FeatureBranchIntegrationTestReportGroup.Arn
+          - Sid: PullSharedSignalsTestImages
+            Effect: Allow
+            Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:BatchGetImage
+              - ecr:GetDownloadUrlForLayer
+            Resource: !GetAtt FeatureBranchIntegrationTestImageRepository.Arn
+          - Sid: GetEcrAuthorizationToken
+            Effect: Allow
+            Action: ecr:GetAuthorizationToken
+            Resource: '*'
+          - Sid: ManageCodeBuildNetworkInterfaces
+            Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterface
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeDhcpOptions
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
+            Resource: '*'
+          - Sid: AuthorizeCodeBuildNetworkInterfaces
+            Effect: Allow
+            Action: ec2:CreateNetworkInterfacePermission
+            Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+            Condition:
+              StringEquals:
+                ec2:AuthorizedService: codebuild.amazonaws.com
+              ArnEquals:
+                ec2:Subnet:
+                  - !Sub
+                    - arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${SubnetId}
+                    - SubnetId: !ImportValue vpc-ProtectedSubnetIdA
+                  - !Sub
+                    - arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${SubnetId}
+                    - SubnetId: !ImportValue vpc-ProtectedSubnetIdB
+
+  FeatureBranchIntegrationTestPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: IsDev
+    # Stack names are supplied per execution, so read-only discovery cannot be scoped to one static stack ARN.
+    #checkov:skip=CKV_AWS_111:Read/list APIs and runtime-selected test resources require wildcard resources; mutations use constrained ARNs
+    #checkov:skip=CKV_AWS_356:List/read APIs without resource-level authorization require Resource '*'
+    Properties:
+      Description: Least-privilege application and setup access for feature branch integration tests
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DescribeFeatureAndDynamicStacks
+            Effect: Allow
+            Action: cloudformation:DescribeStacks
+            Resource: !Sub arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*/*
+          - Sid: UpdateDynamicRpUserStacks
+            Effect: Allow
+            Action: cloudformation:UpdateStack
+            Resource: !Sub arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/txma-dynamic-sqs-set-push-*/*
+          - Sid: ReadTestParameters
+            Effect: Allow
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+            Resource:
+              - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/tests/*
+              - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/SecretsKmsKeyArn
+          - Sid: WriteStackTestParameters
+            Effect: Allow
+            Action: ssm:PutParameter
+            Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/tests/*
+          - Sid: FindTestSecretsAndUserPools
+            Effect: Allow
+            Action:
+              - cognito-idp:ListUserPools
+              - secretsmanager:ListSecrets
+            Resource: '*'
+          - Sid: CreateIntegrationTestCognitoClients
+            Effect: Allow
+            Action: cognito-idp:CreateUserPoolClient
+            Resource: !GetAtt SSFUserPool.Arn
+          - Sid: ReadAndUpdateRpUserSecrets
+            Effect: Allow
+            Action:
+              - secretsmanager:CancelRotateSecret
+              - secretsmanager:GetSecretValue
+              - secretsmanager:RotateSecret
+              - secretsmanager:TagResource
+              - secretsmanager:UntagResource
+              - secretsmanager:UpdateSecret
+            Resource: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:txma-dynamic-sqs-set-push-*
+          - Sid: UseSecretsKmsKey
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:GenerateDataKey
+            Resource: '{{resolve:ssm:SecretsKmsKeyArn}}'
+          - Sid: ConfigureSharedUserData
+            Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:Query
+              - dynamodb:UpdateItem
+            Resource:
+              - !GetAtt UserConfigTable.Arn
+              - !Sub ${UserConfigTable.Arn}/index/*
+          - Sid: ReadMockReceiverTestData
+            Effect: Allow
+            Action:
+              - dynamodb:DeleteItem
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:Query
+              - dynamodb:UpdateItem
+            Resource:
+              - !GetAtt MockReceiverSETTable.Arn
+              - !Sub ${MockReceiverSETTable.Arn}/index/*
+          - Sid: InvokeFeatureApis
+            Effect: Allow
+            Action: execute-api:Invoke
+            Resource: !Sub arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:*
+          - Sid: UseFeatureTestQueues
+            Effect: Allow
+            Action:
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+              - sqs:PurgeQueue
+              - sqs:ReceiveMessage
+              - sqs:SendMessage
+            Resource: !Sub arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:*
+          - Sid: InvokeFeatureTestFunctions
+            Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+              - lambda:ListAliases
+              - lambda:ListEventSourceMappings
+            Resource: '*'
+          - Sid: SignTestSets
+            Effect: Allow
+            Action:
+              - kms:GetPublicKey
+              - kms:Sign
+              - kms:Verify
+            Resource:
+              - !GetAtt SETSigningKMSKey2.Arn
+              - !GetAtt SETSigningKMSKey2RSAArn.Arn
+          - Sid: ReadFeatureLogs
+            Effect: Allow
+            Action:
+              - logs:DescribeLogStreams
+              - logs:FilterLogEvents
+              - logs:GetLogEvents
+            Resource:
+              - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+          - Sid: RepairDynamicStackEventMappings
+            Effect: Allow
+            Action:
+              - lambda:CreateEventSourceMapping
+              - lambda:DeleteEventSourceMapping
+              - lambda:GetEventSourceMapping
+              - lambda:UpdateEventSourceMapping
+            Resource: '*'
+          - Sid: MaintainDynamicStackQueues
+            Effect: Allow
+            Action:
+              - sqs:CreateQueue
+              - sqs:DeleteQueue
+              - sqs:SetQueueAttributes
+              - sqs:TagQueue
+              - sqs:UntagQueue
+            Resource: !Sub arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:txma-dynamic-sqs-set-push-*
+          - Sid: MaintainDynamicStackSecrets
+            Effect: Allow
+            Action:
+              - secretsmanager:CreateSecret
+              - secretsmanager:DeleteSecret
+              - secretsmanager:PutResourcePolicy
+              - secretsmanager:RemoveRegionsFromReplication
+              - secretsmanager:ReplicateSecretToRegions
+            Resource: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:txma-dynamic-sqs-set-push-*
+          - Sid: MaintainDynamicStackAlarms
+            Effect: Allow
+            Action:
+              - cloudwatch:DeleteAlarms
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:PutMetricAlarm
+              - cloudwatch:TagResource
+              - cloudwatch:UntagResource
+            Resource: !Sub arn:${AWS::Partition}:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:txma-dynamic-sqs-set-push-*
+          - Sid: MaintainDynamicStackRoles
+            Effect: Allow
+            Action:
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:DeleteRolePolicy
+              - iam:GetRole
+              - iam:GetRolePolicy
+              - iam:PassRole
+              - iam:PutRolePolicy
+              - iam:TagRole
+              - iam:UntagRole
+              - iam:UpdateAssumeRolePolicy
+            Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/txma-dynamic-sqs-set-push-*
+
+  FeatureBranchIntegrationTestRole:
+    Type: AWS::IAM::Role
+    Condition: IsDev
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCodeBuildToAssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Description: Runs Shared Signals feature branch integration tests inside the dev VPC
+      ManagedPolicyArns:
+        - !Ref FeatureBranchIntegrationTestExecutionPolicy
+        - !Ref FeatureBranchIntegrationTestPolicy
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-feature-branch-integration-tests
+
+  FeatureBranchIntegrationTestProject:
+    Type: AWS::CodeBuild::Project
+    Condition: IsDev
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      ConcurrentBuildLimit: 2
+      Description: Runs integration tests for feature stacks from inside the Shared Signals dev VPC
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: AUTO_PROVISION_RP_USERS
+            Type: PLAINTEXT
+            Value: 'true'
+          - Name: REPORT_GROUP_ARN
+            Type: PLAINTEXT
+            Value: !GetAtt FeatureBranchIntegrationTestReportGroup.Arn
+          - Name: TEST_ENVIRONMENT
+            Type: PLAINTEXT
+            Value: dev
+          - Name: TEST_SUITE
+            Type: PLAINTEXT
+            Value: integration
+        # Every real execution must replace this bootstrap image with the commit image by digest.
+        Image: aws/codebuild/standard:7.0
+        ImagePullCredentialsType: SERVICE_ROLE
+        PrivilegedMode: false
+        Type: LINUX_CONTAINER
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Ref FeatureBranchIntegrationTestLogGroup
+          Status: ENABLED
+          StreamName: feature-branch
+        S3Logs:
+          Status: DISABLED
+      Name: !Sub ${AWS::StackName}-feature-branch-integration-tests
+      QueuedTimeoutInMinutes: 60
+      ServiceRole: !GetAtt FeatureBranchIntegrationTestRole.Arn
+      Source:
+        BuildSpec: |
+          version: 0.2
+
+          phases:
+            pre_build:
+              commands:
+                - mkdir -p /tmp/test-reports
+                - export TEST_REPORT_ABSOLUTE_DIR=/tmp/test-reports
+                - ': "${STACK_NAME:?STACK_NAME must be supplied by the deployment job}"'
+                - ': "${TEST_IMAGE_DIGEST:?TEST_IMAGE_DIGEST must be supplied by the image job}"'
+                - ': "${GIT_COMMIT:?GIT_COMMIT must be supplied by the workflow}"'
+                - test "$TEST_ENVIRONMENT" = dev
+                - test "$TEST_SUITE" = integration
+                - test "$AUTO_PROVISION_RP_USERS" = true
+                - |
+                  case "$CODEBUILD_BUILD_IMAGE" in
+                    *@sha256:*) ;;
+                    *) echo "The CodeBuild image must be overridden with an immutable digest" >&2; exit 1 ;;
+                  esac
+                - |
+                  case "$TEST_IMAGE_DIGEST" in
+                    sha256:*) test "${CODEBUILD_BUILD_IMAGE##*@}" = "$TEST_IMAGE_DIGEST" ;;
+                    *@sha256:*) test "$CODEBUILD_BUILD_IMAGE" = "$TEST_IMAGE_DIGEST" ;;
+                    *) echo "TEST_IMAGE_DIGEST must be a sha256 digest or digest-addressed image URI" >&2; exit 1 ;;
+                  esac
+                - aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].StackStatus' --output text
+            build:
+              commands:
+                - /run-tests.sh
+          reports:
+            $REPORT_GROUP_ARN:
+              base-directory: $TEST_REPORT_ABSOLUTE_DIR
+              files:
+                - junit.xml
+              file-format: JUNITXML
+        Type: NO_SOURCE
+      TimeoutInMinutes: 180
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt FeatureBranchIntegrationTestSecurityGroup.GroupId
+        Subnets:
+          - !ImportValue vpc-ProtectedSubnetIdA
+          - !ImportValue vpc-ProtectedSubnetIdB
+        VpcId: !ImportValue vpc-VpcId
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-feature-branch-integration-tests
+        - Key: Service
+          Value: shared-signals
+
 Outputs:
+  FeatureBranchIntegrationTestImageRepositoryUri:
+    Condition: IsDev
+    Description: URI of the dev-owned ECR repository for temporary feature branch test images
+    Value: !GetAtt FeatureBranchIntegrationTestImageRepository.RepositoryUri
+  FeatureBranchIntegrationTestProjectName:
+    Condition: IsDev
+    Description: Name of the shared in-VPC feature branch integration test project
+    Value: !Ref FeatureBranchIntegrationTestProject
+  FeatureBranchIntegrationTestProjectArn:
+    Condition: IsDev
+    Description: ARN of the shared in-VPC feature branch integration test project
+    Value: !GetAtt FeatureBranchIntegrationTestProject.Arn
   SSFUserPoolId:
     Description: 'user pool id for cognito'
     Value: !Ref SSFUserPool
