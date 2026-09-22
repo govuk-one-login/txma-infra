@@ -7,12 +7,13 @@ import {
 import { sendQueryCompletedQueueMessage } from './sendQueryCompletedQueueMessage.js'
 import { writeTestFileToAthenaOutputBucket } from './writeTestFileToAthenaOutputBucket.js'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (event: SQSEvent, context: Context) => {
   initialiseLogger(context)
 
   const startTime = Date.now()
-  const correlationId = event.Records[0]?.messageId
+  const correlationId = sanitise(event.Records[0]?.messageId)
   logger.info('Handler started', {
     correlationId,
     recordCount: event.Records.length
@@ -20,7 +21,7 @@ export const handler = async (event: SQSEvent, context: Context) => {
 
   try {
     const eventDetails = parseRequestDetails(event)
-    appendZendeskIdToLogger(eventDetails.zendeskId)
+    appendZendeskIdToLogger(sanitise(eventDetails.zendeskId))
 
     await writeTestFileToAthenaOutputBucket(
       eventDetails.athenaQueryId,

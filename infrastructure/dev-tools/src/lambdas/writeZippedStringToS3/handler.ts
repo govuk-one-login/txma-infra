@@ -5,6 +5,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { PutZippedStringParameters } from '../../types/putZippedStringParameters.js'
 import { gzipSync } from 'zlib'
 import { ERROR_CODES } from '../../utils/errorCodes.js'
+import { sanitise } from '../../utils/sanitise.js'
 
 export const handler = async (
   parameters: PutZippedStringParameters,
@@ -14,8 +15,8 @@ export const handler = async (
 
   const startTime = Date.now()
   logger.info('Handler started', {
-    bucket: parameters.bucket,
-    key: parameters.key
+    bucket: sanitise(parameters.bucket),
+    key: sanitise(parameters.key)
   })
 
   try {
@@ -32,8 +33,8 @@ export const handler = async (
     logger.info('Handler completed', {
       outcome: 'success',
       duration: Date.now() - startTime,
-      bucket: parameters.bucket,
-      key: parameters.key,
+      bucket: sanitise(parameters.bucket),
+      key: sanitise(parameters.key),
       versionId: response.VersionId
     })
 
