@@ -7,6 +7,7 @@ Tooling to aid developers. This currently consists of
 
 These are not deployed to integration or production.
 
+## Requirements
 
+Needs core to be deployed. Requires ssm parameters `DatabaseKmsKeyArn` `FirehoseKmsKeyArn` `LambdaKmsKeyArn` `S3LogsBucketName`
 
-TODO: Test change
