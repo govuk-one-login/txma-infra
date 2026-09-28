@@ -628,6 +628,8 @@ Resources:
               Type: string
             - Name: signal_name
               Type: string
+            - Name: signal_type
+              Type: string
             - Name: rp_user_client_id
               Type: string
             - Name: friendly_name
