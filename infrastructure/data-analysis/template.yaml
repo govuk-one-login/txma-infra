@@ -202,6 +202,7 @@ Resources:
               Service: lambda.amazonaws.com
             Action:
               - kms:Decrypt
+              - kms:GenerateDataKey*
             Resource: '*'
 
   AthenaQueryOutputBucketKmsKeyAlias:

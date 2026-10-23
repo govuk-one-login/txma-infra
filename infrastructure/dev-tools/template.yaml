@@ -866,6 +866,21 @@ Resources:
                   - !Sub 'arn:aws:s3:::*/*'
                 Effect: Allow
                 Sid: IntegrationTestS3Access
+              - Action:
+                  - ecs:RunTask
+                  - ecs:DescribeTasks
+                Resource:
+                  - !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/*'
+                  - !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task/*'
+                  - !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/*'
+                Effect: Allow
+                Sid: EcsRunTask
+              - Action:
+                  - iam:PassRole
+                Resource:
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+                Effect: Allow
+                Sid: IamPassRole
       PermissionsBoundary: !If
         - UsePermissionsBoundary
         - !Ref PermissionsBoundary
