@@ -34,8 +34,6 @@ Mappings:
 
 Globals:
   Function:
-    CodeSigningConfigArn:
-      !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
     CodeUri: dist/
     Environment:
       Variables:
@@ -100,6 +98,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: writeTestDataToAthenaBucket.handler
       Role: !GetAtt WriteTestDataToAthenaBucketFunctionRole.Arn
       Environment:
