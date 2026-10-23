@@ -35,8 +35,6 @@ Mappings:
 
 Globals:
   Function:
-    CodeSigningConfigArn:
-      !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
     CodeUri: dist/
     Environment:
       Variables:
@@ -101,6 +99,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: addFirehoseRecord.handler
       FunctionName: !Sub ${AWS::StackName}-add-firehose-record
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
@@ -140,6 +140,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: readS3FileToString.handler
       FunctionName: !Sub ${AWS::StackName}-read-s3-file
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
@@ -166,6 +168,8 @@ Resources:
     Condition: FeatureBranches
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: emptyS3Buckets.handler
       FunctionName: !Sub ${AWS::StackName}-empty-s3-buckets
       Description: 'Used by feature branches so empty s3 buckets so a feature stack can be deleted'
@@ -208,6 +212,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: dynamoOperations.handler
       FunctionName: !Sub ${AWS::StackName}-dynamo-operations
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
@@ -240,6 +246,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: sqsOperations.handler
       FunctionName: !Sub ${AWS::StackName}-sqs-operations
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
@@ -274,6 +282,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: copyS3File.handler
       FunctionName: !Sub ${AWS::StackName}-copy-s3-file
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
@@ -341,6 +351,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: S3Operations.handler
       FunctionName: !Sub ${AWS::StackName}-s3-operations
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
@@ -410,6 +422,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: writeZippedStringToS3.handler
       FunctionName: !Sub ${AWS::StackName}-write-zipped-string
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
@@ -479,6 +493,8 @@ Resources:
     #checkov:skip=CKV_AWS_117:VPC not required
     Type: AWS::Serverless::Function
     Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
       Handler: checkS3FileExists.handler
       FunctionName: !Sub ${AWS::StackName}-check-s3-file-exists
       KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
