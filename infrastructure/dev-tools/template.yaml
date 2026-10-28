@@ -550,6 +550,103 @@ Resources:
   # CheckS3FileExistsFunction END   #
   ###################################
 
+  ###################################
+  # RunAthenaQueryFunction START #
+  ###################################
+
+  RunAthenaQueryFunction:
+    #checkov:skip=CKV_AWS_115:Defined in Globals
+    #checkov:skip=CKV_AWS_116:DLQ not required
+    #checkov:skip=CKV_AWS_117:VPC not required
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeSigningConfigArn:
+        !If [UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue]
+      Handler: runAthenaQuery.handler
+      FunctionName: !Sub ${AWS::StackName}-run-athena-query
+      KmsKeyArn: '{{resolve:ssm:LambdaKmsKeyArn}}'
+      MemorySize: 512
+      Role: !GetAtt RunAthenaQueryRole.Arn
+
+  RunAthenaQueryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-run-athena-query-role'
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaToAssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Ref RunAthenaQueryPolicy
+
+  RunAthenaQueryPolicy:
+    #checkov:skip=CKV_AWS_108: this function is only used in test environments, where
+    # we need to be able to check if files exists or not
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${AWS::StackName}-run-athena-query-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: RunDeliveredSignalAthenaQueries
+            Effect: Allow
+            Action:
+              - athena:StartQueryExecution
+              - athena:GetQueryExecution
+              - athena:GetQueryResults
+            Resource: !Sub arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/*
+
+          - Sid: AthenaResultsBucketAccess
+            Effect: Allow
+            Action:
+              - s3:GetBucketLocation
+              - s3:ListBucket
+              - s3:GetObject
+              - s3:PutObject
+            Resource:
+              - !Sub arn:${AWS::Partition}:s3:::*-athena-results
+              - !Sub arn:${AWS::Partition}:s3:::*-athena-results/*
+
+          - Sid: AthenaGlueCatalogAccess
+            Effect: Allow
+            Action:
+              - glue:GetDatabase
+              - glue:GetDatabases
+              - glue:GetTable
+              - glue:GetTables
+              - glue:GetPartition
+              - glue:GetPartitions
+            Resource: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:*
+
+          - Sid: AthenaSourceDataBucketRead
+            Effect: Allow
+            Action:
+              - s3:GetBucketLocation
+              - s3:ListBucket
+              - s3:GetObject
+            Resource: !Sub arn:${AWS::Partition}:s3:::*
+
+  RunAthenaQueryLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      KmsKeyId: '{{resolve:ssm:LogsKmsKeyArn}}'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-run-athena-query'
+      RetentionInDays: 30
+
+  ###################################
+  # RunAthenaQueryFunction END   #
+  ###################################
+
   IntegrationTestDataBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -635,6 +732,13 @@ Resources:
       Name: /tests/CheckS3FileExistsFunctionName
       Type: String
       Value: !Ref CheckS3FileExistsFunction
+
+  RunAthenaQueryFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /tests/RunAthenaQueryFunctionName
+      Type: String
+      Value: !Ref RunAthenaQueryFunction
 
   S3OperationsFunctionNameParameter:
     Type: AWS::SSM::Parameter
