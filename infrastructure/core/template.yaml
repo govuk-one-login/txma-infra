@@ -247,6 +247,23 @@ Resources:
               - kms:Decrypt
               - kms:GenerateDataKey
             Resource: '*'
+          # Allow the build pipeline test role to decrypt messages when polling
+          # S3-notification SQS queues encrypted with this key (e.g. the Cribl
+          # source queues, DPT-3233). Test environment (build) only, mirroring
+          # the SecretsKmsKey test-role grant below.
+          - !If
+            - TestEnvironment
+            - Sid: Allow Codepipeline test role to decrypt queue notifications
+              Effect: Allow
+              Principal:
+                AWS: '*'
+              Action:
+                - kms:Decrypt
+              Resource: '*'
+              Condition:
+                ArnLike:
+                  aws:PrincipalArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*pipeline-TestRole*'
+            - !Ref AWS::NoValue
 
   S3QueueNotificationsKmsKeyAlias:
     Type: AWS::KMS::Alias
