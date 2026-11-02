@@ -918,6 +918,11 @@ Resources:
                   - sqs:SendMessage
                   - sqs:PurgeQueue
                   - sqs:ReceiveMessage
+                  # DPT-3233: the Cribl source-queue integration tests delete
+                  # messages they consume while polling, and read DLQ attributes
+                  # (MessageRetentionPeriod) to assert 14-day retention.
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
                 Resource:
                   - !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:*'
                 Effect: Allow
