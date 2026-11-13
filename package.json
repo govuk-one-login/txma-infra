@@ -52,6 +52,7 @@
     "node": "^24.0.0"
   },
   "overrides": {
-    "fast-xml-parser": "5.5.6"
+    "fast-xml-parser": "5.5.6",
+    "minimatch": "11.0.8"
   }
 }
